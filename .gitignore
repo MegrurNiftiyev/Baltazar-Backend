@@ -6,8 +6,12 @@ node_modules/
 .env
 .env.local
 .env.*.local
+.env.development
+.env.staging
+.env.production
 serviceAccountKey.json
 *.pem
+implemetation.plan.md
 
 # Logs
 logs

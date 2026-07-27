@@ -1,0 +1,152 @@
+import { db } from '../../config/firebase.js';
+import { AppError } from '../../errors/AppError.js';
+import { COLLECTIONS } from '../../config/collections.js';
+import type {
+  CarsQuery,
+  CreateCompanyInput,
+  UpdateCompanyInput,
+  CreateCarInput,
+  UpdateCarInput,
+} from './rentacar.schema.js';
+
+const companiesCollection = db.collection(COLLECTIONS.COMPANIES);
+const carsCollection = db.collection(COLLECTIONS.CARS);
+
+// ── Companies ──────────────────────────────────────────────────────────
+
+export async function getCompanies() {
+  const snapshot = await companiesCollection
+    .where('serviceType', '==', 'RENT_A_CAR')
+    .where('status', '==', 'ACTIVE')
+    .get();
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+}
+
+export async function getCompanyById(id: string) {
+  const doc = await companiesCollection.doc(id).get();
+  if (!doc.exists) {
+    throw new AppError(404, 'NOT_FOUND');
+  }
+  return { id: doc.id, ...doc.data() };
+}
+
+export async function createCompany(input: CreateCompanyInput) {
+  const docRef = await companiesCollection.add({
+    ...input,
+    serviceType: 'RENT_A_CAR',
+    createdAt: new Date().toISOString(),
+  });
+  return { id: docRef.id, ...input };
+}
+
+export async function updateCompany(id: string, input: UpdateCompanyInput) {
+  const doc = await companiesCollection.doc(id).get();
+  if (!doc.exists) {
+    throw new AppError(404, 'NOT_FOUND');
+  }
+  await companiesCollection.doc(id).update(input);
+  return getCompanyById(id);
+}
+
+export async function deleteCompany(id: string) {
+  const doc = await companiesCollection.doc(id).get();
+  if (!doc.exists) {
+    throw new AppError(404, 'NOT_FOUND');
+  }
+  await companiesCollection.doc(id).delete();
+  return { id, deleted: true };
+}
+
+// ── Cars ───────────────────────────────────────────────────────────────
+
+/**
+ * List cars with filters.
+ * Returns a list DTO: { id, brand, model, price, image, rating }
+ * Full document is only returned by getCarById.
+ */
+export async function getCars(filters: CarsQuery) {
+  let query: FirebaseFirestore.Query = carsCollection;
+
+  // Equality filters (can be combined freely in Firestore)
+  if (filters.companyId) {
+    query = query.where('companyId', '==', filters.companyId);
+  }
+  if (filters.brand) {
+    query = query.where('brand', '==', filters.brand);
+  }
+  if (filters.model) {
+    query = query.where('model', '==', filters.model);
+  }
+  if (filters.category) {
+    query = query.where('category', '==', filters.category);
+  }
+  if (filters.transmission) {
+    query = query.where('transmission', '==', filters.transmission);
+  }
+  if (filters.fuelType) {
+    query = query.where('fuelType', '==', filters.fuelType);
+  }
+
+  // Range filters — only one inequality filter field per Firestore query
+  if (filters.minPrice !== undefined) {
+    query = query.where('price', '>=', filters.minPrice);
+  }
+  if (filters.maxPrice !== undefined) {
+    query = query.where('price', '<=', filters.maxPrice);
+  }
+
+  const snapshot = await query.get();
+
+  // Map to list DTO — only essential fields for listing
+  return snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      brand: data.brand,
+      model: data.model,
+      price: data.price,
+      image: data.images?.[0] || null,
+      rating: data.rating || 0,
+      category: data.category,
+      transmission: data.transmission,
+      fuelType: data.fuelType,
+    };
+  });
+}
+
+/**
+ * Get full car details by ID.
+ */
+export async function getCarById(id: string) {
+  const doc = await carsCollection.doc(id).get();
+  if (!doc.exists) {
+    throw new AppError(404, 'NOT_FOUND');
+  }
+  return { id: doc.id, ...doc.data() };
+}
+
+export async function createCar(input: CreateCarInput) {
+  const docRef = await carsCollection.add({
+    ...input,
+    createdAt: new Date().toISOString(),
+  });
+  return { id: docRef.id, ...input };
+}
+
+export async function updateCar(id: string, input: UpdateCarInput) {
+  const doc = await carsCollection.doc(id).get();
+  if (!doc.exists) {
+    throw new AppError(404, 'NOT_FOUND');
+  }
+  await carsCollection.doc(id).update(input);
+  return getCarById(id);
+}
+
+export async function deleteCar(id: string) {
+  const doc = await carsCollection.doc(id).get();
+  if (!doc.exists) {
+    throw new AppError(404, 'NOT_FOUND');
+  }
+  await carsCollection.doc(id).delete();
+  return { id, deleted: true };
+}

@@ -1,0 +1,17 @@
+export const COLLECTIONS = {
+  USERS: 'users',
+  COMPANIES: 'companies',
+  CARS: 'cars',
+  TRAVELS: 'travels',
+  INCLUDED_SERVICES: 'includedServices',
+  HOTELS: 'hotels',
+  ROOMS: 'rooms',
+  FOOD_ITEMS: 'foodItems',
+  FLOW_BOXES: 'flowBoxes',
+  FLOW_SCREEN_CONFIGS: 'flowScreenConfigs',
+  PAYMENT_METHODS: 'paymentMethods',
+  TRANSACTIONS: 'transactions',
+  REVIEWS: 'reviews',
+  SERVICES: 'services',
+  EXCHANGE_RATES: 'exchangeRates',
+} as const;

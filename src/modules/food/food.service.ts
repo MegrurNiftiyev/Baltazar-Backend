@@ -1,0 +1,136 @@
+import { db } from '../../config/firebase.js';
+import { AppError } from '../../errors/AppError.js';
+import { COLLECTIONS } from '../../config/collections.js';
+import type {
+  FoodItemsQuery,
+  CreateFoodCompanyInput,
+  UpdateFoodCompanyInput,
+  CreateFoodItemInput,
+  UpdateFoodItemInput,
+} from './food.schema.js';
+
+const companiesCollection = db.collection(COLLECTIONS.COMPANIES);
+const foodItemsCollection = db.collection(COLLECTIONS.FOOD_ITEMS);
+
+// ── Companies ──────────────────────────────────────────────────────────
+
+export async function getCompanies() {
+  const snapshot = await companiesCollection
+    .where('serviceType', '==', 'FOOD')
+    .where('status', '==', 'ACTIVE')
+    .get();
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+}
+
+export async function getCompanyById(id: string) {
+  const doc = await companiesCollection.doc(id).get();
+  if (!doc.exists) {
+    throw new AppError(404, 'NOT_FOUND');
+  }
+  return { id: doc.id, ...doc.data() };
+}
+
+export async function createCompany(input: CreateFoodCompanyInput) {
+  const docRef = await companiesCollection.add({
+    ...input,
+    serviceType: 'FOOD',
+    createdAt: new Date().toISOString(),
+  });
+  return { id: docRef.id, ...input };
+}
+
+export async function updateCompany(id: string, input: UpdateFoodCompanyInput) {
+  const doc = await companiesCollection.doc(id).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  await companiesCollection.doc(id).update(input);
+  return getCompanyById(id);
+}
+
+export async function deleteCompany(id: string) {
+  const doc = await companiesCollection.doc(id).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  await companiesCollection.doc(id).delete();
+  return { id, deleted: true };
+}
+
+// ── Food Items ─────────────────────────────────────────────────────────
+
+export async function getFoodItems(filters: FoodItemsQuery) {
+  let query: FirebaseFirestore.Query = foodItemsCollection.where('isAvailable', '==', true);
+
+  if (filters.companyId) {
+    query = query.where('companyId', '==', filters.companyId);
+  }
+  if (filters.category) {
+    query = query.where('category', '==', filters.category);
+  }
+
+  const snapshot = await query.get();
+  let results = snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      companyId: data.companyId,
+      name: data.name,
+      category: data.category,
+      price: data.price,
+      image: data.images?.[0] || null,
+    };
+  });
+
+  // Post-fetch filters
+  if (filters.minPrice !== undefined) {
+    results = results.filter((f) => f.price >= filters.minPrice!);
+  }
+  if (filters.maxPrice !== undefined) {
+    results = results.filter((f) => f.price <= filters.maxPrice!);
+  }
+  if (filters.name) {
+    const searchTerm = filters.name.toLowerCase();
+    results = results.filter((f) => {
+      const name = f.name as Record<string, string>;
+      return (
+        name?.az?.toLowerCase().includes(searchTerm) ||
+        name?.en?.toLowerCase().includes(searchTerm) ||
+        name?.ru?.toLowerCase().includes(searchTerm)
+      );
+    });
+  }
+
+  return results;
+}
+
+export async function getFoodItemById(id: string) {
+  const doc = await foodItemsCollection.doc(id).get();
+  if (!doc.exists) {
+    throw new AppError(404, 'NOT_FOUND');
+  }
+  return { id: doc.id, ...doc.data() };
+}
+
+export async function createFoodItem(input: CreateFoodItemInput) {
+  // Verify company exists
+  const companyDoc = await companiesCollection.doc(input.companyId).get();
+  if (!companyDoc.exists) throw new AppError(404, 'NOT_FOUND');
+
+  const docRef = await foodItemsCollection.add({
+    ...input,
+    createdAt: new Date().toISOString(),
+  });
+  return { id: docRef.id, ...input };
+}
+
+export async function updateFoodItem(id: string, input: UpdateFoodItemInput) {
+  const doc = await foodItemsCollection.doc(id).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  await foodItemsCollection.doc(id).update(input);
+  const updated = await foodItemsCollection.doc(id).get();
+  return { id: updated.id, ...updated.data() };
+}
+
+export async function deleteFoodItem(id: string) {
+  const doc = await foodItemsCollection.doc(id).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  await foodItemsCollection.doc(id).delete();
+  return { id, deleted: true };
+}
