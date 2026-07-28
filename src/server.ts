@@ -1,7 +1,7 @@
 import 'dotenv-flow/config';
-import { env } from './src/config/env.js';
-import { app } from './src/app.js';
-import { logger } from './src/config/logger.js';
+import { env } from './config/env.js';
+import { app } from './app.js';
+import { logger } from './config/logger.js';
 
 const server = app.listen(env.PORT, () => {
   logger.info({ port: env.PORT, env: env.NODE_ENV }, `Baltazar API server running`);
