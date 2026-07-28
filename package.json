@@ -6,9 +6,9 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch app.ts",
+    "dev": "tsx watch server.ts",
     "build": "tsc",
-    "start": "node dist/app.js",
+    "start": "node dist/server.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
