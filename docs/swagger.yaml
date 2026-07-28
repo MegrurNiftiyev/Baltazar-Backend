@@ -1,5 +1,5 @@
 # ──────────────────────────────────────────────────────────────────────────
-# Demli API — OpenAPI 3.0 Specification (Static Reference)
+# Baltazar API — OpenAPI 3.0 Specification (Static Reference)
 #
 # NOTE: The canonical spec is auto-generated at runtime by swagger-jsdoc
 # from @swagger JSDoc annotations in each *.routes.ts file.
@@ -13,7 +13,7 @@
 
 openapi: "3.0.0"
 info:
-  title: Demli API
+  title: Baltazar API
   version: 1.0.0
   description: >
     Multi-domain consumer API — rent-a-car, travel, hotel, food,

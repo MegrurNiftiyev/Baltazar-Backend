@@ -4,7 +4,7 @@ import { app } from './src/app.js';
 import { logger } from './src/config/logger.js';
 
 const server = app.listen(env.PORT, () => {
-  logger.info({ port: env.PORT, env: env.NODE_ENV }, `Demli API server running`);
+  logger.info({ port: env.PORT, env: env.NODE_ENV }, `Baltazar API server running`);
   logger.info(`Swagger docs: http://localhost:${env.PORT}/api-docs`);
 });
 

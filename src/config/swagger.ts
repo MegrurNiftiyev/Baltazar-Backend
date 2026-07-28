@@ -4,7 +4,7 @@ const options: swaggerJSDoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Demli API',
+      title: 'Baltazar API',
       version: '1.0.0',
       description:
         'Multi-domain consumer API — rent-a-car, travel, hotel, food, booking flow, payments',

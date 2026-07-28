@@ -1,7 +1,7 @@
 {
-  "name": "demli-backend",
+  "name": "baltazar-backend",
   "version": "1.0.0",
-  "description": "Demli — multi-domain consumer backend (rent-a-car, travel, hotel, food)",
+  "description": "Baltazar — multi-domain consumer backend (rent-a-car, travel, hotel, food)",
   "main": "dist/server.js",
   "license": "MIT",
   "type": "module",

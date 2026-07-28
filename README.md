@@ -1,6 +1,6 @@
-# Demli Backend
+# Baltazar Backend
 
-Production-grade TypeScript + Express backend for the Demli multi-service platform — rent-a-car, travel, hotel, food ordering, multi-step booking (FlowBox), payments, reviews, and wishlists.
+Production-grade TypeScript + Express backend for the Baltazar multi-service platform — rent-a-car, travel, hotel, food ordering, multi-step booking (FlowBox), payments, reviews, and wishlists.
 
 ## 🏗️ Architecture
 
