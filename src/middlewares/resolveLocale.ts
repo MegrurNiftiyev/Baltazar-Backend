@@ -19,6 +19,16 @@ export const resolveLocale = (
   _res: Response,
   next: NextFunction,
 ): void => {
+  const queryLang = req.query.lang;
+  if (
+    typeof queryLang === 'string' &&
+    SUPPORTED_LANGUAGES.includes(queryLang.toLowerCase() as SupportedLang)
+  ) {
+    req.lang = queryLang.toLowerCase() as SupportedLang;
+    next();
+    return;
+  }
+
   const acceptLang = req.headers['accept-language'];
 
   if (acceptLang) {

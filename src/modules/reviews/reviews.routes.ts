@@ -1,10 +1,13 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { validate } from '../../middlewares/validate.js';
-import { createReviewSchema, reviewQuerySchema } from './reviews.schema.js';
+import { createReviewSchema, reviewQuerySchema, updateReviewSchema } from './reviews.schema.js';
 import {
   getReviewsController,
   createReviewController,
+  getReviewByIdController,
+  updateReviewController,
+  deleteOwnReviewController,
 } from './reviews.controller.js';
 
 const router = Router();
@@ -60,5 +63,9 @@ router.post(
   validate({ body: createReviewSchema }),
   createReviewController,
 );
+
+router.get('/:id', getReviewByIdController);
+router.put('/:id', requireAuth, validate({ body: updateReviewSchema }), updateReviewController);
+router.delete('/:id', requireAuth, deleteOwnReviewController);
 
 export default router;

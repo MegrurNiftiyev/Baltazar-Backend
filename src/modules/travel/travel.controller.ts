@@ -17,12 +17,12 @@ export const getCompanyByIdController = catchAsync(async (req: Request, res: Res
 
 export const createCompanyController = catchAsync(async (req: Request, res: Response) => {
   const company = await travelService.createCompany(req.body);
-  res.status(201).json({ success: true, data: company });
+  res.status(201).json({ success: true, data: localize(company, req.lang!) });
 });
 
 export const updateCompanyController = catchAsync(async (req: Request, res: Response) => {
   const company = await travelService.updateCompany(req.params.id as string, req.body);
-  res.status(200).json({ success: true, data: company });
+  res.status(200).json({ success: true, data: localize(company, req.lang!) });
 });
 
 export const deleteCompanyController = catchAsync(async (req: Request, res: Response) => {
@@ -44,12 +44,12 @@ export const getTourByIdController = catchAsync(async (req: Request, res: Respon
 
 export const createTourController = catchAsync(async (req: Request, res: Response) => {
   const tour = await travelService.createTour(req.body);
-  res.status(201).json({ success: true, data: tour });
+  res.status(201).json({ success: true, data: localize(tour, req.lang!) });
 });
 
 export const updateTourController = catchAsync(async (req: Request, res: Response) => {
   const tour = await travelService.updateTour(req.params.id as string, req.body);
-  res.status(200).json({ success: true, data: tour });
+  res.status(200).json({ success: true, data: localize(tour, req.lang!) });
 });
 
 export const deleteTourController = catchAsync(async (req: Request, res: Response) => {
@@ -66,5 +66,15 @@ export const getIncludedServicesController = catchAsync(async (req: Request, res
 
 export const createIncludedServiceController = catchAsync(async (req: Request, res: Response) => {
   const service = await travelService.createIncludedService(req.body);
-  res.status(201).json({ success: true, data: service });
+  res.status(201).json({ success: true, data: localize(service, req.lang!) });
+});
+
+export const updateIncludedServiceController = catchAsync(async (req: Request, res: Response) => {
+  const service = await travelService.updateIncludedService(req.params.id as string, req.body);
+  res.status(200).json({ success: true, data: localize(service, req.lang!) });
+});
+
+export const deleteIncludedServiceController = catchAsync(async (req: Request, res: Response) => {
+  const result = await travelService.deleteIncludedService(req.params.id as string);
+  res.status(200).json({ success: true, data: result });
 });

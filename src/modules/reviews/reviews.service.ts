@@ -1,6 +1,6 @@
 import { db } from '../../config/firebase.js';
 import { AppError } from '../../errors/AppError.js';
-import type { CreateReviewInput, ReviewQuery } from './reviews.schema.js';
+import type { CreateReviewInput, ReviewQuery, UpdateReviewInput } from './reviews.schema.js';
 import { COLLECTIONS } from '../../config/collections.js';
 
 const reviewsCollection = db.collection(COLLECTIONS.REVIEWS);
@@ -67,6 +67,30 @@ export async function createReview(userId: string, input: CreateReviewInput) {
     rating: input.rating,
     comment: input.comment,
   };
+}
+
+export async function getReviewById(id: string) {
+  const doc = await reviewsCollection.doc(id).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  return { id: doc.id, ...doc.data() };
+}
+
+async function assertOwner(id: string, userId: string) {
+  const review = await getReviewById(id) as { id: string; userId?: string };
+  if (review.userId !== userId) throw new AppError(403, 'REVIEW_NOT_OWNER');
+  return review;
+}
+
+export async function updateReview(id: string, userId: string, input: UpdateReviewInput) {
+  await assertOwner(id, userId);
+  await reviewsCollection.doc(id).update(input);
+  return getReviewById(id);
+}
+
+export async function deleteOwnReview(id: string, userId: string) {
+  await assertOwner(id, userId);
+  await reviewsCollection.doc(id).delete();
+  return { id, deleted: true };
 }
 
 /**

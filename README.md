@@ -65,6 +65,12 @@ Operational errors use this envelope:
 }
 ```
 
+Localized fields are stored as `{ az, en, ru }` maps but API responses always
+return one resolved string. Authenticated requests use the language stored on
+the user profile. Public requests use a valid `?lang=az|en|ru` query parameter,
+then `Accept-Language`, then English. Error `message` values follow the same
+resolution order; `errorCode` remains stable for client-side handling.
+
 The health endpoint is the only route that does not use the `success/data` envelope.
 
 ---
@@ -1107,6 +1113,36 @@ Required fields: `name`, `serviceType`.
 
 Response data: created included service object.
 
+### `PUT /api/included-services/:id`
+
+Access: admin
+
+Status: `200 OK`
+
+Request body: partial `POST /api/included-services/:serviceType` body.
+
+Rules: `name` remains a full `{ az, en, ru }` map when supplied.
+
+Response data: updated included service object with localized fields resolved
+to one string.
+
+### `DELETE /api/included-services/:id`
+
+Access: admin
+
+Status: `200 OK`
+
+Request body: none
+
+Response data:
+
+```json
+{
+  "id": "included_service_id",
+  "deleted": true
+}
+```
+
 ---
 
 ## FlowBox
@@ -1566,4 +1602,3 @@ The intended compiled entry point is `dist/server.js`.
 - `dist/` is ignored by Git and should be generated during deployment.
 - Runtime response envelopes were checked against the current controllers.
 - Request body and query models were checked against the current Zod schemas.
-

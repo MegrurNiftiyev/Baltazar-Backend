@@ -15,12 +15,12 @@ export const getServiceByIdController = catchAsync(async (req: Request, res: Res
 
 export const createServiceController = catchAsync(async (req: Request, res: Response) => {
   const service = await servicesService.createService(req.body);
-  res.status(201).json({ success: true, data: service });
+  res.status(201).json({ success: true, data: localize(service, req.lang!) });
 });
 
 export const updateServiceController = catchAsync(async (req: Request, res: Response) => {
   const service = await servicesService.updateService(req.params.id as string, req.body);
-  res.status(200).json({ success: true, data: service });
+  res.status(200).json({ success: true, data: localize(service, req.lang!) });
 });
 
 export const deleteServiceController = catchAsync(async (req: Request, res: Response) => {

@@ -10,6 +10,8 @@ import {
   createTourSchema,
   updateTourSchema,
   createIncludedServiceSchema,
+  updateIncludedServiceSchema,
+  includedServiceIdParamsSchema,
 } from './travel.schema.js';
 import {
   getCompaniesController,
@@ -24,6 +26,8 @@ import {
   deleteTourController,
   getIncludedServicesController,
   createIncludedServiceController,
+  updateIncludedServiceController,
+  deleteIncludedServiceController,
 } from './travel.controller.js';
 
 const router = Router();
@@ -194,4 +198,52 @@ includedServicesRouter.post(
   requireRole('ADMIN'),
   validate({ body: createIncludedServiceSchema }),
   createIncludedServiceController,
+);
+
+/**
+ * @swagger
+ * /api/included-services/{id}:
+ *   put:
+ *     tags: [IncludedServices]
+ *     summary: Update an included service (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Included service updated }
+ */
+includedServicesRouter.put(
+  '/:id',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate({ params: includedServiceIdParamsSchema, body: updateIncludedServiceSchema }),
+  updateIncludedServiceController,
+);
+
+/**
+ * @swagger
+ * /api/included-services/{id}:
+ *   delete:
+ *     tags: [IncludedServices]
+ *     summary: Delete an included service (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Included service deleted }
+ */
+includedServicesRouter.delete(
+  '/:id',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate({ params: includedServiceIdParamsSchema }),
+  deleteIncludedServiceController,
 );

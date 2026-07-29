@@ -26,7 +26,7 @@ const messages: Record<string, LocalizedMap> = {
     ru: 'Срок действия токена истёк',
   },
   FORBIDDEN: {
-    az: 'Bu əməliyyatı yerinə yetirmək icazəniz yoxdur',
+    az: 'Bu əməliyyat üçün icazəniz yoxdur',
     en: 'You do not have permission to perform this action',
     ru: 'У вас нет разрешения на выполнение этого действия',
   },
@@ -41,7 +41,7 @@ const messages: Record<string, LocalizedMap> = {
     ru: 'Не найдено',
   },
   USER_EXISTS: {
-    az: 'Bu e-poçt ünvanı ilə istifadəçi artıq mövcuddur',
+    az: 'Bu e-poçtla artıq qeydiyyatdan keçmiş istifadəçi var',
     en: 'A user with this email already exists',
     ru: 'Пользователь с таким email уже существует',
   },
@@ -51,14 +51,19 @@ const messages: Record<string, LocalizedMap> = {
     ru: 'Неверный email или пароль',
   },
   INVALID_REFRESH_TOKEN: {
-    az: 'Yeniləmə tokeni etibarsızdır',
+    az: 'Refresh token etibarsızdır',
     en: 'Invalid refresh token',
     ru: 'Недействительный токен обновления',
   },
   REVIEW_NOT_ELIGIBLE: {
-    az: 'Bu xidmətə rəy yazmaq hüququnuz yoxdur',
+    az: 'Bu xidmətə rəy yaza bilməzsiniz',
     en: 'You are not eligible to review this service',
     ru: 'Вы не имеете права оставить отзыв об этой услуге',
+  },
+  REVIEW_NOT_OWNER: {
+    az: 'Bu rəy sizə aid deyil',
+    en: 'You do not own this review',
+    ru: 'Этот отзыв вам не принадлежит',
   },
   FLOWBOX_EXPIRED: {
     az: 'Sifariş müddəti bitib',
@@ -101,7 +106,7 @@ const messages: Record<string, LocalizedMap> = {
     ru: 'Бронирование уже оплачено',
   },
   PRICE_NOT_COMPUTED: {
-    az: 'Sifarişin qiyməti hesablanmayıb',
+    az: 'Sifarişin qiyməti hələ hesablanmayıb',
     en: 'FlowBox has not completed price calculation',
     ru: 'Расчет стоимости бронирования не завершен',
   },
@@ -121,9 +126,14 @@ const messages: Record<string, LocalizedMap> = {
     ru: 'Уже в списке желаний',
   },
   INVALID_WISHLIST_ID: {
-    az: 'İstək siyahısı ID formatı yanlışdır',
+    az: 'Yanlış ID formatı',
     en: 'Invalid wishlist item ID format',
     ru: 'Неверный формат ID элемента списка желаний',
+  },
+  RATE_LIMIT: {
+    az: 'Həddən çox sorğu göndərildi. Zəhmət olmasa, sonra yenidən cəhd edin',
+    en: 'Too many requests. Please try again later',
+    ru: 'Слишком много запросов. Попробуйте позже',
   },
 };
 
@@ -132,8 +142,8 @@ const messages: Record<string, LocalizedMap> = {
  */
 export function t(code: string, lang: SupportedLang = 'en'): string {
   const entry = messages[code];
-  if (!entry) return code;
-  return entry[lang] || entry.en || code;
+  if (!entry) return messages.INTERNAL_ERROR[lang] || messages.INTERNAL_ERROR.en;
+  return entry[lang] || entry.en || messages.INTERNAL_ERROR.en;
 }
 
 export default messages;

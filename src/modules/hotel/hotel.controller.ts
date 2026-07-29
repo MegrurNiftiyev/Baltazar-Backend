@@ -17,12 +17,12 @@ export const getHotelByIdController = catchAsync(async (req: Request, res: Respo
 
 export const createHotelController = catchAsync(async (req: Request, res: Response) => {
   const hotel = await hotelService.createHotel(req.body);
-  res.status(201).json({ success: true, data: hotel });
+  res.status(201).json({ success: true, data: localize(hotel, req.lang!) });
 });
 
 export const updateHotelController = catchAsync(async (req: Request, res: Response) => {
   const hotel = await hotelService.updateHotel(req.params.id as string, req.body);
-  res.status(200).json({ success: true, data: hotel });
+  res.status(200).json({ success: true, data: localize(hotel, req.lang!) });
 });
 
 export const deleteHotelController = catchAsync(async (req: Request, res: Response) => {
@@ -39,12 +39,12 @@ export const getRoomsController = catchAsync(async (req: Request, res: Response)
 
 export const createRoomController = catchAsync(async (req: Request, res: Response) => {
   const room = await hotelService.createRoom(req.body);
-  res.status(201).json({ success: true, data: room });
+  res.status(201).json({ success: true, data: localize(room, req.lang!) });
 });
 
 export const updateRoomController = catchAsync(async (req: Request, res: Response) => {
   const room = await hotelService.updateRoom(req.params.id as string, req.body);
-  res.status(200).json({ success: true, data: room });
+  res.status(200).json({ success: true, data: localize(room, req.lang!) });
 });
 
 export const deleteRoomController = catchAsync(async (req: Request, res: Response) => {

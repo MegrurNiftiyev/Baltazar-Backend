@@ -68,9 +68,16 @@ export const createIncludedServiceSchema = z.object({
   serviceType: z.enum(['TRAVEL', 'HOTEL']),
 });
 
+export const updateIncludedServiceSchema = createIncludedServiceSchema.partial();
+
+export const includedServiceIdParamsSchema = z.object({
+  id: z.string().min(1),
+});
+
 export type ToursQuery = z.infer<typeof toursQuerySchema>;
 export type CreateTourInput = z.infer<typeof createTourSchema>;
 export type UpdateTourInput = z.infer<typeof updateTourSchema>;
 export type CreateTravelCompanyInput = z.infer<typeof createTravelCompanySchema>;
 export type UpdateTravelCompanyInput = z.infer<typeof updateTravelCompanySchema>;
 export type CreateIncludedServiceInput = z.infer<typeof createIncludedServiceSchema>;
+export type UpdateIncludedServiceInput = z.infer<typeof updateIncludedServiceSchema>;

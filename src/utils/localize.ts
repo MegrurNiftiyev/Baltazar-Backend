@@ -20,8 +20,6 @@ function isLocalizedMap(value: unknown): value is LocalizedMap {
  *   const hotel = { name: { az: 'Otel', en: 'Hotel', ru: 'Отель' }, starRating: 5 };
  *   localize(hotel, 'en'); // => { name: 'Hotel', starRating: 5 }
  */
-const ALLOWED_LOCALIZE_FIELDS = new Set(['name', 'about', 'title', 'description', 'categoryName', 'brandName']);
-
 export function localize<T>(obj: T, lang: SupportedLang): T {
   if (obj === null || obj === undefined) return obj;
 
@@ -30,11 +28,13 @@ export function localize<T>(obj: T, lang: SupportedLang): T {
   }
 
   if (typeof obj === 'object') {
+    if (isLocalizedMap(obj)) {
+      return (obj[lang] || obj.en) as T;
+    }
+
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
-      if (ALLOWED_LOCALIZE_FIELDS.has(key) && isLocalizedMap(value)) {
-        result[key] = value[lang] || value.en;
-      } else if (value !== null && typeof value === 'object') {
+      if (value !== null && typeof value === 'object') {
         result[key] = localize(value, lang);
       } else {
         result[key] = value;

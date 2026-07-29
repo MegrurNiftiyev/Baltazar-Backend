@@ -11,6 +11,7 @@ import { httpLogger } from './config/logger.js';
 import { globalLimiter } from './middlewares/rateLimiters.js';
 import { resolveLocale } from './middlewares/resolveLocale.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { t } from './config/locales.js';
 
 // ── Module routers ─────────────────────────────────────────────────────
 import authRouter from './modules/auth/auth.routes.js';
@@ -40,6 +41,7 @@ app.use(
 app.use(express.json({ limit: '1mb' }));
 app.use(hpp());
 app.use(httpLogger);
+app.use(resolveLocale);
 
 // ── Health check ──────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {
@@ -64,7 +66,6 @@ app.get('/api-docs.json', (_req, res) => {
 });
 
 app.use(globalLimiter);
-app.use(resolveLocale);
 
 // ── API routes (order matches Swagger tag order — see config/swagger.ts) ──
 app.use('/api/auth', authRouter);
@@ -82,11 +83,11 @@ app.use('/api/payment', paymentRouter);
 app.use('/api/admin', adminRouter);
 
 // ── 404 catch-all ─────────────────────────────────────────────────────
-app.use((_req, res) => {
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     errorCode: 'NOT_FOUND',
-    message: 'Route not found',
+    message: t('NOT_FOUND', req.lang || 'en'),
   });
 });
 

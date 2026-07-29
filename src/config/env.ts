@@ -13,6 +13,7 @@ const envSchema = z.object({
   FIREBASE_PROJECT_ID: z.string().min(1),
   FIREBASE_CLIENT_EMAIL: z.string().min(1),
   FIREBASE_PRIVATE_KEY: z.string().min(1),
+  FIREBASE_STORAGE_BUCKET: z.string().min(1),
 
   // CORS — comma-separated origin whitelist
   CORS_ORIGIN: z.string().min(1),

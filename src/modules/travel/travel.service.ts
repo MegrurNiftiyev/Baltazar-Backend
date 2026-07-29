@@ -8,6 +8,7 @@ import type {
   CreateTourInput,
   UpdateTourInput,
   CreateIncludedServiceInput,
+  UpdateIncludedServiceInput,
 } from './travel.schema.js';
 
 const companiesCollection = db.collection(COLLECTIONS.COMPANIES);
@@ -159,4 +160,19 @@ export async function createIncludedService(input: CreateIncludedServiceInput) {
     createdAt: new Date().toISOString(),
   });
   return { id: docRef.id, ...input };
+}
+
+export async function updateIncludedService(id: string, input: UpdateIncludedServiceInput) {
+  const doc = await includedServicesCollection.doc(id).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  await includedServicesCollection.doc(id).update(input);
+  const updated = await includedServicesCollection.doc(id).get();
+  return { id: updated.id, ...updated.data() };
+}
+
+export async function deleteIncludedService(id: string) {
+  const doc = await includedServicesCollection.doc(id).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  await includedServicesCollection.doc(id).delete();
+  return { id, deleted: true };
 }
