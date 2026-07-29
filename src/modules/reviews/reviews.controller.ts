@@ -4,7 +4,8 @@ import * as reviewsService from './reviews.service.js';
 import type { ReviewQuery } from './reviews.schema.js';
 
 export const getReviewsController = catchAsync(async (req: Request, res: Response) => {
-  const reviews = await reviewsService.getReviews(req.validatedQuery as ReviewQuery);
+  const role = req.user?.role;
+  const reviews = await reviewsService.getReviews(req.validatedQuery as ReviewQuery, role);
   res.status(200).json({ success: true, data: reviews });
 });
 
@@ -23,12 +24,8 @@ export const updateReviewController = catchAsync(async (req: Request, res: Respo
   res.status(200).json({ success: true, data: review });
 });
 
-export const deleteOwnReviewController = catchAsync(async (req: Request, res: Response) => {
-  const result = await reviewsService.deleteOwnReview(req.params.id as string, req.user!.userId);
+export const deleteReviewController = catchAsync(async (req: Request, res: Response) => {
+  const result = await reviewsService.deleteReview(req.params.id as string, req.user!.userId, req.user!.role);
   res.status(200).json({ success: true, data: result });
 });
 
-export const deleteReviewController = catchAsync(async (req: Request, res: Response) => {
-  const result = await reviewsService.deleteReview(req.params.id as string);
-  res.status(200).json({ success: true, data: result });
-});

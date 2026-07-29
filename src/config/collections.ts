@@ -14,4 +14,5 @@ export const COLLECTIONS = {
   EXCHANGE_RATES: 'exchangeRates',
   USER_INTERESTS: 'userInterests',
   APP_CONFIG: 'appConfig',
+  BANNERS: 'banners',
 } as const;

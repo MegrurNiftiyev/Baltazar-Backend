@@ -1,14 +1,16 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
+import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
-import { createOrderSchema, advanceStepSchema } from './order.schema.js';
+import { createOrderSchema, advanceStepSchema, updateOrderStatusSchema } from './order.schema.js';
 import {
   createOrderController,
-  getUserOrdersController,
+  getOrdersController,
   getOrderByIdController,
   advanceStepController,
   cancelOrderController,
   getPaymentSummaryController,
+  updateOrderStatusController,
 } from './order.controller.js';
 
 const router = Router();
@@ -46,7 +48,7 @@ router.post('/', requireAuth, validate({ body: createOrderSchema }), createOrder
  *     responses:
  *       200: { description: List of user's orders }
  */
-router.get('/', requireAuth, getUserOrdersController);
+router.get('/', requireAuth, getOrdersController);
 
 /**
  * @swagger
@@ -129,5 +131,33 @@ router.put('/:id/cancel', requireAuth, cancelOrderController);
  *       200: { description: Payment summary with transaction history }
  */
 router.get('/:id/payment-summary', requireAuth, getPaymentSummaryController);
+
+/**
+ * @swagger
+ * /api/orders/{id}/status:
+ *   put:
+ *     tags: [Order]
+ *     summary: Update order status (Admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [status]
+ *             properties:
+ *               status: { type: string, enum: [PENDING, AWAITING_PAYMENT, PROCESSING, CONFIRMED, CANCELLED, EXPIRED] }
+ *     responses:
+ *       200: { description: Status updated }
+ *       404: { description: Order not found }
+ */
+router.put('/:id/status', requireAuth, requireRole('ADMIN'), validate({ body: updateOrderStatusSchema }), updateOrderStatusController);
 
 export default router;

@@ -8,8 +8,8 @@ export const createReviewSchema = z.object({
 });
 
 export const reviewQuerySchema = z.object({
-  targetType: z.enum(['RENT_A_CAR', 'TRAVEL', 'HOTEL', 'FOOD', 'COMPANY']),
-  targetId: z.string().min(1),
+  targetType: z.enum(['RENT_A_CAR', 'TRAVEL', 'HOTEL', 'FOOD', 'COMPANY']).optional(),
+  targetId: z.string().min(1).optional(),
 });
 
 export const updateReviewSchema = z.object({

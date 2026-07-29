@@ -6,13 +6,18 @@ import { COLLECTIONS } from '../../config/collections.js';
 const reviewsCollection = db.collection(COLLECTIONS.REVIEWS);
 const ordersCollection = db.collection(COLLECTIONS.ORDERS);
 
-export async function getReviews(filters: ReviewQuery) {
-  const snapshot = await reviewsCollection
-    .where('targetType', '==', filters.targetType)
-    .where('targetId', '==', filters.targetId)
-    .orderBy('createdAt', 'desc')
-    .get();
+export async function getReviews(filters: ReviewQuery, role?: string) {
+  let query: FirebaseFirestore.Query = reviewsCollection;
 
+  if (role === 'ADMIN' && !filters.targetType && !filters.targetId) {
+    // Admin fetching all reviews without filters
+  } else if (filters.targetType && filters.targetId) {
+    query = query.where('targetType', '==', filters.targetType).where('targetId', '==', filters.targetId);
+  } else if (role !== 'ADMIN') {
+    throw new AppError(400, 'VALIDATION_ERROR', 'targetType and targetId are required');
+  }
+
+  const snapshot = await query.orderBy('createdAt', 'desc').get();
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
@@ -73,9 +78,9 @@ export async function getReviewById(id: string) {
   return { id: doc.id, ...doc.data() };
 }
 
-async function assertOwner(id: string, userId: string) {
+async function assertOwner(id: string, userId: string, role?: string) {
   const review = (await getReviewById(id)) as { id: string; userId?: string };
-  if (review.userId !== userId) throw new AppError(403, 'REVIEW_NOT_OWNER');
+  if (role !== 'ADMIN' && review.userId !== userId) throw new AppError(403, 'REVIEW_NOT_OWNER');
   return review;
 }
 
@@ -85,15 +90,9 @@ export async function updateReview(id: string, userId: string, input: UpdateRevi
   return getReviewById(id);
 }
 
-export async function deleteOwnReview(id: string, userId: string) {
-  await assertOwner(id, userId);
+export async function deleteReview(id: string, userId: string, role?: string) {
+  await assertOwner(id, userId, role);
   await reviewsCollection.doc(id).delete();
   return { id, deleted: true };
 }
 
-export async function deleteReview(reviewId: string) {
-  const doc = await reviewsCollection.doc(reviewId).get();
-  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
-  await reviewsCollection.doc(reviewId).delete();
-  return { id: reviewId, deleted: true };
-}

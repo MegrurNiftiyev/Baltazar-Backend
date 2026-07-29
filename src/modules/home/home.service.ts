@@ -1,6 +1,8 @@
 import { FieldValue } from 'firebase-admin/firestore';
 import { db } from '../../config/firebase.js';
 import { COLLECTIONS } from '../../config/collections.js';
+import { AppError } from '../../errors/AppError.js';
+import type { BannerInput } from './home.schema.js';
 
 const titleMap = {
   RENT_A_CAR: { az: 'Avtomobil icaresi', en: 'Car Rental', ru: 'Arenda avto' },
@@ -9,11 +11,36 @@ const titleMap = {
   FOOD: { az: 'Yemek', en: 'Food', ru: 'Eda' },
 };
 
-export async function getBanner() {
-  return [
-    { image: 'https://baltazar-app.example.com/banner/rentacar.jpg', link: '/services/rentacar', order: 1 },
-    { image: 'https://baltazar-app.example.com/banner/travel.jpg', link: '/services/travel', order: 2 },
-  ];
+export async function getBanners() {
+  const snapshot = await db.collection(COLLECTIONS.BANNERS)
+    .where('isActive', '==', true)
+    .orderBy('order', 'asc')
+    .get();
+
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+}
+
+export async function createBanner(data: BannerInput) {
+  const docRef = await db.collection(COLLECTIONS.BANNERS).add(data);
+  return { id: docRef.id, ...data };
+}
+
+export async function updateBanner(id: string, data: Partial<BannerInput>) {
+  const doc = await db.collection(COLLECTIONS.BANNERS).doc(id).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+
+  // Remove undefined values
+  const updates = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined));
+
+  await db.collection(COLLECTIONS.BANNERS).doc(id).update(updates);
+  return { id, ...doc.data(), ...updates };
+}
+
+export async function deleteBanner(id: string) {
+  const doc = await db.collection(COLLECTIONS.BANNERS).doc(id).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  await db.collection(COLLECTIONS.BANNERS).doc(id).delete();
+  return { id, deleted: true };
 }
 
 async function getItemsForServiceType(serviceType: string) {

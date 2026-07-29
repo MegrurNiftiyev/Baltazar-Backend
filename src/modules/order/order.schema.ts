@@ -24,3 +24,17 @@ export const orderScreenKeyEnum = z.enum([
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
 export type AdvanceStepInput = z.infer<typeof advanceStepSchema>;
 export type OrderScreenKey = z.infer<typeof orderScreenKeyEnum>;
+
+export const updateOrderStatusSchema = z.object({
+  status: z.enum(['PENDING', 'AWAITING_PAYMENT', 'PROCESSING', 'CONFIRMED', 'CANCELLED', 'EXPIRED']),
+});
+
+export const adminOrderQuerySchema = z.object({
+  status: z
+    .enum(['PENDING', 'AWAITING_PAYMENT', 'PROCESSING', 'CONFIRMED', 'CANCELLED', 'EXPIRED'])
+    .optional(),
+  userId: z.string().optional(),
+  serviceType: z.string().optional(),
+});
+
+export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>;

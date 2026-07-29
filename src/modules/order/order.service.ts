@@ -193,21 +193,28 @@ export async function cancelOrder(orderId: string, userId: string) {
   return { id: orderId, status: 'CANCELLED' };
 }
 
-export async function getOrderById(orderId: string, userId: string) {
+export async function getOrderById(orderId: string, userId: string, role?: string) {
   const doc = await ordersCollection.doc(orderId).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
 
   const order = doc.data()!;
-  if (order.userId !== userId) throw new AppError(403, 'FORBIDDEN');
+  if (role !== 'ADMIN' && order.userId !== userId) throw new AppError(403, 'FORBIDDEN');
 
   return { id: doc.id, ...order };
 }
 
-export async function getUserOrders(userId: string) {
-  const snapshot = await ordersCollection
-    .where('userId', '==', userId)
-    .orderBy('createdAt', 'desc')
-    .get();
+export async function getOrders(userId: string, role?: string, filters?: { status?: string; userId?: string; serviceType?: string }) {
+  let query: FirebaseFirestore.Query = ordersCollection;
+
+  if (role === 'ADMIN') {
+    if (filters?.status) query = query.where('status', '==', filters.status);
+    if (filters?.userId) query = query.where('userId', '==', filters.userId);
+    if (filters?.serviceType) query = query.where('serviceType', '==', filters.serviceType);
+  } else {
+    query = query.where('userId', '==', userId);
+  }
+
+  const snapshot = await query.orderBy('createdAt', 'desc').get();
 
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
@@ -230,4 +237,17 @@ export async function getPaymentSummary(orderId: string, userId: string) {
     details: order.details,
     transactions,
   };
+}
+
+export async function updateOrderStatus(orderId: string, status: string) {
+  const doc = await ordersCollection.doc(orderId).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+
+  const updates: Record<string, unknown> = { status };
+  if (status === 'CONFIRMED' || status === 'CANCELLED' || status === 'EXPIRED') {
+    updates.isCompleted = true;
+  }
+
+  await ordersCollection.doc(orderId).update(updates);
+  return { id: orderId, status };
 }

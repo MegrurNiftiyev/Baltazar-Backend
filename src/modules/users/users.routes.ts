@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
+import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
 import { updateProfileSchema } from './users.schema.js';
-import { getProfileController, updateProfileController } from './users.controller.js';
+import { getProfileController, updateProfileController, disableUserController } from './users.controller.js';
 
 const router = Router();
 
@@ -43,5 +44,24 @@ router.get('/me', requireAuth, getProfileController);
  *       401: { description: Authentication required }
  */
 router.put('/me', requireAuth, validate({ body: updateProfileSchema }), updateProfileController);
+
+/**
+ * @swagger
+ * /api/users/{id}/disable:
+ *   put:
+ *     tags: [Users]
+ *     summary: Revoke all sessions for a user (disable/ban action)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Refresh token revoked immediately; any still-valid access token (up to 15 min) keeps working until natural expiry }
+ *       404: { description: User not found }
+ */
+router.put('/:id/disable', requireAuth, requireRole('ADMIN'), disableUserController);
 
 export default router;

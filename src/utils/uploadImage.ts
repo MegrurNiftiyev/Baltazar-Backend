@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { bucket } from '../config/firebase.js';
 
-type ImageFolder = 'hotels' | 'cars' | 'food' | 'tours' | 'rooms';
+type ImageFolder = 'hotels' | 'cars' | 'food' | 'tours' | 'rooms' | 'banners';
 
 export async function uploadImage(file: Express.Multer.File, folder: ImageFolder): Promise<string> {
   const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');

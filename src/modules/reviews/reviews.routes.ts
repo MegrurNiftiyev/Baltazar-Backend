@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
+import { optionalAuth } from '../../middlewares/optionalAuth.js';
 import { validate } from '../../middlewares/validate.js';
 import { createReviewSchema, reviewQuerySchema, updateReviewSchema } from './reviews.schema.js';
 import {
@@ -7,7 +8,7 @@ import {
   createReviewController,
   getReviewByIdController,
   updateReviewController,
-  deleteOwnReviewController,
+  deleteReviewController,
 } from './reviews.controller.js';
 
 const router = Router();
@@ -22,16 +23,16 @@ const router = Router();
  *     parameters:
  *       - in: query
  *         name: targetType
- *         required: true
+ *         required: false
  *         schema: { type: string, enum: [RENT_A_CAR, TRAVEL, HOTEL, FOOD, COMPANY] }
  *       - in: query
  *         name: targetId
- *         required: true
+ *         required: false
  *         schema: { type: string }
  *     responses:
  *       200: { description: List of reviews }
  */
-router.get('/', validate({ query: reviewQuerySchema }), getReviewsController);
+router.get('/', optionalAuth, validate({ query: reviewQuerySchema }), getReviewsController);
 
 /**
  * @swagger
@@ -66,6 +67,6 @@ router.post(
 
 router.get('/:id', getReviewByIdController);
 router.put('/:id', requireAuth, validate({ body: updateReviewSchema }), updateReviewController);
-router.delete('/:id', requireAuth, deleteOwnReviewController);
+router.delete('/:id', requireAuth, deleteReviewController);
 
 export default router;
