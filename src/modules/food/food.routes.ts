@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
@@ -108,7 +108,7 @@ router.get('/items/:id', getFoodItemByIdController);
  * @swagger
  * /api/services/food/companies:
  *   post:
- *     tags: [Admin]
+ *     tags: [Food]
  *     summary: Create food company
  *     security:
  *       - bearerAuth: []
@@ -133,7 +133,7 @@ router.post(
  * @swagger
  * /api/services/food/companies/{id}:
  *   put:
- *     tags: [Admin]
+ *     tags: [Food]
  *     summary: Update food company
  *     security:
  *       - bearerAuth: []
@@ -163,7 +163,7 @@ router.put(
  * @swagger
  * /api/services/food/companies/{id}:
  *   delete:
- *     tags: [Admin]
+ *     tags: [Food]
  *     summary: Delete food company
  *     security:
  *       - bearerAuth: []
@@ -183,7 +183,7 @@ router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompany
  * @swagger
  * /api/services/food/items:
  *   post:
- *     tags: [Admin]
+ *     tags: [Food]
  *     summary: Create food item
  *     security:
  *       - bearerAuth: []
@@ -208,7 +208,7 @@ router.post(
  * @swagger
  * /api/services/food/items/{id}:
  *   put:
- *     tags: [Admin]
+ *     tags: [Food]
  *     summary: Update food item
  *     security:
  *       - bearerAuth: []
@@ -238,7 +238,7 @@ router.put(
  * @swagger
  * /api/services/food/items/{id}:
  *   delete:
- *     tags: [Admin]
+ *     tags: [Food]
  *     summary: Delete food item
  *     security:
  *       - bearerAuth: []

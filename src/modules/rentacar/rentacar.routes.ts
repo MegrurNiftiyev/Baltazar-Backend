@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
@@ -117,7 +117,7 @@ router.get('/cars/:id', getCarByIdController);
  * @swagger
  * /api/services/rentacar/companies:
  *   post:
- *     tags: [Admin]
+ *     tags: [RentACar]
  *     summary: Create rent-a-car company
  *     security:
  *       - bearerAuth: []
@@ -142,7 +142,7 @@ router.post(
  * @swagger
  * /api/services/rentacar/companies/{id}:
  *   put:
- *     tags: [Admin]
+ *     tags: [RentACar]
  *     summary: Update rent-a-car company
  *     security:
  *       - bearerAuth: []
@@ -172,7 +172,7 @@ router.put(
  * @swagger
  * /api/services/rentacar/companies/{id}:
  *   delete:
- *     tags: [Admin]
+ *     tags: [RentACar]
  *     summary: Delete rent-a-car company
  *     security:
  *       - bearerAuth: []
@@ -192,7 +192,7 @@ router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompany
  * @swagger
  * /api/services/rentacar/cars:
  *   post:
- *     tags: [Admin]
+ *     tags: [RentACar]
  *     summary: Create car
  *     security:
  *       - bearerAuth: []
@@ -217,7 +217,7 @@ router.post(
  * @swagger
  * /api/services/rentacar/cars/{id}:
  *   put:
- *     tags: [Admin]
+ *     tags: [RentACar]
  *     summary: Update car
  *     security:
  *       - bearerAuth: []
@@ -247,7 +247,7 @@ router.put(
  * @swagger
  * /api/services/rentacar/cars/{id}:
  *   delete:
- *     tags: [Admin]
+ *     tags: [RentACar]
  *     summary: Delete car
  *     security:
  *       - bearerAuth: []

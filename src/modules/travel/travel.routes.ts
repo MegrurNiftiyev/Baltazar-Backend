@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
@@ -118,7 +118,7 @@ router.get('/tours/:id', getTourByIdController);
  * @swagger
  * /api/services/travel/companies:
  *   post:
- *     tags: [Admin]
+ *     tags: [Travel]
  *     summary: Create travel company
  *     security:
  *       - bearerAuth: []
@@ -143,7 +143,7 @@ router.post(
  * @swagger
  * /api/services/travel/companies/{id}:
  *   put:
- *     tags: [Admin]
+ *     tags: [Travel]
  *     summary: Update travel company
  *     security:
  *       - bearerAuth: []
@@ -173,7 +173,7 @@ router.put(
  * @swagger
  * /api/services/travel/companies/{id}:
  *   delete:
- *     tags: [Admin]
+ *     tags: [Travel]
  *     summary: Delete travel company
  *     security:
  *       - bearerAuth: []
@@ -193,7 +193,7 @@ router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompany
  * @swagger
  * /api/services/travel/tours:
  *   post:
- *     tags: [Admin]
+ *     tags: [Travel]
  *     summary: Create tour
  *     security:
  *       - bearerAuth: []
@@ -218,7 +218,7 @@ router.post(
  * @swagger
  * /api/services/travel/tours/{id}:
  *   put:
- *     tags: [Admin]
+ *     tags: [Travel]
  *     summary: Update tour
  *     security:
  *       - bearerAuth: []
@@ -248,7 +248,7 @@ router.put(
  * @swagger
  * /api/services/travel/tours/{id}:
  *   delete:
- *     tags: [Admin]
+ *     tags: [Travel]
  *     summary: Delete tour
  *     security:
  *       - bearerAuth: []

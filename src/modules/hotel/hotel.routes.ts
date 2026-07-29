@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
@@ -101,7 +101,7 @@ router.get('/:id/rooms', validate({ query: roomQuerySchema }), getRoomsControlle
  * @swagger
  * /api/services/hotel:
  *   post:
- *     tags: [Admin]
+ *     tags: [Hotel]
  *     summary: Create hotel
  *     security:
  *       - bearerAuth: []
@@ -126,7 +126,7 @@ router.post(
  * @swagger
  * /api/services/hotel/{id}:
  *   put:
- *     tags: [Admin]
+ *     tags: [Hotel]
  *     summary: Update hotel
  *     security:
  *       - bearerAuth: []
@@ -156,7 +156,7 @@ router.put(
  * @swagger
  * /api/services/hotel/{id}:
  *   delete:
- *     tags: [Admin]
+ *     tags: [Hotel]
  *     summary: Delete hotel
  *     security:
  *       - bearerAuth: []
@@ -176,7 +176,7 @@ router.delete('/:id', requireAuth, requireRole('ADMIN'), deleteHotelController);
  * @swagger
  * /api/services/hotel/rooms:
  *   post:
- *     tags: [Admin]
+ *     tags: [Hotel]
  *     summary: Create room
  *     security:
  *       - bearerAuth: []
@@ -201,7 +201,7 @@ router.post(
  * @swagger
  * /api/services/hotel/rooms/{id}:
  *   put:
- *     tags: [Admin]
+ *     tags: [Hotel]
  *     summary: Update room
  *     security:
  *       - bearerAuth: []
@@ -231,7 +231,7 @@ router.put(
  * @swagger
  * /api/services/hotel/rooms/{id}:
  *   delete:
- *     tags: [Admin]
+ *     tags: [Hotel]
  *     summary: Delete room
  *     security:
  *       - bearerAuth: []
