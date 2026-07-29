@@ -2,6 +2,9 @@ import 'dotenv-flow/config';
 import { env } from './config/env.js';
 import { app } from './app.js';
 import { logger } from './config/logger.js';
+import { scheduleExchangeRateRefresh } from './jobs/refreshExchangeRates.js';
+
+scheduleExchangeRateRefresh();
 
 const server = app.listen(env.PORT, () => {
   logger.info(`🚀 Server running: http://localhost:${env.PORT}`);

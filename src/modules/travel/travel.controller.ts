@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsync.js';
 import { localize } from '../../utils/localize.js';
 import * as travelService from './travel.service.js';
+import { incrementUserInterest } from '../home/home.service.js';
 
 // ── Companies ──────────────────────────────────────────────────────────
 
@@ -39,6 +40,9 @@ export const getToursController = catchAsync(async (req: Request, res: Response)
 
 export const getTourByIdController = catchAsync(async (req: Request, res: Response) => {
   const tour = await travelService.getTourById(req.params.id as string);
+  if (req.user) {
+    void incrementUserInterest(req.user.userId, 'TRAVEL').catch(() => {});
+  }
   res.status(200).json({ success: true, data: localize(tour, req.lang!) });
 });
 

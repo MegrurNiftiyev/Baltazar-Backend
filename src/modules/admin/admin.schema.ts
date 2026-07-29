@@ -4,13 +4,13 @@ export const addAdminSchema = z.object({
   userId: z.string().min(1),
 });
 
-export const updateFlowboxStatusSchema = z.object({
-  status: z.enum(['PENDING', 'AWAITING_PAYMENT', 'CONFIRMED', 'CANCELLED', 'EXPIRED']),
+export const updateOrderStatusSchema = z.object({
+  status: z.enum(['PENDING', 'AWAITING_PAYMENT', 'PROCESSING', 'CONFIRMED', 'CANCELLED', 'EXPIRED']),
 });
 
-export const adminFlowboxQuerySchema = z.object({
+export const adminOrderQuerySchema = z.object({
   status: z
-    .enum(['PENDING', 'AWAITING_PAYMENT', 'CONFIRMED', 'CANCELLED', 'EXPIRED'])
+    .enum(['PENDING', 'AWAITING_PAYMENT', 'PROCESSING', 'CONFIRMED', 'CANCELLED', 'EXPIRED'])
     .optional(),
   userId: z.string().optional(),
   serviceType: z.string().optional(),
@@ -22,4 +22,4 @@ export const adminTransactionQuerySchema = z.object({
 });
 
 export type AddAdminInput = z.infer<typeof addAdminSchema>;
-export type UpdateFlowboxStatusInput = z.infer<typeof updateFlowboxStatusSchema>;
+export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>;

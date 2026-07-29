@@ -28,7 +28,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/hotel:
+ * /api/services/hotel:
  *   get:
  *     tags: [Hotel]
  *     summary: List hotels with filters
@@ -59,7 +59,7 @@ router.get('/', validate({ query: hotelQuerySchema }), getHotelsController);
 
 /**
  * @swagger
- * /api/hotel/{id}:
+ * /api/services/hotel/{id}:
  *   get:
  *     tags: [Hotel]
  *     summary: Get hotel details by ID
@@ -77,7 +77,7 @@ router.get('/:id', getHotelByIdController);
 
 /**
  * @swagger
- * /api/hotel/{id}/rooms:
+ * /api/services/hotel/{id}/rooms:
  *   get:
  *     tags: [Hotel]
  *     summary: List rooms for a hotel
@@ -95,8 +95,25 @@ router.get('/:id', getHotelByIdController);
  */
 router.get('/:id/rooms', validate({ query: roomQuerySchema }), getRoomsController);
 
-// ── Admin CRUD ────────────────────────────────────────────────────────
+// Admin CRUD
 
+/**
+ * @swagger
+ * /api/services/hotel:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Create hotel
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.post(
   '/',
   requireAuth,
@@ -105,6 +122,28 @@ router.post(
   createHotelController,
 );
 
+/**
+ * @swagger
+ * /api/services/hotel/{id}:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Update hotel
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.put(
   '/:id',
   requireAuth,
@@ -113,10 +152,43 @@ router.put(
   updateHotelController,
 );
 
+/**
+ * @swagger
+ * /api/services/hotel/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Delete hotel
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ *       409: { description: Has active bookings }
+ */
 router.delete('/:id', requireAuth, requireRole('ADMIN'), deleteHotelController);
 
-// ── Room admin CRUD ──────────────────────────────────────────────────
-
+/**
+ * @swagger
+ * /api/services/hotel/rooms:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Create room
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.post(
   '/rooms',
   requireAuth,
@@ -125,6 +197,28 @@ router.post(
   createRoomController,
 );
 
+/**
+ * @swagger
+ * /api/services/hotel/rooms/{id}:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Update room
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.put(
   '/rooms/:id',
   requireAuth,
@@ -133,6 +227,25 @@ router.put(
   updateRoomController,
 );
 
+/**
+ * @swagger
+ * /api/services/hotel/rooms/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Delete room
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ *       409: { description: Has active bookings }
+ */
 router.delete('/rooms/:id', requireAuth, requireRole('ADMIN'), deleteRoomController);
 
 export default router;
+

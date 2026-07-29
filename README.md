@@ -2,7 +2,7 @@
 
 Production-grade TypeScript + Express backend for the Baltazar multi-service platform.
 
-The API covers authentication, users, admin tools, services, rent-a-car, travel, hotel, food, FlowBox booking, payments, reviews, wishlists, and included service definitions.
+The API covers authentication, users, admin tools, services, rent-a-car, travel, hotel, food, Order booking, payments, reviews, wishlists, and included service definitions.
 
 ---
 
@@ -299,7 +299,7 @@ Response data:
 
 ## Services
 
-### `GET /api/servis`
+### `GET /api/services`
 
 Access: public
 
@@ -309,7 +309,7 @@ Request body: none
 
 Response data: localized service array.
 
-### `GET /api/servis/:id`
+### `GET /api/services/:id`
 
 Access: public
 
@@ -319,7 +319,7 @@ Request body: none
 
 Response data: localized service object.
 
-### `POST /api/servis`
+### `POST /api/services`
 
 Access: admin
 
@@ -342,17 +342,17 @@ Request body:
 
 Response data: created service object.
 
-### `PUT /api/servis/:id`
+### `PUT /api/services/:id`
 
 Access: admin
 
 Status: `200 OK`
 
-Request body: partial `POST /api/servis` body.
+Request body: partial `POST /api/services` body.
 
 Response data: updated service object.
 
-### `DELETE /api/servis/:id`
+### `DELETE /api/services/:id`
 
 Access: admin
 
@@ -373,7 +373,7 @@ Response data:
 
 ## Hotel
 
-### `GET /api/hotel`
+### `GET /api/services/hotel`
 
 Access: public
 
@@ -392,7 +392,7 @@ Request body: none
 
 Response data: localized hotel array.
 
-### `GET /api/hotel/:id`
+### `GET /api/services/hotel/:id`
 
 Access: public
 
@@ -402,7 +402,7 @@ Request body: none
 
 Response data: localized hotel object.
 
-### `GET /api/hotel/:id/rooms`
+### `GET /api/services/hotel/:id/rooms`
 
 Access: public
 
@@ -416,7 +416,7 @@ Request body: none
 
 Response data: localized room array.
 
-### `POST /api/hotel`
+### `POST /api/services/hotel`
 
 Access: admin
 
@@ -453,17 +453,17 @@ Required fields: `name`, `city`, `starRating`, `price`.
 
 Response data: created hotel object.
 
-### `PUT /api/hotel/:id`
+### `PUT /api/services/hotel/:id`
 
 Access: admin
 
 Status: `200 OK`
 
-Request body: partial `POST /api/hotel` body.
+Request body: partial `POST /api/services/hotel` body.
 
 Response data: updated hotel object.
 
-### `DELETE /api/hotel/:id`
+### `DELETE /api/services/hotel/:id`
 
 Access: admin
 
@@ -480,7 +480,7 @@ Response data:
 }
 ```
 
-### `POST /api/hotel/rooms`
+### `POST /api/services/hotel/rooms`
 
 Access: admin
 
@@ -514,17 +514,17 @@ Required fields: `hotelId`, `roomType`, `name`, `price`, `capacity`.
 
 Response data: created room object.
 
-### `PUT /api/hotel/rooms/:id`
+### `PUT /api/services/hotel/rooms/:id`
 
 Access: admin
 
 Status: `200 OK`
 
-Request body: partial `POST /api/hotel/rooms` body.
+Request body: partial `POST /api/services/hotel/rooms` body.
 
 Response data: updated room object.
 
-### `DELETE /api/hotel/rooms/:id`
+### `DELETE /api/services/hotel/rooms/:id`
 
 Access: admin
 
@@ -545,7 +545,7 @@ Response data:
 
 ## Rent A Car
 
-### `GET /api/rentacar/companies`
+### `GET /api/services/rentacar/companies`
 
 Access: public
 
@@ -555,7 +555,7 @@ Request body: none
 
 Response data: localized rent-a-car company array.
 
-### `GET /api/rentacar/companies/:id`
+### `GET /api/services/rentacar/companies/:id`
 
 Access: public
 
@@ -565,7 +565,7 @@ Request body: none
 
 Response data: localized rent-a-car company object.
 
-### `GET /api/rentacar/cars`
+### `GET /api/services/rentacar/cars`
 
 Access: public
 
@@ -586,7 +586,7 @@ Request body: none
 
 Response data: car array.
 
-### `GET /api/rentacar/cars/:id`
+### `GET /api/services/rentacar/cars/:id`
 
 Access: public
 
@@ -596,7 +596,7 @@ Request body: none
 
 Response data: localized car object.
 
-### `POST /api/rentacar/companies`
+### `POST /api/services/rentacar/companies`
 
 Access: admin
 
@@ -629,17 +629,17 @@ Required fields: `name`.
 
 Response data: created company object.
 
-### `PUT /api/rentacar/companies/:id`
+### `PUT /api/services/rentacar/companies/:id`
 
 Access: admin
 
 Status: `200 OK`
 
-Request body: partial `POST /api/rentacar/companies` body.
+Request body: partial `POST /api/services/rentacar/companies` body.
 
 Response data: updated company object.
 
-### `DELETE /api/rentacar/companies/:id`
+### `DELETE /api/services/rentacar/companies/:id`
 
 Access: admin
 
@@ -656,7 +656,7 @@ Response data:
 }
 ```
 
-### `POST /api/rentacar/cars`
+### `POST /api/services/rentacar/cars`
 
 Access: admin
 
@@ -686,17 +686,17 @@ Required fields: `companyId`, `brand`, `model`, `category`, `transmission`, `fue
 
 Response data: created car object.
 
-### `PUT /api/rentacar/cars/:id`
+### `PUT /api/services/rentacar/cars/:id`
 
 Access: admin
 
 Status: `200 OK`
 
-Request body: partial `POST /api/rentacar/cars` body.
+Request body: partial `POST /api/services/rentacar/cars` body.
 
 Response data: updated car object.
 
-### `DELETE /api/rentacar/cars/:id`
+### `DELETE /api/services/rentacar/cars/:id`
 
 Access: admin
 
@@ -717,7 +717,7 @@ Response data:
 
 ## Food
 
-### `GET /api/food/companies`
+### `GET /api/services/food/companies`
 
 Access: public
 
@@ -727,7 +727,7 @@ Request body: none
 
 Response data: localized food company array.
 
-### `GET /api/food/companies/:id`
+### `GET /api/services/food/companies/:id`
 
 Access: public
 
@@ -737,7 +737,7 @@ Request body: none
 
 Response data: localized food company object.
 
-### `GET /api/food/items`
+### `GET /api/services/food/items`
 
 Access: public
 
@@ -755,7 +755,7 @@ Request body: none
 
 Response data: localized food item array.
 
-### `GET /api/food/items/:id`
+### `GET /api/services/food/items/:id`
 
 Access: public
 
@@ -765,7 +765,7 @@ Request body: none
 
 Response data: localized food item object.
 
-### `POST /api/food/companies`
+### `POST /api/services/food/companies`
 
 Access: admin
 
@@ -800,17 +800,17 @@ Required fields: `name`.
 
 Response data: created company object.
 
-### `PUT /api/food/companies/:id`
+### `PUT /api/services/food/companies/:id`
 
 Access: admin
 
 Status: `200 OK`
 
-Request body: partial `POST /api/food/companies` body.
+Request body: partial `POST /api/services/food/companies` body.
 
 Response data: updated company object.
 
-### `DELETE /api/food/companies/:id`
+### `DELETE /api/services/food/companies/:id`
 
 Access: admin
 
@@ -827,7 +827,7 @@ Response data:
 }
 ```
 
-### `POST /api/food/items`
+### `POST /api/services/food/items`
 
 Access: admin
 
@@ -860,17 +860,17 @@ Required fields: `companyId`, `name`, `category`, `price`.
 
 Response data: created food item object.
 
-### `PUT /api/food/items/:id`
+### `PUT /api/services/food/items/:id`
 
 Access: admin
 
 Status: `200 OK`
 
-Request body: partial `POST /api/food/items` body.
+Request body: partial `POST /api/services/food/items` body.
 
 Response data: updated food item object.
 
-### `DELETE /api/food/items/:id`
+### `DELETE /api/services/food/items/:id`
 
 Access: admin
 
@@ -891,7 +891,7 @@ Response data:
 
 ## Travel
 
-### `GET /api/travel/companies`
+### `GET /api/services/travel/companies`
 
 Access: public
 
@@ -901,7 +901,7 @@ Request body: none
 
 Response data: localized travel company array.
 
-### `GET /api/travel/companies/:id`
+### `GET /api/services/travel/companies/:id`
 
 Access: public
 
@@ -911,7 +911,7 @@ Request body: none
 
 Response data: localized travel company object.
 
-### `GET /api/travel/tours`
+### `GET /api/services/travel/tours`
 
 Access: public
 
@@ -930,7 +930,7 @@ Request body: none
 
 Response data: localized tour array.
 
-### `GET /api/travel/tours/:id`
+### `GET /api/services/travel/tours/:id`
 
 Access: public
 
@@ -940,7 +940,7 @@ Request body: none
 
 Response data: localized tour object.
 
-### `POST /api/travel/companies`
+### `POST /api/services/travel/companies`
 
 Access: admin
 
@@ -973,17 +973,17 @@ Required fields: `name`.
 
 Response data: created company object.
 
-### `PUT /api/travel/companies/:id`
+### `PUT /api/services/travel/companies/:id`
 
 Access: admin
 
 Status: `200 OK`
 
-Request body: partial `POST /api/travel/companies` body.
+Request body: partial `POST /api/services/travel/companies` body.
 
 Response data: updated company object.
 
-### `DELETE /api/travel/companies/:id`
+### `DELETE /api/services/travel/companies/:id`
 
 Access: admin
 
@@ -1000,7 +1000,7 @@ Response data:
 }
 ```
 
-### `POST /api/travel/tours`
+### `POST /api/services/travel/tours`
 
 Access: admin
 
@@ -1040,17 +1040,17 @@ Required fields: `companyId`, `categories`, `title`, `images`, `duration`, `star
 
 Response data: created tour object.
 
-### `PUT /api/travel/tours/:id`
+### `PUT /api/services/travel/tours/:id`
 
 Access: admin
 
 Status: `200 OK`
 
-Request body: partial `POST /api/travel/tours` body.
+Request body: partial `POST /api/services/travel/tours` body.
 
 Response data: updated tour object.
 
-### `DELETE /api/travel/tours/:id`
+### `DELETE /api/services/travel/tours/:id`
 
 Access: admin
 
@@ -1071,7 +1071,7 @@ Response data:
 
 ## Included Services
 
-### `GET /api/included-services/:serviceType`
+### `GET /api/services/included-services/:serviceType`
 
 Access: public
 
@@ -1085,7 +1085,7 @@ Request body: none
 
 Response data: localized included service array.
 
-### `POST /api/included-services/:serviceType`
+### `POST /api/services/included-services/:serviceType`
 
 Access: admin
 
@@ -1113,20 +1113,20 @@ Required fields: `name`, `serviceType`.
 
 Response data: created included service object.
 
-### `PUT /api/included-services/:id`
+### `PUT /api/services/included-services/:id`
 
 Access: admin
 
 Status: `200 OK`
 
-Request body: partial `POST /api/included-services/:serviceType` body.
+Request body: partial `POST /api/services/included-services/:serviceType` body.
 
 Rules: `name` remains a full `{ az, en, ru }` map when supplied.
 
 Response data: updated included service object with localized fields resolved
 to one string.
 
-### `DELETE /api/included-services/:id`
+### `DELETE /api/services/included-services/:id`
 
 Access: admin
 
@@ -1145,9 +1145,9 @@ Response data:
 
 ---
 
-## FlowBox
+## Order
 
-### `POST /api/flowboxes`
+### `POST /api/orders`
 
 Access: authenticated
 
@@ -1166,19 +1166,9 @@ Rules:
 
 - `serviceType`: `RENT_A_CAR`, `TRAVEL`, `HOTEL`, or `FOOD`
 
-Response data: created FlowBox object.
+Response data: created Order object.
 
-### `GET /api/flowboxes`
-
-Access: authenticated
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: FlowBox array for the authenticated user.
-
-### `GET /api/flowboxes/:id`
+### `GET /api/orders`
 
 Access: authenticated
 
@@ -1186,9 +1176,19 @@ Status: `200 OK`
 
 Request body: none
 
-Response data: FlowBox object.
+Response data: Order array for the authenticated user.
 
-### `PUT /api/flowboxes/:id/step`
+### `GET /api/orders/:id`
+
+Access: authenticated
+
+Status: `200 OK`
+
+Request body: none
+
+Response data: Order object.
+
+### `PUT /api/orders/:id/step`
 
 Access: authenticated
 
@@ -1205,9 +1205,9 @@ Request body:
 }
 ```
 
-Response data: updated FlowBox step result.
+Response data: updated Order step result.
 
-### `PUT /api/flowboxes/:id/cancel`
+### `PUT /api/orders/:id/cancel`
 
 Access: authenticated
 
@@ -1219,12 +1219,12 @@ Response data:
 
 ```json
 {
-  "id": "flowbox_id",
+  "id": "order_id",
   "status": "CANCELLED"
 }
 ```
 
-### `GET /api/flowboxes/flow-screens/:serviceType`
+### `GET /api/orders/flow-screens/:serviceType`
 
 Access: admin
 
@@ -1238,7 +1238,7 @@ Request body: none
 
 Response data: flow screen configuration.
 
-### `PUT /api/flowboxes/flow-screens/:serviceType`
+### `PUT /api/orders/flow-screens/:serviceType`
 
 Access: admin
 
@@ -1330,7 +1330,7 @@ Request body:
 
 ```json
 {
-  "flowBoxId": "flowbox_id",
+  "orderId": "order_id",
   "paymentMethodId": "payment_method_id"
 }
 ```
@@ -1417,7 +1417,7 @@ Response data:
 }
 ```
 
-### `GET /api/admin/flowboxes`
+### `GET /api/admin/orders`
 
 Status: `200 OK`
 
@@ -1429,17 +1429,17 @@ Query params:
 
 Request body: none
 
-Response data: FlowBox array.
+Response data: Order array.
 
-### `GET /api/admin/flowboxes/:id`
+### `GET /api/admin/orders/:id`
 
 Status: `200 OK`
 
 Request body: none
 
-Response data: FlowBox object.
+Response data: Order object.
 
-### `PUT /api/admin/flowboxes/:id/status`
+### `PUT /api/admin/orders/:id/status`
 
 Status: `200 OK`
 
@@ -1455,7 +1455,7 @@ Response data:
 
 ```json
 {
-  "id": "flowbox_id",
+  "id": "order_id",
   "status": "CONFIRMED"
 }
 ```
@@ -1536,7 +1536,7 @@ Copy `.env.example` to `.env.development` or your local `.env` file and fill in 
 
 | Variable | Description |
 |---|---|
-| `NODE_ENV` | `development`, `staging`, or `production` |
+| `NODE_ENV` | `development` or `production` |
 | `PORT` | HTTP port, default `3000` |
 | `LOG_LEVEL` | Pino log level |
 | `JWT_ACCESS_SECRET` | Secret for access tokens, minimum 32 chars |
@@ -1602,3 +1602,7 @@ The intended compiled entry point is `dist/server.js`.
 - `dist/` is ignored by Git and should be generated during deployment.
 - Runtime response envelopes were checked against the current controllers.
 - Request body and query models were checked against the current Zod schemas.
+
+
+
+

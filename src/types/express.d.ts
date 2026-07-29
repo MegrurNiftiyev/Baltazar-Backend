@@ -7,6 +7,7 @@ declare global {
       user?: {
         userId: string;
         role: 'USER' | 'ADMIN';
+        language: SupportedLang;
       };
       /** Populated by resolveLocale middleware. */
       lang?: SupportedLang;

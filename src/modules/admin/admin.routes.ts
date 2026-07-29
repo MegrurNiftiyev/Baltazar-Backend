@@ -4,23 +4,23 @@ import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
 import {
   addAdminSchema,
-  updateFlowboxStatusSchema,
-  adminFlowboxQuerySchema,
+  updateOrderStatusSchema,
+  adminOrderQuerySchema,
   adminTransactionQuerySchema,
 } from './admin.schema.js';
 import {
   addAdminController,
-  getAllFlowboxesController,
-  getFlowboxByIdController,
-  updateFlowboxStatusController,
+  getAllOrdersController,
+  getOrderByIdController,
+  updateOrderStatusController,
   getAllTransactionsController,
   getAllReviewsController,
   deleteReviewController,
+  disableUserController,
 } from './admin.controller.js';
 
 const router = Router();
 
-// All admin routes require auth + ADMIN role
 router.use(requireAuth, requireRole('ADMIN'));
 
 /**
@@ -42,40 +42,17 @@ router.use(requireAuth, requireRole('ADMIN'));
  *               userId: { type: string }
  *     responses:
  *       200: { description: User promoted }
- *       403: { description: Forbidden — caller is not an admin }
+ *       403: { description: Forbidden, caller is not an admin }
  *       404: { description: User not found }
  */
 router.post('/users/add-admin', validate({ body: addAdminSchema }), addAdminController);
 
 /**
  * @swagger
- * /api/admin/flowboxes:
- *   get:
+ * /api/admin/users/{id}/disable:
+ *   put:
  *     tags: [Admin]
- *     summary: Get all flowboxes (admin view)
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: status
- *         schema: { type: string, enum: [PENDING, AWAITING_PAYMENT, CONFIRMED, CANCELLED, EXPIRED] }
- *       - in: query
- *         name: userId
- *         schema: { type: string }
- *       - in: query
- *         name: serviceType
- *         schema: { type: string }
- *     responses:
- *       200: { description: List of flowboxes }
- */
-router.get('/flowboxes', validate({ query: adminFlowboxQuerySchema }), getAllFlowboxesController);
-
-/**
- * @swagger
- * /api/admin/flowboxes/{id}:
- *   get:
- *     tags: [Admin]
- *     summary: Get a single flowbox by ID (admin view)
+ *     summary: Revoke all sessions for a user (disable/ban action)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -84,17 +61,59 @@ router.get('/flowboxes', validate({ query: adminFlowboxQuerySchema }), getAllFlo
  *         required: true
  *         schema: { type: string }
  *     responses:
- *       200: { description: FlowBox details }
- *       404: { description: FlowBox not found }
+ *       200: { description: Refresh token revoked immediately; any still-valid access token (up to 15 min) keeps working until natural expiry }
+ *       404: { description: User not found }
  */
-router.get('/flowboxes/:id', getFlowboxByIdController);
+router.put('/users/:id/disable', disableUserController);
 
 /**
  * @swagger
- * /api/admin/flowboxes/{id}/status:
+ * /api/admin/orders:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Get all orders (admin view)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema: { type: string, enum: [PENDING, AWAITING_PAYMENT, PROCESSING, CONFIRMED, CANCELLED, EXPIRED] }
+ *       - in: query
+ *         name: userId
+ *         schema: { type: string }
+ *       - in: query
+ *         name: serviceType
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: List of orders }
+ */
+router.get('/orders', validate({ query: adminOrderQuerySchema }), getAllOrdersController);
+
+/**
+ * @swagger
+ * /api/admin/orders/{id}:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Get a single order by ID (admin view)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Order details }
+ *       404: { description: Order not found }
+ */
+router.get('/orders/:id', getOrderByIdController);
+
+/**
+ * @swagger
+ * /api/admin/orders/{id}/status:
  *   put:
  *     tags: [Admin]
- *     summary: Update flowbox status
+ *     summary: Update order status
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -110,16 +129,12 @@ router.get('/flowboxes/:id', getFlowboxByIdController);
  *             type: object
  *             required: [status]
  *             properties:
- *               status: { type: string, enum: [PENDING, AWAITING_PAYMENT, CONFIRMED, CANCELLED, EXPIRED] }
+ *               status: { type: string, enum: [PENDING, AWAITING_PAYMENT, PROCESSING, CONFIRMED, CANCELLED, EXPIRED] }
  *     responses:
  *       200: { description: Status updated }
- *       404: { description: FlowBox not found }
+ *       404: { description: Order not found }
  */
-router.put(
-  '/flowboxes/:id/status',
-  validate({ body: updateFlowboxStatusSchema }),
-  updateFlowboxStatusController,
-);
+router.put('/orders/:id/status', validate({ body: updateOrderStatusSchema }), updateOrderStatusController);
 
 /**
  * @swagger
@@ -139,11 +154,7 @@ router.put(
  *     responses:
  *       200: { description: List of transactions }
  */
-router.get(
-  '/transactions',
-  validate({ query: adminTransactionQuerySchema }),
-  getAllTransactionsController,
-);
+router.get('/transactions', validate({ query: adminTransactionQuerySchema }), getAllTransactionsController);
 
 /**
  * @swagger
@@ -178,3 +189,4 @@ router.get('/reviews', getAllReviewsController);
 router.delete('/reviews/:id', deleteReviewController);
 
 export default router;
+

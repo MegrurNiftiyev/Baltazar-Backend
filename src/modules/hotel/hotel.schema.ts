@@ -32,7 +32,9 @@ export const createHotelSchema = z.object({
   amenities: z.array(z.string()).optional(),
   images: z.array(z.string()).optional(),
   logo: z.string().optional(),
-  price: z.number().min(0),
+  sectionsOrder: z.array(z.string()).optional(),
+  serviceType: z.literal('HOTEL').default('HOTEL'),
+  price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
   rating: z.number().min(0).max(5).default(0),
   reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
@@ -45,7 +47,7 @@ export const createRoomSchema = z.object({
   roomType: z.string().min(1),
   name: localizedMapSchema,
   description: localizedMapSchema.optional(),
-  price: z.number().min(0),
+  price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
   capacity: z.number().int().min(1),
   amenities: z.array(z.string()).optional(),
   images: z.array(z.string()).optional(),

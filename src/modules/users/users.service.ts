@@ -24,6 +24,11 @@ export async function getProfile(userId: string) {
     region: data.region || null,
     language: data.language || 'en',
     wishlist: data.wishlist || [],
+    profileCompleteness: data.profileCompleteness || {
+      personalInfo: false,
+      driverLicense: false,
+      passport: false,
+    },
     createdAt: data.createdAt,
   };
 }
@@ -43,6 +48,20 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
   if (input.phone !== undefined) updates.phone = input.phone;
   if (input.region !== undefined) updates.region = input.region;
   if (input.language !== undefined) updates.language = input.language;
+  if (input.personalInfo !== undefined) {
+    updates.personalInfo = input.personalInfo;
+    updates['profileCompleteness.personalInfo'] = Boolean(
+      input.personalInfo.dateOfBirth && input.personalInfo.address && input.personalInfo.idNumber,
+    );
+  }
+  if (input.driverLicense !== undefined) {
+    updates.driverLicense = input.driverLicense;
+    updates['profileCompleteness.driverLicense'] = true;
+  }
+  if (input.passport !== undefined) {
+    updates.passport = input.passport;
+    updates['profileCompleteness.passport'] = true;
+  }
 
   if (Object.keys(updates).length === 0) {
     throw new AppError(400, 'NO_FIELDS_TO_UPDATE');

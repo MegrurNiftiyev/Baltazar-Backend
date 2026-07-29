@@ -4,6 +4,7 @@ import { env } from '../config/env.js';
 export interface AccessTokenPayload {
   userId: string;
   role: 'USER' | 'ADMIN';
+  language: 'az' | 'en' | 'ru';
 }
 
 export interface RefreshTokenPayload {

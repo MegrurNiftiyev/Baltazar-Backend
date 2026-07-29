@@ -20,8 +20,10 @@ const options: swaggerJSDoc.Options = {
       { name: 'Travel' },
       { name: 'IncludedServices' },
       { name: 'Reviews' },
-      { name: 'FlowBox' },
+      { name: 'Order' },
       { name: 'Payment' },
+      { name: 'Home' },
+      { name: 'AppConfig' },
       { name: 'Admin' },
     ],
     components: {

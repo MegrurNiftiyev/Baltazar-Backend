@@ -4,11 +4,8 @@ import type { CreateReviewInput, ReviewQuery, UpdateReviewInput } from './review
 import { COLLECTIONS } from '../../config/collections.js';
 
 const reviewsCollection = db.collection(COLLECTIONS.REVIEWS);
-const flowBoxesCollection = db.collection(COLLECTIONS.FLOW_BOXES);
+const ordersCollection = db.collection(COLLECTIONS.ORDERS);
 
-/**
- * Get reviews for a specific target (service/item).
- */
 export async function getReviews(filters: ReviewQuery) {
   const snapshot = await reviewsCollection
     .where('targetType', '==', filters.targetType)
@@ -19,36 +16,37 @@ export async function getReviews(filters: ReviewQuery) {
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
-/**
- * Create a review — only allowed if the user has a CONFIRMED FlowBox
- * for the target service (eligibility check).
- *
- * Rating/reviewCount increment on the target document is delegated
- * to a Cloud Function trigger (not implemented in this REST API).
- */
-export async function createReview(userId: string, input: CreateReviewInput) {
-  // Eligibility check — user must have a confirmed FlowBox for this service
-  const eligibleSnapshot = await flowBoxesCollection
+async function canReview(userId: string, targetType: string, targetId: string): Promise<boolean> {
+  if (targetType === 'COMPANY') {
+    const snap = await ordersCollection
+      .where('userId', '==', userId)
+      .where('details.companyId', '==', targetId)
+      .where('status', '==', 'CONFIRMED')
+      .limit(1)
+      .get();
+    return !snap.empty;
+  }
+
+  const snap = await ordersCollection
     .where('userId', '==', userId)
-    .where('serviceId', '==', input.targetId)
+    .where('serviceId', '==', targetId)
     .where('status', '==', 'CONFIRMED')
     .limit(1)
     .get();
+  return !snap.empty;
+}
 
-  if (eligibleSnapshot.empty) {
-    throw new AppError(403, 'REVIEW_NOT_ELIGIBLE');
-  }
+export async function createReview(userId: string, input: CreateReviewInput) {
+  const eligible = await canReview(userId, input.targetType, input.targetId);
+  if (!eligible) throw new AppError(403, 'REVIEW_NOT_ELIGIBLE');
 
-  // Prevent duplicate reviews
   const existingReview = await reviewsCollection
     .where('userId', '==', userId)
     .where('targetId', '==', input.targetId)
     .limit(1)
     .get();
 
-  if (!existingReview.empty) {
-    throw new AppError(409, 'ALREADY_REVIEWED');
-  }
+  if (!existingReview.empty) throw new AppError(409, 'ALREADY_REVIEWED');
 
   const docRef = await reviewsCollection.add({
     userId,
@@ -76,7 +74,7 @@ export async function getReviewById(id: string) {
 }
 
 async function assertOwner(id: string, userId: string) {
-  const review = await getReviewById(id) as { id: string; userId?: string };
+  const review = (await getReviewById(id)) as { id: string; userId?: string };
   if (review.userId !== userId) throw new AppError(403, 'REVIEW_NOT_OWNER');
   return review;
 }
@@ -93,14 +91,9 @@ export async function deleteOwnReview(id: string, userId: string) {
   return { id, deleted: true };
 }
 
-/**
- * Delete a review — admin only.
- */
 export async function deleteReview(reviewId: string) {
   const doc = await reviewsCollection.doc(reviewId).get();
-  if (!doc.exists) {
-    throw new AppError(404, 'NOT_FOUND');
-  }
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
   await reviewsCollection.doc(reviewId).delete();
   return { id: reviewId, deleted: true };
 }

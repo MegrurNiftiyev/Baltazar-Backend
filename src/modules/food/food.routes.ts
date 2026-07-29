@@ -28,7 +28,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/food/companies:
+ * /api/services/food/companies:
  *   get:
  *     tags: [Food]
  *     summary: Get all food companies
@@ -40,7 +40,7 @@ router.get('/companies', getCompaniesController);
 
 /**
  * @swagger
- * /api/food/companies/{id}:
+ * /api/services/food/companies/{id}:
  *   get:
  *     tags: [Food]
  *     summary: Get a food company by ID
@@ -58,7 +58,7 @@ router.get('/companies/:id', getCompanyByIdController);
 
 /**
  * @swagger
- * /api/food/items:
+ * /api/services/food/items:
  *   get:
  *     tags: [Food]
  *     summary: List food items with filters
@@ -86,7 +86,7 @@ router.get('/items', validate({ query: foodItemsQuerySchema }), getFoodItemsCont
 
 /**
  * @swagger
- * /api/food/items/{id}:
+ * /api/services/food/items/{id}:
  *   get:
  *     tags: [Food]
  *     summary: Get food item details by ID
@@ -102,8 +102,25 @@ router.get('/items', validate({ query: foodItemsQuerySchema }), getFoodItemsCont
  */
 router.get('/items/:id', getFoodItemByIdController);
 
-// ── Admin CRUD — Companies ────────────────────────────────────────────
+// Admin CRUD
 
+/**
+ * @swagger
+ * /api/services/food/companies:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Create food company
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.post(
   '/companies',
   requireAuth,
@@ -112,6 +129,28 @@ router.post(
   createCompanyController,
 );
 
+/**
+ * @swagger
+ * /api/services/food/companies/{id}:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Update food company
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.put(
   '/companies/:id',
   requireAuth,
@@ -120,10 +159,43 @@ router.put(
   updateCompanyController,
 );
 
+/**
+ * @swagger
+ * /api/services/food/companies/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Delete food company
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ *       409: { description: Has active bookings }
+ */
 router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompanyController);
 
-// ── Admin CRUD — Food Items ──────────────────────────────────────────
-
+/**
+ * @swagger
+ * /api/services/food/items:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Create food item
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.post(
   '/items',
   requireAuth,
@@ -132,6 +204,28 @@ router.post(
   createFoodItemController,
 );
 
+/**
+ * @swagger
+ * /api/services/food/items/{id}:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Update food item
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.put(
   '/items/:id',
   requireAuth,
@@ -140,6 +234,25 @@ router.put(
   updateFoodItemController,
 );
 
+/**
+ * @swagger
+ * /api/services/food/items/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Delete food item
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ *       409: { description: Has active bookings }
+ */
 router.delete('/items/:id', requireAuth, requireRole('ADMIN'), deleteFoodItemController);
 
 export default router;
+

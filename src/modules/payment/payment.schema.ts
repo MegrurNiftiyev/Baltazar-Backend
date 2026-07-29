@@ -9,7 +9,6 @@ export const addCardSchema = z.object({
 });
 
 export const paySchema = z.object({
-  flowBoxId: z.string().min(1),
   paymentMethodId: z.string().min(1),
 });
 

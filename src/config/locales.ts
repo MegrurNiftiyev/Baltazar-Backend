@@ -65,7 +65,7 @@ const messages: Record<string, LocalizedMap> = {
     en: 'You do not own this review',
     ru: 'Этот отзыв вам не принадлежит',
   },
-  FLOWBOX_EXPIRED: {
+  ORDER_EXPIRED: {
     az: 'Sifariş müddəti bitib',
     en: 'This booking has expired',
     ru: 'Срок бронирования истёк',
@@ -85,29 +85,29 @@ const messages: Record<string, LocalizedMap> = {
     en: 'User is already an admin',
     ru: 'Пользователь уже является администратором',
   },
-  FLOWBOX_CANCELLED: {
+  ORDER_CANCELLED: {
     az: 'Sifariş ləğv edilib',
-    en: 'FlowBox has been cancelled',
+    en: 'Order has been cancelled',
     ru: 'Бронирование отменено',
   },
-  FLOWBOX_CONFIRMED: {
+  ORDER_CONFIRMED: {
     az: 'Sifariş artıq təsdiqlənib',
-    en: 'FlowBox is already confirmed',
+    en: 'Order is already confirmed',
     ru: 'Бронирование уже подтверждено',
   },
   CANNOT_CANCEL_CONFIRMED: {
     az: 'Təsdiqlənmiş sifarişi ləğv etmək olmaz',
-    en: 'Cannot cancel a confirmed FlowBox',
+    en: 'Cannot cancel a confirmed order',
     ru: 'Невозможно отменить подтвержденное бронирование',
   },
-  FLOWBOX_ALREADY_PAID: {
+  ORDER_ALREADY_PAID: {
     az: 'Sifariş artıq ödənilib',
-    en: 'FlowBox is already paid',
+    en: 'Order is already paid',
     ru: 'Бронирование уже оплачено',
   },
   PRICE_NOT_COMPUTED: {
     az: 'Sifarişin qiyməti hələ hesablanmayıb',
-    en: 'FlowBox has not completed price calculation',
+    en: 'Order has not completed price calculation',
     ru: 'Расчет стоимости бронирования не завершен',
   },
   ALREADY_REVIEWED: {
@@ -135,7 +135,16 @@ const messages: Record<string, LocalizedMap> = {
     en: 'Too many requests. Please try again later',
     ru: 'Слишком много запросов. Попробуйте позже',
   },
-};
+  HAS_ACTIVE_BOOKINGS: {
+    az: 'Bu xidmete aktiv sifarisler baglidir, siline bilmez',
+    en: 'This item has active bookings and cannot be deleted',
+    ru: 'U etogo obekta est aktivnye bronirovaniya, udalenie nevozmozhno',
+  },
+  PAYMENT_IN_PROGRESS: {
+    az: 'Bu sifaris ucun odenis artiq icra olunur',
+    en: 'Payment is already in progress for this order',
+    ru: 'Platezh po etomu zakazu uzhe obrabatyvaetsya',
+  },};
 
 /**
  * Get a localized system message by error/message code.
@@ -147,3 +156,5 @@ export function t(code: string, lang: SupportedLang = 'en'): string {
 }
 
 export default messages;
+
+

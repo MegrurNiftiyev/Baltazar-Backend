@@ -30,6 +30,11 @@ async function findUserByEmail(email: string) {
     phone?: string;
     region?: string;
     language?: string;
+    profileCompleteness?: {
+      personalInfo: boolean;
+      driverLicense: boolean;
+      passport: boolean;
+    };
     refreshToken?: string;
     refreshTokenExpiresAt?: Date;
     wishlist?: Array<{ serviceId: string; serviceType: string }>;
@@ -37,8 +42,8 @@ async function findUserByEmail(email: string) {
   };
 }
 
-async function issueTokens(userId: string, role: 'USER' | 'ADMIN') {
-  const accessToken = signAccessToken({ userId, role });
+async function issueTokens(userId: string, role: 'USER' | 'ADMIN', language: 'az' | 'en' | 'ru') {
+  const accessToken = signAccessToken({ userId, role, language });
   const refreshToken = signRefreshToken({ userId });
   const expiresAt = refreshTokenExpiresAt();
 
@@ -76,10 +81,11 @@ export async function register(input: RegisterInput) {
     region: input.region || null,
     language: input.language || 'en',
     wishlist: [],
+    profileCompleteness: { personalInfo: false, driverLicense: false, passport: false },
     createdAt: new Date().toISOString(),
   });
 
-  const tokens = await issueTokens(docRef.id, 'USER');
+  const tokens = await issueTokens(docRef.id, 'USER', input.language || 'en');
 
   return {
     user: {
@@ -111,7 +117,7 @@ export async function login(input: LoginInput) {
     throw new AppError(401, 'INVALID_CREDENTIALS');
   }
 
-  const tokens = await issueTokens(user.id, user.role);
+  const tokens = await issueTokens(user.id, user.role, (user.language as 'az' | 'en' | 'ru') || 'en');
 
   return {
     user: {
@@ -161,7 +167,11 @@ export async function refresh(refreshToken: string) {
     throw new AppError(401, 'INVALID_REFRESH_TOKEN');
   }
 
-  const tokens = await issueTokens(payload.userId, userData.role as 'USER' | 'ADMIN');
+  const tokens = await issueTokens(
+    payload.userId,
+    userData.role as 'USER' | 'ADMIN',
+    (userData.language as 'az' | 'en' | 'ru') || 'en',
+  );
 
   return {
     user: {
@@ -203,6 +213,7 @@ export async function googleLogin(input: GoogleLoginInput) {
       region: null,
       language: 'en',
       wishlist: [],
+      profileCompleteness: { personalInfo: false, driverLicense: false, passport: false },
       createdAt: new Date().toISOString(),
     });
 
@@ -212,12 +223,13 @@ export async function googleLogin(input: GoogleLoginInput) {
       email: googlePayload.email,
       passwordHash: '',
       role: 'USER' as const,
+      language: 'en',
       wishlist: [],
       createdAt: new Date().toISOString(),
     };
   }
 
-  const tokens = await issueTokens(user.id, user.role);
+  const tokens = await issueTokens(user.id, user.role, (user.language as 'az' | 'en' | 'ru') || 'en');
 
   return {
     user: {
@@ -228,4 +240,14 @@ export async function googleLogin(input: GoogleLoginInput) {
     },
     ...tokens,
   };
+}
+
+export async function revokeUserSessions(userId: string) {
+  const doc = await usersCollection.doc(userId).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  await usersCollection.doc(userId).update({
+    refreshToken: null,
+    refreshTokenExpiresAt: null,
+  });
+  return { userId, revoked: true };
 }

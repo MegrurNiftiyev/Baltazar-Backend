@@ -28,7 +28,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/rentacar/companies:
+ * /api/services/rentacar/companies:
  *   get:
  *     tags: [RentACar]
  *     summary: Get all rent-a-car companies
@@ -40,7 +40,7 @@ router.get('/companies', getCompaniesController);
 
 /**
  * @swagger
- * /api/rentacar/companies/{id}:
+ * /api/services/rentacar/companies/{id}:
  *   get:
  *     tags: [RentACar]
  *     summary: Get a rent-a-car company by ID
@@ -58,7 +58,7 @@ router.get('/companies/:id', getCompanyByIdController);
 
 /**
  * @swagger
- * /api/rentacar/cars:
+ * /api/services/rentacar/cars:
  *   get:
  *     tags: [RentACar]
  *     summary: List cars with filters
@@ -95,7 +95,7 @@ router.get('/cars', validate({ query: carsQuerySchema }), getCarsController);
 
 /**
  * @swagger
- * /api/rentacar/cars/{id}:
+ * /api/services/rentacar/cars/{id}:
  *   get:
  *     tags: [RentACar]
  *     summary: Get full car details by ID
@@ -111,8 +111,25 @@ router.get('/cars', validate({ query: carsQuerySchema }), getCarsController);
  */
 router.get('/cars/:id', getCarByIdController);
 
-// ── Admin CRUD ────────────────────────────────────────────────────────
+// Admin CRUD
 
+/**
+ * @swagger
+ * /api/services/rentacar/companies:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Create rent-a-car company
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.post(
   '/companies',
   requireAuth,
@@ -121,6 +138,28 @@ router.post(
   createCompanyController,
 );
 
+/**
+ * @swagger
+ * /api/services/rentacar/companies/{id}:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Update rent-a-car company
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.put(
   '/companies/:id',
   requireAuth,
@@ -129,8 +168,43 @@ router.put(
   updateCompanyController,
 );
 
+/**
+ * @swagger
+ * /api/services/rentacar/companies/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Delete rent-a-car company
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ *       409: { description: Has active bookings }
+ */
 router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompanyController);
 
+/**
+ * @swagger
+ * /api/services/rentacar/cars:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Create car
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.post(
   '/cars',
   requireAuth,
@@ -139,6 +213,28 @@ router.post(
   createCarController,
 );
 
+/**
+ * @swagger
+ * /api/services/rentacar/cars/{id}:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Update car
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.put(
   '/cars/:id',
   requireAuth,
@@ -147,6 +243,25 @@ router.put(
   updateCarController,
 );
 
+/**
+ * @swagger
+ * /api/services/rentacar/cars/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Delete car
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ *       409: { description: Has active bookings }
+ */
 router.delete('/cars/:id', requireAuth, requireRole('ADMIN'), deleteCarController);
 
 export default router;
+

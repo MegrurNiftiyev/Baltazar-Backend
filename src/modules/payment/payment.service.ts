@@ -6,13 +6,8 @@ import { COLLECTIONS } from '../../config/collections.js';
 
 const paymentMethodsCollection = db.collection(COLLECTIONS.PAYMENT_METHODS);
 const transactionsCollection = db.collection(COLLECTIONS.TRANSACTIONS);
-const flowBoxesCollection = db.collection(COLLECTIONS.FLOW_BOXES);
+const ordersCollection = db.collection(COLLECTIONS.ORDERS);
 
-// ── Helpers ────────────────────────────────────────────────────────────
-
-/**
- * Proxy request to the external Payment Gateway Simulator.
- */
 async function gatewayRequest(path: string, body: Record<string, unknown>) {
   const response = await fetch(`${env.PAYMENT_GATEWAY_URL}${path}`, {
     method: 'POST',
@@ -32,38 +27,20 @@ async function gatewayRequest(path: string, body: Record<string, unknown>) {
   return response.json();
 }
 
-// ── Public API ─────────────────────────────────────────────────────────
-
-/**
- * Get all saved payment methods (cards) for a user.
- * Only stores last4, brand, paymentMethodId — never raw card data.
- */
 export async function getAllCards(userId: string) {
-  const snapshot = await paymentMethodsCollection
-    .where('userId', '==', userId)
-    .get();
-
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
+  const snapshot = await paymentMethodsCollection.where('userId', '==', userId).get();
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
-/**
- * Add a card — proxies to the external gateway, stores only a tokenized reference.
- * Raw card data (full number, CVV) is NEVER persisted in Firestore.
- */
 export async function addCard(userId: string, input: AddCardInput) {
-  // Send raw card data to the payment gateway only
-  const gatewayResponse = await gatewayRequest('/api/payments/methods', {
+  const gatewayResponse = (await gatewayRequest('/api/payments/methods', {
     cardNumber: input.cardNumber,
     expiryMonth: input.expiryMonth,
     expiryYear: input.expiryYear,
     cvv: input.cvv,
     cardholderName: input.cardholderName,
-  }) as { paymentMethodId: string; brand: string; last4: string };
+  })) as { paymentMethodId: string; brand: string; last4: string };
 
-  // Store only the tokenized reference in Firestore
   const docRef = await paymentMethodsCollection.add({
     userId,
     paymentMethodId: gatewayResponse.paymentMethodId,
@@ -81,57 +58,53 @@ export async function addCard(userId: string, input: AddCardInput) {
   };
 }
 
-/**
- * Process payment for a FlowBox.
- * Proxies to external gateway, creates a Transaction doc, updates FlowBox status.
- * Idempotent on `providerEventId` to prevent duplicate charges.
- */
-export async function processPayment(userId: string, input: PayInput) {
-  // Verify FlowBox exists and belongs to user
-  const flowBoxDoc = await flowBoxesCollection.doc(input.flowBoxId).get();
-  if (!flowBoxDoc.exists) {
-    throw new AppError(404, 'NOT_FOUND');
+export async function processPayment(userId: string, orderId: string, input: PayInput) {
+  await db.runTransaction(async (tx) => {
+    const orderRef = ordersCollection.doc(orderId);
+    const orderSnap = await tx.get(orderRef);
+    if (!orderSnap.exists) throw new AppError(404, 'NOT_FOUND');
+
+    const order = orderSnap.data()!;
+    if (order.userId !== userId) throw new AppError(403, 'FORBIDDEN');
+    if (order.status === 'PROCESSING') throw new AppError(409, 'PAYMENT_IN_PROGRESS');
+    if (order.status === 'CONFIRMED') throw new AppError(400, 'ORDER_ALREADY_PAID');
+    if (order.status === 'CANCELLED' || order.status === 'EXPIRED') {
+      throw new AppError(400, 'VALIDATION_ERROR', `Order is ${order.status.toLowerCase()}`);
+    }
+
+    tx.update(orderRef, { status: 'PROCESSING' });
+  });
+
+  const orderDoc = await ordersCollection.doc(orderId).get();
+  if (!orderDoc.exists) throw new AppError(404, 'NOT_FOUND');
+
+  const order = orderDoc.data()!;
+
+  let chargeResponse: { chargeId: string; status: string };
+  let amount: number;
+  try {
+    const methodSnapshot = await paymentMethodsCollection
+      .where('userId', '==', userId)
+      .where('paymentMethodId', '==', input.paymentMethodId)
+      .limit(1)
+      .get();
+
+    if (methodSnapshot.empty) throw new AppError(404, 'NOT_FOUND');
+
+    amount = order.details?.serverComputedPrice;
+    if (typeof amount !== 'number' || amount <= 0) throw new AppError(400, 'PRICE_NOT_COMPUTED');
+
+    chargeResponse = (await gatewayRequest('/api/payments/charges', {
+      paymentMethodId: input.paymentMethodId,
+      amount,
+      currency: 'USD',
+      description: `Order ${orderId}`,
+    })) as { chargeId: string; status: string };
+  } catch (err) {
+    await ordersCollection.doc(orderId).update({ status: 'PENDING' });
+    throw err;
   }
 
-  const flowBox = flowBoxDoc.data()!;
-  if (flowBox.userId !== userId) {
-    throw new AppError(403, 'FORBIDDEN');
-  }
-
-  if (flowBox.status === 'CONFIRMED') {
-    throw new AppError(400, 'FLOWBOX_ALREADY_PAID');
-  }
-
-  if (flowBox.status === 'CANCELLED' || flowBox.status === 'EXPIRED') {
-    throw new AppError(400, 'VALIDATION_ERROR', `FlowBox is ${flowBox.status.toLowerCase()}`);
-  }
-
-  // Verify payment method belongs to user
-  const methodSnapshot = await paymentMethodsCollection
-    .where('userId', '==', userId)
-    .where('paymentMethodId', '==', input.paymentMethodId)
-    .limit(1)
-    .get();
-
-  if (methodSnapshot.empty) {
-    throw new AppError(404, 'NOT_FOUND');
-  }
-
-  // Compute amount from FlowBox details
-  const amount = flowBox.details?.serverComputedPrice;
-  if (typeof amount !== 'number' || amount <= 0) {
-    throw new AppError(400, 'PRICE_NOT_COMPUTED');
-  }
-
-  // Charge via gateway
-  const chargeResponse = await gatewayRequest('/api/payments/charges', {
-    paymentMethodId: input.paymentMethodId,
-    amount,
-    currency: 'USD',
-    description: `FlowBox ${input.flowBoxId}`,
-  }) as { chargeId: string; status: string };
-
-  // Idempotency check — don't create duplicate transactions
   const existingTx = await transactionsCollection
     .where('providerEventId', '==', chargeResponse.chargeId)
     .limit(1)
@@ -141,62 +114,32 @@ export async function processPayment(userId: string, input: PayInput) {
     return { id: existingTx.docs[0]!.id, ...existingTx.docs[0]!.data() };
   }
 
-  // Create Transaction document
+  const status = chargeResponse.status === 'succeeded' ? 'SUCCESS' : 'FAILED';
   const txRef = await transactionsCollection.add({
     userId,
-    flowBoxId: input.flowBoxId,
+    orderId,
     paymentMethodId: input.paymentMethodId,
     amount,
     currency: 'USD',
     providerEventId: chargeResponse.chargeId,
-    status: chargeResponse.status === 'succeeded' ? 'SUCCESS' : 'FAILED',
+    status,
     createdAt: new Date().toISOString(),
   });
 
-  // Update FlowBox status on successful payment
   if (chargeResponse.status === 'succeeded') {
-    await flowBoxesCollection.doc(input.flowBoxId).update({
+    await ordersCollection.doc(orderId).update({
       status: 'CONFIRMED',
       paidAt: new Date().toISOString(),
     });
+  } else {
+    await ordersCollection.doc(orderId).update({ status: 'PENDING' });
   }
 
   return {
     id: txRef.id,
-    flowBoxId: input.flowBoxId,
+    orderId,
     amount,
     currency: 'USD',
-    status: chargeResponse.status === 'succeeded' ? 'SUCCESS' : 'FAILED',
-  };
-}
-
-/**
- * Get payment summary for a FlowBox.
- */
-export async function getPaymentSummary(flowBoxId: string, userId: string) {
-  const flowBoxDoc = await flowBoxesCollection.doc(flowBoxId).get();
-  if (!flowBoxDoc.exists) {
-    throw new AppError(404, 'NOT_FOUND');
-  }
-
-  const flowBox = flowBoxDoc.data()!;
-  if (flowBox.userId !== userId) {
-    throw new AppError(403, 'FORBIDDEN');
-  }
-
-  // Fetch related transactions
-  const txSnapshot = await transactionsCollection
-    .where('flowBoxId', '==', flowBoxId)
-    .get();
-
-  const transactions = txSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-
-  return {
-    flowBoxId,
-    serviceType: flowBox.serviceType,
-    serviceId: flowBox.serviceId,
-    status: flowBox.status,
-    details: flowBox.details,
-    transactions,
+    status,
   };
 }

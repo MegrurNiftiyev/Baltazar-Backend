@@ -13,11 +13,6 @@ export const addCardController = catchAsync(async (req: Request, res: Response) 
 });
 
 export const payController = catchAsync(async (req: Request, res: Response) => {
-  const result = await paymentService.processPayment(req.user!.userId, req.body);
+  const result = await paymentService.processPayment(req.user!.userId, req.params.orderId as string, req.body);
   res.status(200).json({ success: true, data: result });
-});
-
-export const getPaymentSummaryController = catchAsync(async (req: Request, res: Response) => {
-  const summary = await paymentService.getPaymentSummary(req.params.id as string, req.user!.userId);
-  res.status(200).json({ success: true, data: summary });
 });

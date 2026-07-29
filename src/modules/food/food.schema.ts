@@ -38,10 +38,14 @@ export const createFoodItemSchema = z.object({
   name: localizedMapSchema,
   description: localizedMapSchema.optional(),
   category: z.string().min(1),
-  price: z.number().min(0),
+  price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
   images: z.array(z.string()).optional(),
   ingredients: z.array(z.string()).optional(),
-  isAvailable: z.boolean().default(true),
+  status: z.enum(['AVAILABLE', 'OUT_OF_STOCK']).default('AVAILABLE'),
+  calories: z.number().optional(),
+  protein: z.number().optional(),
+  fat: z.number().optional(),
+  carb: z.number().optional(),
 });
 
 export const updateFoodItemSchema = createFoodItemSchema.partial();

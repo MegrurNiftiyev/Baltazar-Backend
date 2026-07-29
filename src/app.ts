@@ -17,15 +17,17 @@ import { t } from './config/locales.js';
 import authRouter from './modules/auth/auth.routes.js';
 import usersRouter from './modules/users/users.routes.js';
 import adminRouter from './modules/admin/admin.routes.js';
-import servicesRouter from './modules/services/services.routes.js';
 import rentacarRouter from './modules/rentacar/rentacar.routes.js';
 import travelRouter, { includedServicesRouter } from './modules/travel/travel.routes.js';
 import hotelRouter from './modules/hotel/hotel.routes.js';
 import foodRouter from './modules/food/food.routes.js';
-import flowboxRouter from './modules/flowbox/flowbox.routes.js';
+import orderRouter from './modules/order/order.routes.js';
+import orderScreensRouter from './modules/order/orderScreens.routes.js';
 import paymentRouter from './modules/payment/payment.routes.js';
 import reviewsRouter from './modules/reviews/reviews.routes.js';
 import wishlistRouter from './modules/wishlist/wishlist.routes.js';
+import homeRouter from './modules/home/home.routes.js';
+import appConfigRouter from './modules/appConfig/appConfig.routes.js';
 
 // ── App initialization ────────────────────────────────────────────────
 export const app = express();
@@ -71,15 +73,17 @@ app.use(globalLimiter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/user', wishlistRouter);
-app.use('/api/servis', servicesRouter);
-app.use('/api/hotel', hotelRouter);
-app.use('/api/rentacar', rentacarRouter);
-app.use('/api/food', foodRouter);
-app.use('/api/travel', travelRouter);
-app.use('/api/included-services', includedServicesRouter);
+app.use('/api/services/hotel', hotelRouter);
+app.use('/api/services/rentacar', rentacarRouter);
+app.use('/api/services/food', foodRouter);
+app.use('/api/services/travel', travelRouter);
+app.use('/api/services/included-services', includedServicesRouter);
 app.use('/api/reviews', reviewsRouter);
-app.use('/api/flowboxes', flowboxRouter);
+app.use('/api/orders', orderRouter);
+app.use('/api/order-screens', orderScreensRouter);
 app.use('/api/payment', paymentRouter);
+app.use('/api/home', homeRouter);
+app.use('/api/app/config', appConfigRouter);
 app.use('/api/admin', adminRouter);
 
 // ── 404 catch-all ─────────────────────────────────────────────────────

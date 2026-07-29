@@ -12,6 +12,29 @@ import type {
 
 const hotelsCollection = db.collection(COLLECTIONS.HOTELS);
 const roomsCollection = db.collection(COLLECTIONS.ROOMS);
+const ordersCollection = db.collection(COLLECTIONS.ORDERS);
+const activeStatuses = ['PENDING', 'AWAITING_PAYMENT', 'PROCESSING', 'CONFIRMED'];
+
+async function assertNoActiveOrdersForServiceIds(serviceIds: string[]) {
+  for (let i = 0; i < serviceIds.length; i += 30) {
+    const chunk = serviceIds.slice(i, i + 30);
+    if (chunk.length === 0) continue;
+    const activeOrders = await ordersCollection
+      .where('serviceId', 'in', chunk)
+      .where('status', 'in', activeStatuses)
+      .limit(1)
+      .get();
+    if (!activeOrders.empty) throw new AppError(409, 'HAS_ACTIVE_BOOKINGS');
+  }
+}
+
+async function deleteSnapshotInBatches(snapshot: FirebaseFirestore.QuerySnapshot) {
+  for (let i = 0; i < snapshot.docs.length; i += 450) {
+    const batch = db.batch();
+    snapshot.docs.slice(i, i + 450).forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+  }
+}
 
 // ── Hotels ─────────────────────────────────────────────────────────────
 
@@ -76,6 +99,7 @@ export async function getHotelById(id: string) {
 export async function createHotel(input: CreateHotelInput) {
   const docRef = await hotelsCollection.add({
     ...input,
+    serviceType: 'HOTEL',
     createdAt: new Date().toISOString(),
   });
   return { id: docRef.id, ...input };
@@ -91,8 +115,11 @@ export async function updateHotel(id: string, input: UpdateHotelInput) {
 export async function deleteHotel(id: string) {
   const doc = await hotelsCollection.doc(id).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  const childSnapshot = await roomsCollection.where('hotelId', '==', id).get();
+  await assertNoActiveOrdersForServiceIds(childSnapshot.docs.map((child) => child.id));
+  await deleteSnapshotInBatches(childSnapshot);
   await hotelsCollection.doc(id).delete();
-  return { id, deleted: true };
+  return { id, deleted: true, deletedRooms: childSnapshot.size };
 }
 
 // ── Rooms ──────────────────────────────────────────────────────────────
@@ -131,6 +158,7 @@ export async function updateRoom(id: string, input: UpdateRoomInput) {
 export async function deleteRoom(id: string) {
   const doc = await roomsCollection.doc(id).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  await assertNoActiveOrdersForServiceIds([id]);
   await roomsCollection.doc(id).delete();
   return { id, deleted: true };
 }

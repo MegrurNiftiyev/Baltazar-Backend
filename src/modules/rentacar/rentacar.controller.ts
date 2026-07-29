@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsync.js';
 import { localize } from '../../utils/localize.js';
 import * as rentacarService from './rentacar.service.js';
+import { incrementUserInterest } from '../home/home.service.js';
 
 // ── Companies ──────────────────────────────────────────────────────────
 
@@ -39,6 +40,9 @@ export const getCarsController = catchAsync(async (req: Request, res: Response) 
 
 export const getCarByIdController = catchAsync(async (req: Request, res: Response) => {
   const car = await rentacarService.getCarById(req.params.id as string);
+  if (req.user) {
+    void incrementUserInterest(req.user.userId, 'RENT_A_CAR').catch(() => {});
+  }
   res.status(200).json({ success: true, data: localize(car, req.lang!) });
 });
 

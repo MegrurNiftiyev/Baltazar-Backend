@@ -31,12 +31,13 @@ import {
 } from './travel.controller.js';
 
 const router = Router();
+const includedServicesRouter = Router();
 
 // ── Public routes ──────────────────────────────────────────────────────
 
 /**
  * @swagger
- * /api/travel/companies:
+ * /api/services/travel/companies:
  *   get:
  *     tags: [Travel]
  *     summary: Get all travel companies
@@ -48,7 +49,7 @@ router.get('/companies', getCompaniesController);
 
 /**
  * @swagger
- * /api/travel/companies/{id}:
+ * /api/services/travel/companies/{id}:
  *   get:
  *     tags: [Travel]
  *     summary: Get a travel company by ID
@@ -65,7 +66,7 @@ router.get('/companies/:id', getCompanyByIdController);
 
 /**
  * @swagger
- * /api/travel/tours:
+ * /api/services/travel/tours:
  *   get:
  *     tags: [Travel]
  *     summary: List tours with filters
@@ -96,7 +97,7 @@ router.get('/tours', validate({ query: toursQuerySchema }), getToursController);
 
 /**
  * @swagger
- * /api/travel/tours/{id}:
+ * /api/services/travel/tours/{id}:
  *   get:
  *     tags: [Travel]
  *     summary: Get full tour details
@@ -111,8 +112,25 @@ router.get('/tours', validate({ query: toursQuerySchema }), getToursController);
  */
 router.get('/tours/:id', getTourByIdController);
 
-// ── Admin CRUD ────────────────────────────────────────────────────────
+// Admin CRUD
 
+/**
+ * @swagger
+ * /api/services/travel/companies:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Create travel company
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.post(
   '/companies',
   requireAuth,
@@ -121,6 +139,28 @@ router.post(
   createCompanyController,
 );
 
+/**
+ * @swagger
+ * /api/services/travel/companies/{id}:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Update travel company
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
 router.put(
   '/companies/:id',
   requireAuth,
@@ -129,83 +169,12 @@ router.put(
   updateCompanyController,
 );
 
-router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompanyController);
-
-router.post(
-  '/tours',
-  requireAuth,
-  requireRole('ADMIN'),
-  validate({ body: createTourSchema }),
-  createTourController,
-);
-
-router.put(
-  '/tours/:id',
-  requireAuth,
-  requireRole('ADMIN'),
-  validate({ body: updateTourSchema }),
-  updateTourController,
-);
-
-router.delete('/tours/:id', requireAuth, requireRole('ADMIN'), deleteTourController);
-
-export default router;
-
-// ── Included Services (separate router, mounted at /api/included-services) ──
-
-export const includedServicesRouter = Router();
-
 /**
  * @swagger
- * /api/included-services/{serviceType}:
- *   get:
- *     tags: [IncludedServices]
- *     summary: Get included services by type (TRAVEL or HOTEL)
- *     security: []
- *     parameters:
- *       - in: path
- *         name: serviceType
- *         required: true
- *         schema: { type: string, enum: [TRAVEL, HOTEL] }
- *     responses:
- *       200: { description: List of included services }
- */
-includedServicesRouter.get(
-  '/:serviceType',
-  validate({ params: includedServicesParamsSchema }),
-  getIncludedServicesController,
-);
-
-/**
- * @swagger
- * /api/included-services/{serviceType}:
- *   post:
- *     tags: [IncludedServices]
- *     summary: Create an included service (admin only)
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: serviceType
- *         required: true
- *         schema: { type: string, enum: [TRAVEL, HOTEL] }
- *     responses:
- *       201: { description: Included service created }
- */
-includedServicesRouter.post(
-  '/:serviceType',
-  requireAuth,
-  requireRole('ADMIN'),
-  validate({ body: createIncludedServiceSchema }),
-  createIncludedServiceController,
-);
-
-/**
- * @swagger
- * /api/included-services/{id}:
- *   put:
- *     tags: [IncludedServices]
- *     summary: Update an included service (admin only)
+ * /api/services/travel/companies/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Delete travel company
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -214,22 +183,161 @@ includedServicesRouter.post(
  *         required: true
  *         schema: { type: string }
  *     responses:
- *       200: { description: Included service updated }
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ *       409: { description: Has active bookings }
  */
-includedServicesRouter.put(
-  '/:id',
+router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompanyController);
+
+/**
+ * @swagger
+ * /api/services/travel/tours:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Create tour
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
+router.post(
+  '/tours',
   requireAuth,
   requireRole('ADMIN'),
-  validate({ params: includedServiceIdParamsSchema, body: updateIncludedServiceSchema }),
-  updateIncludedServiceController,
+  validate({ body: createTourSchema }),
+  createTourController,
 );
 
 /**
  * @swagger
- * /api/included-services/{id}:
+ * /api/services/travel/tours/{id}:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Update tour
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ */
+router.put(
+  '/tours/:id',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate({ body: updateTourSchema }),
+  updateTourController,
+);
+
+/**
+ * @swagger
+ * /api/services/travel/tours/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Delete tour
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Success }
+ *       403: { description: Forbidden, admin only }
+ *       409: { description: Has active bookings }
+ */
+router.delete('/tours/:id', requireAuth, requireRole('ADMIN'), deleteTourController);
+
+
+// Included Services
+
+/**
+ * @swagger
+ * /api/services/included-services/{serviceType}:
+ *   get:
+ *     tags: [IncludedServices]
+ *     summary: Get included services by service type
+ *     security: []
+ *     parameters:
+ *       - in: path
+ *         name: serviceType
+ *         required: true
+ *         schema: { type: string, enum: [TRAVEL, HOTEL] }
+ *     responses:
+ *       200: { description: Included services }
+ */
+includedServicesRouter.get('/:serviceType', validate({ params: includedServicesParamsSchema }), getIncludedServicesController);
+
+/**
+ * @swagger
+ * /api/services/included-services/{serviceType}:
+ *   post:
+ *     tags: [IncludedServices]
+ *     summary: Create included service
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: serviceType
+ *         required: true
+ *         schema: { type: string, enum: [TRAVEL, HOTEL] }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       201: { description: Included service created }
+ *       403: { description: Forbidden, admin only }
+ */
+includedServicesRouter.post('/:serviceType', requireAuth, requireRole('ADMIN'), validate({ params: includedServicesParamsSchema, body: createIncludedServiceSchema }), createIncludedServiceController);
+
+/**
+ * @swagger
+ * /api/services/included-services/{id}:
+ *   put:
+ *     tags: [IncludedServices]
+ *     summary: Update included service
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Included service updated }
+ *       403: { description: Forbidden, admin only }
+ */
+includedServicesRouter.put('/:id', requireAuth, requireRole('ADMIN'), validate({ params: includedServiceIdParamsSchema, body: updateIncludedServiceSchema }), updateIncludedServiceController);
+
+/**
+ * @swagger
+ * /api/services/included-services/{id}:
  *   delete:
  *     tags: [IncludedServices]
- *     summary: Delete an included service (admin only)
+ *     summary: Delete included service
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -239,11 +347,10 @@ includedServicesRouter.put(
  *         schema: { type: string }
  *     responses:
  *       200: { description: Included service deleted }
+ *       403: { description: Forbidden, admin only }
  */
-includedServicesRouter.delete(
-  '/:id',
-  requireAuth,
-  requireRole('ADMIN'),
-  validate({ params: includedServiceIdParamsSchema }),
-  deleteIncludedServiceController,
-);
+includedServicesRouter.delete('/:id', requireAuth, requireRole('ADMIN'), validate({ params: includedServiceIdParamsSchema }), deleteIncludedServiceController);
+
+export default router;
+export { includedServicesRouter };
+

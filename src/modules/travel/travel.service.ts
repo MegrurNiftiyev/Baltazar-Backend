@@ -14,6 +14,29 @@ import type {
 const companiesCollection = db.collection(COLLECTIONS.COMPANIES);
 const toursCollection = db.collection(COLLECTIONS.TRAVELS);
 const includedServicesCollection = db.collection(COLLECTIONS.INCLUDED_SERVICES);
+const ordersCollection = db.collection(COLLECTIONS.ORDERS);
+const activeStatuses = ['PENDING', 'AWAITING_PAYMENT', 'PROCESSING', 'CONFIRMED'];
+
+async function assertNoActiveOrdersForServiceIds(serviceIds: string[]) {
+  for (let i = 0; i < serviceIds.length; i += 30) {
+    const chunk = serviceIds.slice(i, i + 30);
+    if (chunk.length === 0) continue;
+    const activeOrders = await ordersCollection
+      .where('serviceId', 'in', chunk)
+      .where('status', 'in', activeStatuses)
+      .limit(1)
+      .get();
+    if (!activeOrders.empty) throw new AppError(409, 'HAS_ACTIVE_BOOKINGS');
+  }
+}
+
+async function deleteSnapshotInBatches(snapshot: FirebaseFirestore.QuerySnapshot) {
+  for (let i = 0; i < snapshot.docs.length; i += 450) {
+    const batch = db.batch();
+    snapshot.docs.slice(i, i + 450).forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+  }
+}
 
 // ── Companies ──────────────────────────────────────────────────────────
 
@@ -52,8 +75,11 @@ export async function updateCompany(id: string, input: UpdateTravelCompanyInput)
 export async function deleteCompany(id: string) {
   const doc = await companiesCollection.doc(id).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  const childSnapshot = await toursCollection.where('companyId', '==', id).get();
+  await assertNoActiveOrdersForServiceIds(childSnapshot.docs.map((child) => child.id));
+  await deleteSnapshotInBatches(childSnapshot);
   await companiesCollection.doc(id).delete();
-  return { id, deleted: true };
+  return { id, deleted: true, deletedTours: childSnapshot.size };
 }
 
 // ── Tours ──────────────────────────────────────────────────────────────
@@ -141,6 +167,7 @@ export async function updateTour(id: string, input: UpdateTourInput) {
 export async function deleteTour(id: string) {
   const doc = await toursCollection.doc(id).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  await assertNoActiveOrdersForServiceIds([id]);
   await toursCollection.doc(id).delete();
   return { id, deleted: true };
 }

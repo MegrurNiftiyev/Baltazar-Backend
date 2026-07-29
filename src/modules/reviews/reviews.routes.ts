@@ -23,7 +23,7 @@ const router = Router();
  *       - in: query
  *         name: targetType
  *         required: true
- *         schema: { type: string, enum: [RENT_A_CAR, TRAVEL, HOTEL, FOOD] }
+ *         schema: { type: string, enum: [RENT_A_CAR, TRAVEL, HOTEL, FOOD, COMPANY] }
  *       - in: query
  *         name: targetId
  *         required: true
@@ -38,7 +38,7 @@ router.get('/', validate({ query: reviewQuerySchema }), getReviewsController);
  * /api/reviews:
  *   post:
  *     tags: [Reviews]
- *     summary: Create a review (requires confirmed FlowBox)
+ *     summary: Create a review (requires a confirmed order)
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -49,7 +49,7 @@ router.get('/', validate({ query: reviewQuerySchema }), getReviewsController);
  *             type: object
  *             required: [targetType, targetId, rating, comment]
  *             properties:
- *               targetType: { type: string, enum: [RENT_A_CAR, TRAVEL, HOTEL, FOOD] }
+ *               targetType: { type: string, enum: [RENT_A_CAR, TRAVEL, HOTEL, FOOD, COMPANY] }
  *               targetId: { type: string }
  *               rating: { type: integer, minimum: 1, maximum: 5 }
  *               comment: { type: string }
