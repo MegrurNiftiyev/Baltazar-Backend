@@ -32,17 +32,7 @@ router.get('/', getAppConfigController);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [latestVersion, minSupportedVersion]
- *             properties:
- *               latestVersion: { type: string }
- *               minSupportedVersion: { type: string }
- *               updateNotes:
- *                 type: object
- *                 properties:
- *                   az: { type: string }
- *                   en: { type: string }
- *                   ru: { type: string }
+ *             $ref: '#/components/schemas/AppConfigInput'
  *     responses:
  *       200: { description: Updated app configuration }
  *       403: { description: Forbidden, admin only }

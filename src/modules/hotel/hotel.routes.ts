@@ -109,7 +109,8 @@ router.get('/:id/rooms', validate({ query: roomQuerySchema }), getRoomsControlle
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/CreateHotelInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -139,7 +140,8 @@ router.post(
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateHotelInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -184,7 +186,8 @@ router.delete('/:id', requireAuth, requireRole('ADMIN'), deleteHotelController);
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/CreateRoomInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -214,7 +217,8 @@ router.post(
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateRoomInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }

@@ -33,12 +33,7 @@ router.get('/me', requireAuth, getProfileController);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               name: { type: string }
- *               phone: { type: string }
- *               region: { type: string }
- *               language: { type: string, enum: [az, en, ru] }
+ *             $ref: '#/components/schemas/UpdateProfileInput'
  *     responses:
  *       200: { description: Profile updated }
  *       401: { description: Authentication required }

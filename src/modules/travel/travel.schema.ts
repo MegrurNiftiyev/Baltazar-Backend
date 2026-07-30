@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+
+extendZodWithOpenApi(z);
 
 const localizedMapSchema = z.object({
   az: z.string(),
@@ -15,11 +18,11 @@ export const toursQuerySchema = z.object({
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   name: z.string().optional(),
-});
+}).openapi('ToursQuery');
 
 export const includedServicesParamsSchema = z.object({
   serviceType: z.enum(['TRAVEL', 'HOTEL']),
-});
+}).openapi('IncludedServicesParams');
 
 // ── Admin CRUD Schemas ─────────────────────────────────────────────────
 
@@ -34,9 +37,9 @@ export const createTravelCompanySchema = z.object({
   rating: z.number().min(0).max(5).default(0),
   reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
-});
+}).openapi('CreateTravelCompanyInput');
 
-export const updateTravelCompanySchema = createTravelCompanySchema.partial();
+export const updateTravelCompanySchema = createTravelCompanySchema.partial().openapi('UpdateTravelCompanyInput');
 
 export const createTourSchema = z.object({
   companyId: z.string().min(1),
@@ -60,21 +63,21 @@ export const createTourSchema = z.object({
   rating: z.number().min(0).max(5).default(0),
   reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['ACTIVE', 'INACTIVE', 'SOLD_OUT']).default('ACTIVE'),
-});
+}).openapi('CreateTourInput');
 
-export const updateTourSchema = createTourSchema.partial();
+export const updateTourSchema = createTourSchema.partial().openapi('UpdateTourInput');
 
 export const createIncludedServiceSchema = z.object({
   name: localizedMapSchema,
   icon: z.string().optional(),
   serviceType: z.enum(['TRAVEL', 'HOTEL']),
-});
+}).openapi('CreateIncludedServiceInput');
 
-export const updateIncludedServiceSchema = createIncludedServiceSchema.partial();
+export const updateIncludedServiceSchema = createIncludedServiceSchema.partial().openapi('UpdateIncludedServiceInput');
 
 export const includedServiceIdParamsSchema = z.object({
   id: z.string().min(1),
-});
+}).openapi('IncludedServiceIdParams');
 
 export type ToursQuery = z.infer<typeof toursQuerySchema>;
 export type CreateTourInput = z.infer<typeof createTourSchema>;

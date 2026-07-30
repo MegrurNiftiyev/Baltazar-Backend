@@ -27,6 +27,23 @@ const router = Router();
  */
 router.get('/banner', getBannerController);
 
+/**
+ * @swagger
+ * /api/home/banner:
+ *   post:
+ *     tags: [Home]
+ *     summary: Create a banner slide
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             $ref: '#/components/schemas/BannerInput'
+ *     responses:
+ *       201: { description: Banner created }
+ */
 router.post(
   '/banner',
   requireAuth,
@@ -36,6 +53,28 @@ router.post(
   createBannerController
 );
 
+/**
+ * @swagger
+ * /api/home/banner/{id}:
+ *   put:
+ *     tags: [Home]
+ *     summary: Update a banner slide
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             $ref: '#/components/schemas/BannerInput'
+ *     responses:
+ *       200: { description: Banner updated }
+ */
 router.put(
   '/banner/:id',
   requireAuth,
@@ -45,6 +84,22 @@ router.put(
   updateBannerController
 );
 
+/**
+ * @swagger
+ * /api/home/banner/{id}:
+ *   delete:
+ *     tags: [Home]
+ *     summary: Delete a banner slide
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Banner deleted }
+ */
 router.delete(
   '/banner/:id',
   requireAuth,

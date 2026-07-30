@@ -1,4 +1,9 @@
 import swaggerJSDoc from 'swagger-jsdoc';
+import { OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
+import { registry } from '../openapi/registry.js';
+
+const generator = new OpenApiGeneratorV3(registry.definitions);
+const generatedComponents = generator.generateComponents();
 
 const options: swaggerJSDoc.Options = {
   definition: {
@@ -43,6 +48,7 @@ const options: swaggerJSDoc.Options = {
             message: { type: 'string', example: 'Invalid request body' },
           },
         },
+        ...generatedComponents.components?.schemas,
       },
     },
     // Applied globally — public routes override with `security: []`

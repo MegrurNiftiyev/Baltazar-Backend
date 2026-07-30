@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+
+extendZodWithOpenApi(z);
 
 /**
  * Update profile — all fields optional (partial update).
@@ -27,13 +30,13 @@ export const updateProfileSchema = z.object({
       expiryDate: z.string().min(1),
     })
     .optional(),
-});
+}).openapi('UpdateProfileInput');
 
 export const profileCompletenessSchema = z.object({
   personalInfo: z.boolean().default(false),
   driverLicense: z.boolean().default(false),
   passport: z.boolean().default(false),
-});
+}).openapi('ProfileCompleteness');
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type ProfileCompleteness = z.infer<typeof profileCompletenessSchema>;

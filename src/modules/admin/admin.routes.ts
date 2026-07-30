@@ -28,10 +28,7 @@ router.use(requireAuth, requireRole('ADMIN'));
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [userId]
- *             properties:
- *               userId: { type: string }
+ *             $ref: '#/components/schemas/AddAdminInput'
  *     responses:
  *       200: { description: User promoted }
  *       403: { description: Forbidden, caller is not an admin }

@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+
+extendZodWithOpenApi(z);
 
 export const bannerSchema = z.object({
   link: z.string().min(1),
@@ -8,6 +11,6 @@ export const bannerSchema = z.object({
     z.boolean()
   ).optional().default(true),
   image: z.string().optional(),
-});
+}).openapi('BannerInput');
 
 export type BannerInput = z.infer<typeof bannerSchema>;

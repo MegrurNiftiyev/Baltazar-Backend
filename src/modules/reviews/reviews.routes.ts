@@ -47,13 +47,7 @@ router.get('/', optionalAuth, validate({ query: reviewQuerySchema }), getReviews
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [targetType, targetId, rating, comment]
- *             properties:
- *               targetType: { type: string, enum: [RENT_A_CAR, TRAVEL, HOTEL, FOOD, COMPANY] }
- *               targetId: { type: string }
- *               rating: { type: integer, minimum: 1, maximum: 5 }
- *               comment: { type: string }
+ *             $ref: '#/components/schemas/CreateReviewInput'
  *     responses:
  *       201: { description: Review created }
  *       403: { description: Not eligible to review }
@@ -65,6 +59,54 @@ router.post(
   createReviewController,
 );
 
+/**
+ * @swagger
+ * /api/reviews/{id}:
+ *   get:
+ *     tags: [Reviews]
+ *     summary: Get a review by ID
+ *     security: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Review details }
+ *       404: { description: Review not found }
+ *   put:
+ *     tags: [Reviews]
+ *     summary: Update the authenticated user's review
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateReviewInput'
+ *     responses:
+ *       200: { description: Review updated }
+ *       403: { description: Forbidden }
+ *   delete:
+ *     tags: [Reviews]
+ *     summary: Delete the authenticated user's review
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Review deleted }
+ *       403: { description: Forbidden }
+ */
 router.get('/:id', getReviewByIdController);
 router.put('/:id', requireAuth, validate({ body: updateReviewSchema }), updateReviewController);
 router.delete('/:id', requireAuth, deleteReviewController);

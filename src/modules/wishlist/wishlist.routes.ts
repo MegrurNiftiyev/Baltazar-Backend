@@ -36,11 +36,7 @@ router.get('/wishlist', requireAuth, getWishlistController);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [serviceId, serviceType]
- *             properties:
- *               serviceId: { type: string }
- *               serviceType: { type: string, enum: [RENT_A_CAR, TRAVEL, HOTEL, FOOD] }
+ *             $ref: '#/components/schemas/AddToWishlistInput'
  *     responses:
  *       201: { description: Added to wishlist }
  *       409: { description: Already in wishlist }

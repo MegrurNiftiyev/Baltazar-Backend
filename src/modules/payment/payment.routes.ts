@@ -37,14 +37,7 @@ router.get('/all-cards', requireAuth, getAllCardsController);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [cardNumber, expiryMonth, expiryYear, cvv, cardholderName]
- *             properties:
- *               cardNumber: { type: string }
- *               expiryMonth: { type: integer }
- *               expiryYear: { type: integer }
- *               cvv: { type: string }
- *               cardholderName: { type: string }
+ *             $ref: '#/components/schemas/AddCardInput'
  *     responses:
  *       201: { description: Card added (returns last4 and brand only) }
  */
@@ -74,10 +67,7 @@ router.post(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [paymentMethodId]
- *             properties:
- *               paymentMethodId: { type: string }
+ *             $ref: '#/components/schemas/PayInput'
  *     responses:
  *       200: { description: Payment result }
  */

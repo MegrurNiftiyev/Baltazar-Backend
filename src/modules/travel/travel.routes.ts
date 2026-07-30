@@ -126,7 +126,8 @@ router.get('/tours/:id', getTourByIdController);
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/CreateTravelCompanyInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -156,7 +157,8 @@ router.post(
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateTravelCompanyInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -201,7 +203,8 @@ router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompany
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/CreateTourInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -231,7 +234,8 @@ router.post(
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateTourInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -301,7 +305,8 @@ includedServicesRouter.get('/:serviceType', validate({ params: includedServicesP
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/CreateIncludedServiceInput'
  *     responses:
  *       201: { description: Included service created }
  *       403: { description: Forbidden, admin only }
@@ -325,7 +330,8 @@ includedServicesRouter.post('/:serviceType', requireAuth, requireRole('ADMIN'), 
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateIncludedServiceInput'
  *     responses:
  *       200: { description: Included service updated }
  *       403: { description: Forbidden, admin only }

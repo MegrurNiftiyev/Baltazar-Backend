@@ -125,7 +125,8 @@ router.get('/cars/:id', getCarByIdController);
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/CreateRentACarCompanyInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -155,7 +156,8 @@ router.post(
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateRentACarCompanyInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -200,7 +202,8 @@ router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompany
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/CreateCarInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -230,7 +233,8 @@ router.post(
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateCarInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }

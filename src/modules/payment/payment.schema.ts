@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+
+extendZodWithOpenApi(z);
 
 export const addCardSchema = z.object({
   cardNumber: z.string().min(13).max(19),
@@ -6,11 +9,11 @@ export const addCardSchema = z.object({
   expiryYear: z.number().int().min(2024),
   cvv: z.string().min(3).max(4),
   cardholderName: z.string().min(1),
-});
+}).openapi('AddCardInput');
 
 export const paySchema = z.object({
   paymentMethodId: z.string().min(1),
-});
+}).openapi('PayInput');
 
 export type AddCardInput = z.infer<typeof addCardSchema>;
 export type PayInput = z.infer<typeof paySchema>;

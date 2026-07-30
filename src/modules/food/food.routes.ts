@@ -116,7 +116,8 @@ router.get('/items/:id', getFoodItemByIdController);
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/CreateFoodCompanyInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -146,7 +147,8 @@ router.post(
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateFoodCompanyInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -191,7 +193,8 @@ router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompany
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/CreateFoodItemInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -221,7 +224,8 @@ router.post(
  *       required: true
  *       content:
  *         application/json:
- *           schema: { type: object }
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateFoodItemInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }

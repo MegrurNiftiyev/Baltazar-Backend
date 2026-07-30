@@ -28,15 +28,7 @@ const router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [name, email, password]
- *             properties:
- *               name: { type: string, minLength: 2, maxLength: 100 }
- *               email: { type: string, format: email }
- *               password: { type: string, minLength: 8, maxLength: 128 }
- *               phone: { type: string }
- *               region: { type: string }
- *               language: { type: string, enum: [az, en, ru] }
+ *             $ref: '#/components/schemas/RegisterInput'
  *     responses:
  *       201: { description: User registered successfully }
  *       409: { description: User with this email already exists }
@@ -55,11 +47,7 @@ router.post('/register', authLimiter, validate({ body: registerSchema }), regist
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [email, password]
- *             properties:
- *               email: { type: string, format: email }
- *               password: { type: string }
+ *             $ref: '#/components/schemas/LoginInput'
  *     responses:
  *       200: { description: Login successful }
  *       401: { description: Invalid email or password }
@@ -78,10 +66,7 @@ router.post('/login', authLimiter, validate({ body: loginSchema }), loginControl
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [refreshToken]
- *             properties:
- *               refreshToken: { type: string }
+ *             $ref: '#/components/schemas/RefreshInput'
  *     responses:
  *       200: { description: Tokens refreshed }
  *       401: { description: Invalid or expired refresh token }
@@ -100,10 +85,7 @@ router.post('/refresh', validate({ body: refreshSchema }), refreshController);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [idToken]
- *             properties:
- *               idToken: { type: string }
+ *             $ref: '#/components/schemas/GoogleLoginInput'
  *     responses:
  *       200: { description: Login successful }
  *       401: { description: Invalid Google token }

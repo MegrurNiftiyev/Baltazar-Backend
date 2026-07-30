@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+
+extendZodWithOpenApi(z);
 
 const localizedMapSchema = z.object({
   az: z.string(),
@@ -17,7 +20,7 @@ export const carsQuerySchema = z.object({
   category: z.string().optional(),
   transmission: z.enum(['AUTOMATIC', 'MANUAL']).optional(),
   fuelType: z.enum(['PETROL', 'DIESEL', 'ELECTRIC', 'HYBRID']).optional(),
-});
+}).openapi('CarsQuery');
 
 // ── Admin CRUD Schemas ─────────────────────────────────────────────────
 
@@ -32,9 +35,9 @@ export const createCompanySchema = z.object({
   rating: z.number().min(0).max(5).default(0),
   reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
-});
+}).openapi('CreateRentACarCompanyInput');
 
-export const updateCompanySchema = createCompanySchema.partial();
+export const updateCompanySchema = createCompanySchema.partial().openapi('UpdateRentACarCompanyInput');
 
 export const createCarSchema = z.object({
   companyId: z.string().min(1),
@@ -51,9 +54,9 @@ export const createCarSchema = z.object({
   rating: z.number().min(0).max(5).default(0),
   reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['AVAILABLE', 'UNAVAILABLE']).default('AVAILABLE'),
-});
+}).openapi('CreateCarInput');
 
-export const updateCarSchema = createCarSchema.partial();
+export const updateCarSchema = createCarSchema.partial().openapi('UpdateCarInput');
 
 export type CarsQuery = z.infer<typeof carsQuerySchema>;
 export type CreateCompanyInput = z.infer<typeof createCompanySchema>;

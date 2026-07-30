@@ -28,10 +28,7 @@ const router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               serviceType: { type: string, enum: [RENT_A_CAR, TRAVEL, HOTEL_ROOM, FOOD] }
- *               serviceId: { type: string }
+ *             $ref: '#/components/schemas/CreateOrderInput'
  *     responses:
  *       201: { description: Order created }
  */
@@ -87,10 +84,7 @@ router.get('/:id', requireAuth, getOrderByIdController);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               screen: { type: string }
- *               data: { type: object }
+ *             $ref: '#/components/schemas/AdvanceOrderStepInput'
  *     responses:
  *       200: { description: Step advanced, returns next step info }
  */
@@ -150,10 +144,7 @@ router.get('/:id/payment-summary', requireAuth, getPaymentSummaryController);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [status]
- *             properties:
- *               status: { type: string, enum: [PENDING, AWAITING_PAYMENT, PROCESSING, CONFIRMED, CANCELLED, EXPIRED] }
+ *             $ref: '#/components/schemas/UpdateOrderStatusInput'
  *     responses:
  *       200: { description: Status updated }
  *       404: { description: Order not found }

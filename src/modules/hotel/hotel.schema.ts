@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+
+extendZodWithOpenApi(z);
 
 const localizedMapSchema = z.object({
   az: z.string(),
@@ -15,11 +18,11 @@ export const hotelQuerySchema = z.object({
   city: z.string().optional(),
   minRating: z.coerce.number().min(0).max(5).optional(),
   name: z.string().optional(),
-});
+}).openapi('HotelQuery');
 
 export const roomQuerySchema = z.object({
   roomType: z.string().optional(),
-});
+}).openapi('RoomQuery');
 
 // ── Admin CRUD Schemas ─────────────────────────────────────────────────
 
@@ -38,9 +41,9 @@ export const createHotelSchema = z.object({
   rating: z.number().min(0).max(5).default(0),
   reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
-});
+}).openapi('CreateHotelInput');
 
-export const updateHotelSchema = createHotelSchema.partial();
+export const updateHotelSchema = createHotelSchema.partial().openapi('UpdateHotelInput');
 
 export const createRoomSchema = z.object({
   hotelId: z.string().min(1),
@@ -52,9 +55,9 @@ export const createRoomSchema = z.object({
   amenities: z.array(z.string()).optional(),
   images: z.array(z.string()).optional(),
   status: z.enum(['AVAILABLE', 'UNAVAILABLE']).default('AVAILABLE'),
-});
+}).openapi('CreateRoomInput');
 
-export const updateRoomSchema = createRoomSchema.partial();
+export const updateRoomSchema = createRoomSchema.partial().openapi('UpdateRoomInput');
 
 export type HotelQuery = z.infer<typeof hotelQuerySchema>;
 export type RoomQuery = z.infer<typeof roomQuerySchema>;
