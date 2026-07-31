@@ -115,6 +115,8 @@ export async function updateHotel(id: string, input: UpdateHotelInput) {
   const doc = await hotelsCollection.doc(id).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
   await hotelsCollection.doc(id).update(input);
+  // Note: reviewEligibility in this response reflects no particular user (userId defaults to undefined)
+  // because this is an admin PUT response, not a customer-facing product page.
   return getHotelById(id);
 }
 

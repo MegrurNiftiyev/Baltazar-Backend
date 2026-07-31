@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baltazar Admin Panel</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <h1>⚡ Baltazar</h1>
+  <input id="baseUrl" placeholder="Base URL" value="http://localhost:3000">
+  <input id="tokenInput" placeholder="Bearer Token" type="password" style="max-width:300px">
+  <button id="saveBtn">Save</button>
+  <span class="status-dot"><span class="dot off" id="tokenDot"></span><span id="tokenStatus">No token</span></span>
+</div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="section-label">Auth & Users</div>
+  <a href="#auth" class="active">Auth</a>
+  <a href="#users">Users</a>
+  <a href="#wishlist">Wishlist</a>
+  <div class="section-label">Services</div>
+  <a href="#hotel">Hotel</a>
+  <a href="#rentacar">RentACar</a>
+  <a href="#travel">Travel</a>
+  <a href="#food">Food</a>
+  <a href="#included-services">Included Services</a>
+  <div class="section-label">Operations</div>
+  <a href="#reviews">Reviews</a>
+  <a href="#orders">Orders</a>
+  <a href="#payment">Payment</a>
+  <a href="#banner">Banner</a>
+  <a href="#appconfig">App Config</a>
+  <a href="#admin">Admin</a>
+  <div class="sidebar-footer">
+    <a href="https://baltazar-backend-kf2f.onrender.com/api-docs/#/" target="_blank">📖 API Docs (Swagger)</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main" id="main">
+
+<!-- PAGE: Auth -->
+<div class="page active" id="page-auth">
+  <div class="page-header"><h2>Auth</h2></div>
+  <div class="auth-forms">
+    <div class="auth-card">
+      <h4>Register</h4>
+      <div class="form-group"><input id="auth-reg-name" placeholder="Name"></div>
+      <div class="form-group"><input id="auth-reg-email" placeholder="Email" type="email"></div>
+      <div class="form-group"><input id="auth-reg-password" placeholder="Password" type="password"></div>
+      <button onclick="authRegister()">Register</button>
+    </div>
+    <div class="auth-card">
+      <h4>Login</h4>
+      <div class="form-group"><input id="auth-login-email" placeholder="Email" type="email"></div>
+      <div class="form-group"><input id="auth-login-password" placeholder="Password" type="password"></div>
+      <button onclick="authLogin()">Login</button>
+    </div>
+    <div class="auth-card">
+      <h4>Refresh Token</h4>
+      <div class="form-group"><input id="auth-refresh-token" placeholder="Refresh Token"></div>
+      <button onclick="authRefresh()">Refresh</button>
+    </div>
+    <div class="auth-card">
+      <h4>Google Login</h4>
+      <div class="form-group"><input id="auth-google-token" placeholder="Google ID Token"></div>
+      <button onclick="authGoogle()">Google Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: Users -->
+<div class="page" id="page-users">
+  <div class="page-header"><h2>Users</h2></div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div class="auth-card" style="flex:1;min-width:300px">
+      <h4>My Profile</h4>
+      <div id="profile-display"></div>
+      <button onclick="loadProfile()" style="margin-top:8px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600">Load Profile</button>
+    </div>
+    <div class="auth-card" style="flex:1;min-width:300px">
+      <h4>Update Profile</h4>
+      <div class="form-group"><input id="user-name" placeholder="Name"></div>
+      <div class="form-group"><input id="user-phone" placeholder="Phone"></div>
+      <div class="form-group"><input id="user-region" placeholder="Region"></div>
+      <div class="form-group">
+        <select id="user-lang"><option value="">Language</option><option value="az">AZ</option><option value="en">EN</option><option value="ru">RU</option></select>
+      </div>
+      <button onclick="updateProfile()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600">Update</button>
+    </div>
+    <div class="auth-card" style="flex:1;min-width:300px">
+      <h4>Avatar</h4>
+      <div class="form-group"><input id="avatar-file" type="file" accept="image/*" onchange="previewFile(this,'avatar-preview')"></div>
+      <img class="file-preview" id="avatar-preview">
+      <button onclick="uploadAvatar()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600">Upload Avatar</button>
+    </div>
+    <div class="auth-card" style="flex:1;min-width:300px">
+      <h4>Disable User</h4>
+      <div class="form-group"><input id="disable-user-id" placeholder="User ID"></div>
+      <button onclick="disableUser()" style="background:var(--error);color:#fff;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600">Disable</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: Wishlist -->
+<div class="page" id="page-wishlist">
+  <div class="page-header"><h2>Wishlist</h2><button class="btn-create" onclick="showWishlistForm()">+ Add</button></div>
+  <div id="wishlist-table"></div>
+</div>
+
+<!-- PAGE: Hotel -->
+<div class="page" id="page-hotel">
+  <div class="page-header"><h2>Hotels</h2><button class="btn-create" onclick="showHotelForm()">+ Create Hotel</button></div>
+  <div class="filters-bar" id="hotel-filters">
+    <input placeholder="minPrice" id="hotel-f-minPrice" type="number">
+    <input placeholder="maxPrice" id="hotel-f-maxPrice" type="number">
+    <input placeholder="starRating" id="hotel-f-starRating" type="number" min="1" max="5">
+    <input placeholder="city" id="hotel-f-city">
+    <input placeholder="minRating" id="hotel-f-minRating" type="number" min="0" max="5" step="0.1">
+    <input placeholder="name" id="hotel-f-name">
+    <button onclick="loadHotels()">Filter</button>
+  </div>
+  <div id="hotel-table"></div>
+  <div id="hotel-rooms-section" style="margin-top:24px;display:none">
+    <div class="page-header"><h3 id="hotel-rooms-title">Rooms</h3><button class="btn-create" onclick="showRoomForm()">+ Create Room</button></div>
+    <div id="hotel-rooms-table"></div>
+  </div>
+</div>
+
+<!-- PAGE: RentACar -->
+<div class="page" id="page-rentacar">
+  <div class="page-header"><h2>Rent-a-Car Companies</h2><button class="btn-create" onclick="showRentacarCompanyForm()">+ Create Company</button></div>
+  <div id="rentacar-companies-table"></div>
+  <div style="margin-top:24px">
+    <div class="page-header"><h2>Cars</h2><button class="btn-create" onclick="showRentacarCarForm()">+ Create Car</button></div>
+    <div class="filters-bar">
+      <select id="car-f-companyId"><option value="">All Companies</option></select>
+      <input placeholder="minPrice" id="car-f-minPrice" type="number">
+      <input placeholder="maxPrice" id="car-f-maxPrice" type="number">
+      <input placeholder="brand" id="car-f-brand">
+      <input placeholder="model" id="car-f-model">
+      <input placeholder="category" id="car-f-category">
+      <select id="car-f-transmission"><option value="">Transmission</option><option value="AUTOMATIC">AUTOMATIC</option><option value="MANUAL">MANUAL</option></select>
+      <select id="car-f-fuelType"><option value="">Fuel</option><option value="PETROL">PETROL</option><option value="DIESEL">DIESEL</option><option value="ELECTRIC">ELECTRIC</option><option value="HYBRID">HYBRID</option></select>
+      <button onclick="loadRentacarCars()">Filter</button>
+    </div>
+    <div id="rentacar-cars-table"></div>
+  </div>
+</div>
+
+<!-- PAGE: Travel -->
+<div class="page" id="page-travel">
+  <div class="page-header"><h2>Travel Companies</h2><button class="btn-create" onclick="showTravelCompanyForm()">+ Create Company</button></div>
+  <div id="travel-companies-table"></div>
+  <div style="margin-top:24px">
+    <div class="page-header"><h2>Tours</h2><button class="btn-create" onclick="showTravelTourForm()">+ Create Tour</button></div>
+    <div class="filters-bar">
+      <select id="tour-f-companyId"><option value="">All Companies</option></select>
+      <input placeholder="category" id="tour-f-category">
+      <input placeholder="minRating" id="tour-f-minRating" type="number" min="0" max="5" step="0.1">
+      <input placeholder="startDate" id="tour-f-startDate" type="date">
+      <input placeholder="endDate" id="tour-f-endDate" type="date">
+      <input placeholder="name" id="tour-f-name">
+      <button onclick="loadTravelTours()">Filter</button>
+    </div>
+    <div id="travel-tours-table"></div>
+  </div>
+</div>
+
+<!-- PAGE: Food -->
+<div class="page" id="page-food">
+  <div class="page-header"><h2>Food Companies</h2><button class="btn-create" onclick="showFoodCompanyForm()">+ Create Company</button></div>
+  <div id="food-companies-table"></div>
+  <div style="margin-top:24px">
+    <div class="page-header"><h2>Food Items</h2><button class="btn-create" onclick="showFoodItemForm()">+ Create Item</button></div>
+    <div class="filters-bar">
+      <select id="item-f-companyId"><option value="">All Companies</option></select>
+      <input placeholder="category" id="item-f-category">
+      <input placeholder="minPrice" id="item-f-minPrice" type="number">
+      <input placeholder="maxPrice" id="item-f-maxPrice" type="number">
+      <input placeholder="name" id="item-f-name">
+      <button onclick="loadFoodItems()">Filter</button>
+    </div>
+    <div id="food-items-table"></div>
+  </div>
+</div>
+
+<!-- PAGE: Included Services -->
+<div class="page" id="page-included-services">
+  <div class="page-header"><h2>Included Services</h2><button class="btn-create" onclick="showIncludedServiceForm()">+ Create</button></div>
+  <div class="toggle-group" id="is-toggle">
+    <button class="active" onclick="switchIncludedServiceType('TRAVEL')">TRAVEL</button>
+    <button onclick="switchIncludedServiceType('HOTEL')">HOTEL</button>
+  </div>
+  <div id="included-services-table"></div>
+</div>
+
+<!-- PAGE: Reviews -->
+<div class="page" id="page-reviews">
+  <div class="page-header"><h2>Reviews</h2><button class="btn-create" onclick="showReviewForm()">+ Create</button></div>
+  <div class="filters-bar">
+    <select id="review-f-targetType"><option value="">All Types</option><option value="RENT_A_CAR">RENT_A_CAR</option><option value="TRAVEL">TRAVEL</option><option value="HOTEL">HOTEL</option><option value="FOOD">FOOD</option><option value="COMPANY">COMPANY</option></select>
+    <input placeholder="targetId" id="review-f-targetId">
+    <button onclick="loadReviews()">Filter</button>
+  </div>
+  <div id="reviews-table"></div>
+</div>
+
+<!-- PAGE: Orders -->
+<div class="page" id="page-orders">
+  <div class="page-header"><h2>Orders</h2><button class="btn-create" onclick="showOrderForm()">+ Create Order</button></div>
+  <div id="orders-table"></div>
+</div>
+
+<!-- PAGE: Payment -->
+<div class="page" id="page-payment">
+  <div class="page-header"><h2>Payment</h2></div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div class="auth-card" style="flex:1;min-width:300px">
+      <h4>All Cards</h4>
+      <button onclick="loadCards()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600">Load Cards</button>
+      <div id="cards-display" style="margin-top:8px"></div>
+    </div>
+    <div class="auth-card" style="flex:1;min-width:300px">
+      <h4>Add Card</h4>
+      <div class="form-group"><input id="card-number" placeholder="Card Number"></div>
+      <div class="form-row">
+        <div class="form-group"><input id="card-expiry-month" placeholder="Expiry Month (1-12)" type="number" min="1" max="12"></div>
+        <div class="form-group"><input id="card-expiry-year" placeholder="Expiry Year (e.g. 2027)" type="number" min="2024"></div>
+      </div>
+      <div class="form-group"><input id="card-cvv" placeholder="CVV"></div>
+      <div class="form-group"><input id="card-holder" placeholder="Cardholder Name"></div>
+      <button onclick="addCard()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600">Add Card</button>
+    </div>
+    <div class="auth-card" style="flex:1;min-width:300px">
+      <h4>Pay Order</h4>
+      <div class="form-group"><input id="pay-order-id" placeholder="Order ID"></div>
+      <div class="form-group"><input id="pay-method-id" placeholder="Payment Method ID (see All Cards above)"></div>
+      <button onclick="payOrder()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600">Pay</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: Banner -->
+<div class="page" id="page-banner">
+  <div class="page-header"><h2>Banners</h2><button class="btn-create" onclick="showBannerForm()">+ Create</button></div>
+  <div id="banner-table"></div>
+</div>
+
+<!-- PAGE: App Config -->
+<div class="page" id="page-appconfig">
+  <div class="page-header"><h2>App Config</h2></div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div class="auth-card" style="flex:1;min-width:300px">
+      <h4>Current Config</h4>
+      <button onclick="loadAppConfig()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600">Load Config</button>
+      <div id="appconfig-display" style="margin-top:8px"></div>
+    </div>
+    <div class="auth-card" style="flex:1;min-width:300px">
+      <h4>Update Config</h4>
+      <div class="form-group"><textarea id="appconfig-json" rows="8" placeholder='{"key":"value"}'></textarea></div>
+      <button onclick="updateAppConfig()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: Admin -->
+<div class="page" id="page-admin">
+  <div class="page-header"><h2>Admin</h2></div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div class="auth-card" style="flex:1;min-width:300px">
+      <h4>Add Admin</h4>
+      <div class="form-group"><input id="admin-userId" placeholder="User ID (Firestore doc ID)"></div>
+      <button onclick="addAdmin()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600">Add Admin</button>
+    </div>
+    <div class="auth-card" style="flex:1;min-width:300px">
+      <h4>Transactions</h4>
+      <div class="form-group"><input id="tx-status" placeholder="Status filter"></div>
+      <div class="form-group"><input id="tx-userId" placeholder="User ID filter"></div>
+      <button onclick="loadTransactions()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600">Load</button>
+      <div id="transactions-display" style="margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent">
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- INSPECTOR -->
+<div class="inspector collapsed" id="inspector">
+  <div class="inspector-toggle" onclick="toggleInspector()">
+    <span>📋 Request Inspector</span>
+    <span id="inspectorArrow">▲</span>
+  </div>
+  <div class="inspector-body hidden" id="inspectorBody">
+    <div class="inspector-history" id="inspectorHistory"></div>
+    <div class="inspector-tabs" id="inspectorTabs">
+      <button class="active" onclick="switchInspectorTab('curl')">cURL</button>
+      <button onclick="switchInspectorTab('body')">Request Body</button>
+      <button onclick="switchInspectorTab('response')">Response</button>
+      <button onclick="switchInspectorTab('headers')">Headers</button>
+    </div>
+    <div class="inspector-content" id="inspectorContent"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

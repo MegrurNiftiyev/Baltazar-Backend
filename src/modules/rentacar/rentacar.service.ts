@@ -74,6 +74,8 @@ export async function updateCompany(id: string, input: UpdateCompanyInput) {
     throw new AppError(404, 'NOT_FOUND');
   }
   await companiesCollection.doc(id).update(input);
+  // Note: reviewEligibility in this response reflects no particular user (userId defaults to undefined)
+  // because this is an admin PUT response, not a customer-facing product page.
   return getCompanyById(id);
 }
 
@@ -176,6 +178,8 @@ export async function updateCar(id: string, input: UpdateCarInput) {
     throw new AppError(404, 'NOT_FOUND');
   }
   await carsCollection.doc(id).update(input);
+  // Note: reviewEligibility in this response reflects no particular user (userId defaults to undefined)
+  // because this is an admin PUT response, not a customer-facing product page.
   return getCarById(id);
 }
 

@@ -97,7 +97,7 @@ router.get('/:id', optionalAuth, getHotelByIdController);
  *     responses:
  *       200: { description: List of rooms }
  */
-router.get('/:id/rooms', validate({ query: roomQuerySchema }), getRoomsController);
+router.get('/:id/rooms', optionalAuth, validate({ query: roomQuerySchema }), getRoomsController);
 
 // Admin CRUD
 

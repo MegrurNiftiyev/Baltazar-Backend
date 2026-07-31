@@ -75,6 +75,8 @@ export async function updateCompany(id: string, input: UpdateTravelCompanyInput)
   const doc = await companiesCollection.doc(id).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
   await companiesCollection.doc(id).update(input);
+  // Note: reviewEligibility in this response reflects no particular user (userId defaults to undefined)
+  // because this is an admin PUT response, not a customer-facing product page.
   return getCompanyById(id);
 }
 
@@ -172,6 +174,8 @@ export async function updateTour(id: string, input: UpdateTourInput) {
   const doc = await toursCollection.doc(id).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
   await toursCollection.doc(id).update(input);
+  // Note: reviewEligibility in this response reflects no particular user (userId defaults to undefined)
+  // because this is an admin PUT response, not a customer-facing product page.
   return getTourById(id);
 }
 

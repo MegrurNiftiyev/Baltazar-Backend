@@ -72,6 +72,8 @@ export async function updateCompany(id: string, input: UpdateFoodCompanyInput) {
   const doc = await companiesCollection.doc(id).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
   await companiesCollection.doc(id).update(input);
+  // Note: reviewEligibility in this response reflects no particular user (userId defaults to undefined)
+  // because this is an admin PUT response, not a customer-facing product page.
   return getCompanyById(id);
 }
 
@@ -158,6 +160,8 @@ export async function updateFoodItem(id: string, input: UpdateFoodItemInput) {
   const doc = await foodItemsCollection.doc(id).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
   await foodItemsCollection.doc(id).update(input);
+  // Note: reviewEligibility in this response reflects no particular user (userId defaults to undefined)
+  // because this is an admin PUT response, not a customer-facing product page.
   const updated = await foodItemsCollection.doc(id).get();
   return { id: updated.id, ...updated.data() };
 }
