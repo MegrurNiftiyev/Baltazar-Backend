@@ -32,8 +32,6 @@ export const createCompanySchema = z.object({
   profileImage: z.string().url().optional(),
   bannerImage: z.string().url().optional(),
   images: z.array(z.string()).optional(),
-  rating: z.number().min(0).max(5).default(0),
-  reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
 }).openapi('CreateRentACarCompanyInput');
 
@@ -51,8 +49,6 @@ export const createCarSchema = z.object({
   price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
   images: z.array(z.string()).min(1),
   features: z.array(z.string()).optional(),
-  rating: z.number().min(0).max(5).default(0),
-  reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['AVAILABLE', 'UNAVAILABLE']).default('AVAILABLE'),
 }).openapi('CreateCarInput');
 

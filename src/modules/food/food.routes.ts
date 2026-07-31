@@ -1,6 +1,10 @@
 ﻿import { Router } from 'express';
+import { optionalAuth } from '../../middlewares/optionalAuth.js';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
+import { upload } from '../../middlewares/upload.js';
+import { parseJsonPayload } from '../../middlewares/parseJsonPayload.js';
+import { resolveImageFields } from '../../middlewares/resolveImageFields.js';
 import { validate } from '../../middlewares/validate.js';
 import {
   foodItemsQuerySchema,
@@ -54,7 +58,7 @@ router.get('/companies', getCompaniesController);
  *       200: { description: Company details }
  *       404: { description: Company not found }
  */
-router.get('/companies/:id', getCompanyByIdController);
+router.get('/companies/:id', optionalAuth, getCompanyByIdController);
 
 /**
  * @swagger
@@ -100,7 +104,7 @@ router.get('/items', validate({ query: foodItemsQuerySchema }), getFoodItemsCont
  *       200: { description: Food item details }
  *       404: { description: Food item not found }
  */
-router.get('/items/:id', getFoodItemByIdController);
+router.get('/items/:id', optionalAuth, getFoodItemByIdController);
 
 // Admin CRUD
 
@@ -109,15 +113,24 @@ router.get('/items/:id', getFoodItemByIdController);
  * /api/services/food/companies:
  *   post:
  *     tags: [Food]
- *     summary: Create food company
+ *     summary: Create food company (admin)
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreateFoodCompanyInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching CreateFoodCompanyInput (see components.schemas), minus the image fields below
+ *               logo: { type: string, format: binary }
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -126,6 +139,15 @@ router.post(
   '/companies',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('foodCompanies', [
+    { field: 'logo', kind: 'single' },
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: createFoodCompanySchema }),
   createCompanyController,
 );
@@ -135,7 +157,7 @@ router.post(
  * /api/services/food/companies/{id}:
  *   put:
  *     tags: [Food]
- *     summary: Update food company
+ *     summary: Update food company (admin)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -146,9 +168,18 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/UpdateFoodCompanyInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching UpdateFoodCompanyInput (see components.schemas), minus the image fields below
+ *               logo: { type: string, format: binary }
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -157,6 +188,15 @@ router.put(
   '/companies/:id',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('foodCompanies', [
+    { field: 'logo', kind: 'single' },
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: updateFoodCompanySchema }),
   updateCompanyController,
 );
@@ -186,15 +226,23 @@ router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompany
  * /api/services/food/items:
  *   post:
  *     tags: [Food]
- *     summary: Create food item
+ *     summary: Create food item (admin)
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreateFoodItemInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching CreateFoodItemInput (see components.schemas), minus the image fields below
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -203,6 +251,13 @@ router.post(
   '/items',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('foodItems', [
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: createFoodItemSchema }),
   createFoodItemController,
 );
@@ -212,7 +267,7 @@ router.post(
  * /api/services/food/items/{id}:
  *   put:
  *     tags: [Food]
- *     summary: Update food item
+ *     summary: Update food item (admin)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -223,9 +278,17 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/UpdateFoodItemInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching UpdateFoodItemInput (see components.schemas), minus the image fields below
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -234,6 +297,13 @@ router.put(
   '/items/:id',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('foodItems', [
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: updateFoodItemSchema }),
   updateFoodItemController,
 );

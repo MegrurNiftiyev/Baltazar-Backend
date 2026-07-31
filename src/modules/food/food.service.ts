@@ -1,6 +1,7 @@
 import { db } from '../../config/firebase.js';
 import { AppError } from '../../errors/AppError.js';
 import { COLLECTIONS } from '../../config/collections.js';
+import { getReviewEligibility } from '../reviews/reviews.service.js';
 import type {
   FoodItemsQuery,
   CreateFoodCompanyInput,
@@ -45,21 +46,26 @@ export async function getCompanies() {
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
-export async function getCompanyById(id: string) {
+export async function getCompanyById(id: string, userId?: string) {
   const doc = await companiesCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
-  return { id: doc.id, ...doc.data() };
+  const { ratingSum, ...data } = doc.data()!;
+  const reviewEligibility = await getReviewEligibility(userId, 'COMPANY', id);
+  return { id: doc.id, ...data, reviewEligibility };
 }
 
 export async function createCompany(input: CreateFoodCompanyInput) {
   const docRef = await companiesCollection.add({
     ...input,
     serviceType: 'FOOD',
+    rating: 5,
+    reviewCount: 0,
+    ratingSum: 0,
     createdAt: new Date().toISOString(),
   });
-  return { id: docRef.id, ...input };
+  return { id: docRef.id, ...input, rating: 5, reviewCount: 0 };
 }
 
 export async function updateCompany(id: string, input: UpdateFoodCompanyInput) {
@@ -126,12 +132,14 @@ export async function getFoodItems(filters: FoodItemsQuery) {
   return results;
 }
 
-export async function getFoodItemById(id: string) {
+export async function getFoodItemById(id: string, userId?: string) {
   const doc = await foodItemsCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
-  return { id: doc.id, ...doc.data() };
+  const { ratingSum, ...data } = doc.data()!;
+  const reviewEligibility = await getReviewEligibility(userId, 'FOOD', id);
+  return { id: doc.id, ...data, reviewEligibility };
 }
 
 export async function createFoodItem(input: CreateFoodItemInput) {

@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
+import { upload } from '../../middlewares/upload.js';
 import { validate } from '../../middlewares/validate.js';
 import { updateProfileSchema } from './users.schema.js';
-import { getProfileController, updateProfileController, disableUserController } from './users.controller.js';
+import { getProfileController, updateProfileController, disableUserController, updateAvatarController } from './users.controller.js';
 
 const router = Router();
 
@@ -39,6 +40,30 @@ router.get('/me', requireAuth, getProfileController);
  *       401: { description: Authentication required }
  */
 router.put('/me', requireAuth, validate({ body: updateProfileSchema }), updateProfileController);
+
+/**
+ * @swagger
+ * /api/users/me/avatar:
+ *   put:
+ *     tags: [Users]
+ *     summary: Upload/replace the current user's avatar image
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [avatar]
+ *             properties:
+ *               avatar: { type: string, format: binary }
+ *     responses:
+ *       200: { description: Avatar updated, returns full profile }
+ *       400: { description: No file provided }
+ *       401: { description: Authentication required }
+ */
+router.put('/me/avatar', requireAuth, upload.single('avatar'), updateAvatarController);
 
 /**
  * @swagger

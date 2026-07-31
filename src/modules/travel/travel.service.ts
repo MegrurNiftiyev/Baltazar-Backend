@@ -1,6 +1,7 @@
 import { db } from '../../config/firebase.js';
 import { AppError } from '../../errors/AppError.js';
 import { COLLECTIONS } from '../../config/collections.js';
+import { getReviewEligibility } from '../reviews/reviews.service.js';
 import type {
   ToursQuery,
   CreateTravelCompanyInput,
@@ -48,21 +49,26 @@ export async function getCompanies() {
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
-export async function getCompanyById(id: string) {
+export async function getCompanyById(id: string, userId?: string) {
   const doc = await companiesCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
-  return { id: doc.id, ...doc.data() };
+  const { ratingSum, ...data } = doc.data()!;
+  const reviewEligibility = await getReviewEligibility(userId, 'COMPANY', id);
+  return { id: doc.id, ...data, reviewEligibility };
 }
 
 export async function createCompany(input: CreateTravelCompanyInput) {
   const docRef = await companiesCollection.add({
     ...input,
     serviceType: 'TRAVEL',
+    rating: 5,
+    reviewCount: 0,
+    ratingSum: 0,
     createdAt: new Date().toISOString(),
   });
-  return { id: docRef.id, ...input };
+  return { id: docRef.id, ...input, rating: 5, reviewCount: 0 };
 }
 
 export async function updateCompany(id: string, input: UpdateTravelCompanyInput) {
@@ -141,20 +147,25 @@ export async function getTours(filters: ToursQuery) {
   return results;
 }
 
-export async function getTourById(id: string) {
+export async function getTourById(id: string, userId?: string) {
   const doc = await toursCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
-  return { id: doc.id, ...doc.data() };
+  const { ratingSum, ...data } = doc.data()!;
+  const reviewEligibility = await getReviewEligibility(userId, 'TRAVEL', id);
+  return { id: doc.id, ...data, reviewEligibility };
 }
 
 export async function createTour(input: CreateTourInput) {
   const docRef = await toursCollection.add({
     ...input,
+    rating: 5,
+    reviewCount: 0,
+    ratingSum: 0,
     createdAt: new Date().toISOString(),
   });
-  return { id: docRef.id, ...input };
+  return { id: docRef.id, ...input, rating: 5, reviewCount: 0 };
 }
 
 export async function updateTour(id: string, input: UpdateTourInput) {

@@ -12,7 +12,7 @@ export const getCompaniesController = catchAsync(async (req: Request, res: Respo
 });
 
 export const getCompanyByIdController = catchAsync(async (req: Request, res: Response) => {
-  const company = await travelService.getCompanyById(req.params.id as string);
+  const company = await travelService.getCompanyById(req.params.id as string, req.user?.userId);
   res.status(200).json({ success: true, data: localize(company, req.lang!) });
 });
 
@@ -39,7 +39,7 @@ export const getToursController = catchAsync(async (req: Request, res: Response)
 });
 
 export const getTourByIdController = catchAsync(async (req: Request, res: Response) => {
-  const tour = await travelService.getTourById(req.params.id as string);
+  const tour = await travelService.getTourById(req.params.id as string, req.user?.userId);
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'TRAVEL').catch(() => {});
   }

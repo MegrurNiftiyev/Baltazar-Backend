@@ -1,6 +1,10 @@
 ﻿import { Router } from 'express';
+import { optionalAuth } from '../../middlewares/optionalAuth.js';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
+import { upload } from '../../middlewares/upload.js';
+import { parseJsonPayload } from '../../middlewares/parseJsonPayload.js';
+import { resolveImageFields } from '../../middlewares/resolveImageFields.js';
 import { validate } from '../../middlewares/validate.js';
 import {
   toursQuerySchema,
@@ -62,7 +66,7 @@ router.get('/companies', getCompaniesController);
  *     responses:
  *       200: { description: Company details }
  */
-router.get('/companies/:id', getCompanyByIdController);
+router.get('/companies/:id', optionalAuth, getCompanyByIdController);
 
 /**
  * @swagger
@@ -110,7 +114,7 @@ router.get('/tours', validate({ query: toursQuerySchema }), getToursController);
  *     responses:
  *       200: { description: Tour details }
  */
-router.get('/tours/:id', getTourByIdController);
+router.get('/tours/:id', optionalAuth, getTourByIdController);
 
 // Admin CRUD
 
@@ -119,15 +123,25 @@ router.get('/tours/:id', getTourByIdController);
  * /api/services/travel/companies:
  *   post:
  *     tags: [Travel]
- *     summary: Create travel company
+ *     summary: Create travel company (admin)
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreateTravelCompanyInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching CreateTravelCompanyInput (see components.schemas), minus the image fields below
+ *               profileImage: { type: string, format: binary }
+ *               bannerImage: { type: string, format: binary }
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -136,6 +150,17 @@ router.post(
   '/companies',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'profileImage', maxCount: 1 },
+    { name: 'bannerImage', maxCount: 1 },
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('travelCompanies', [
+    { field: 'profileImage', kind: 'single' },
+    { field: 'bannerImage', kind: 'single' },
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: createTravelCompanySchema }),
   createCompanyController,
 );
@@ -145,7 +170,7 @@ router.post(
  * /api/services/travel/companies/{id}:
  *   put:
  *     tags: [Travel]
- *     summary: Update travel company
+ *     summary: Update travel company (admin)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -156,9 +181,19 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/UpdateTravelCompanyInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching UpdateTravelCompanyInput (see components.schemas), minus the image fields below
+ *               profileImage: { type: string, format: binary }
+ *               bannerImage: { type: string, format: binary }
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -167,6 +202,17 @@ router.put(
   '/companies/:id',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'profileImage', maxCount: 1 },
+    { name: 'bannerImage', maxCount: 1 },
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('travelCompanies', [
+    { field: 'profileImage', kind: 'single' },
+    { field: 'bannerImage', kind: 'single' },
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: updateTravelCompanySchema }),
   updateCompanyController,
 );
@@ -196,15 +242,23 @@ router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompany
  * /api/services/travel/tours:
  *   post:
  *     tags: [Travel]
- *     summary: Create tour
+ *     summary: Create tour (admin)
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreateTourInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching CreateTourInput (see components.schemas), minus the image fields below
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -213,6 +267,13 @@ router.post(
   '/tours',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('tours', [
+    { field: 'images', kind: 'multi', required: true },
+  ]),
   validate({ body: createTourSchema }),
   createTourController,
 );
@@ -222,7 +283,7 @@ router.post(
  * /api/services/travel/tours/{id}:
  *   put:
  *     tags: [Travel]
- *     summary: Update tour
+ *     summary: Update tour (admin)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -233,9 +294,17 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/UpdateTourInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching UpdateTourInput (see components.schemas), minus the image fields below
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -244,6 +313,13 @@ router.put(
   '/tours/:id',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('tours', [
+    { field: 'images', kind: 'multi', required: true },
+  ]),
   validate({ body: updateTourSchema }),
   updateTourController,
 );

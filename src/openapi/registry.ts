@@ -3,7 +3,7 @@ import { addAdminSchema, adminTransactionQuerySchema } from '../modules/admin/ad
 import { appConfigSchema } from '../modules/appConfig/appConfig.schema.js';
 import { registerSchema, loginSchema, refreshSchema, googleLoginSchema } from '../modules/auth/auth.schema.js';
 import { foodItemsQuerySchema, createFoodCompanySchema, updateFoodCompanySchema, createFoodItemSchema, updateFoodItemSchema } from '../modules/food/food.schema.js';
-import { bannerSchema } from '../modules/home/home.schema.js';
+import { createBannerSchema, updateBannerSchema } from '../modules/home/home.schema.js';
 import { hotelQuerySchema, roomQuerySchema, createHotelSchema, updateHotelSchema, createRoomSchema, updateRoomSchema } from '../modules/hotel/hotel.schema.js';
 import { createOrderSchema, advanceStepSchema, updateOrderStatusSchema, adminOrderQuerySchema } from '../modules/order/order.schema.js';
 import { addCardSchema, paySchema } from '../modules/payment/payment.schema.js';
@@ -27,7 +27,8 @@ registry.register('CreateFoodCompanyInput', createFoodCompanySchema);
 registry.register('UpdateFoodCompanyInput', updateFoodCompanySchema);
 registry.register('CreateFoodItemInput', createFoodItemSchema);
 registry.register('UpdateFoodItemInput', updateFoodItemSchema);
-registry.register('BannerInput', bannerSchema);
+registry.register('CreateBannerInput', createBannerSchema);
+registry.register('UpdateBannerInput', updateBannerSchema);
 registry.register('HotelQuery', hotelQuerySchema);
 registry.register('RoomQuery', roomQuerySchema);
 registry.register('CreateHotelInput', createHotelSchema);

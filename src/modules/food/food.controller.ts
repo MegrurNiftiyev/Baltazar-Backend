@@ -12,7 +12,7 @@ export const getCompaniesController = catchAsync(async (req: Request, res: Respo
 });
 
 export const getCompanyByIdController = catchAsync(async (req: Request, res: Response) => {
-  const company = await foodService.getCompanyById(req.params.id as string);
+  const company = await foodService.getCompanyById(req.params.id as string, req.user?.userId);
   res.status(200).json({ success: true, data: localize(company, req.lang!) });
 });
 
@@ -39,7 +39,7 @@ export const getFoodItemsController = catchAsync(async (req: Request, res: Respo
 });
 
 export const getFoodItemByIdController = catchAsync(async (req: Request, res: Response) => {
-  const item = await foodService.getFoodItemById(req.params.id as string);
+  const item = await foodService.getFoodItemById(req.params.id as string, req.user?.userId);
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'FOOD').catch(() => {});
   }

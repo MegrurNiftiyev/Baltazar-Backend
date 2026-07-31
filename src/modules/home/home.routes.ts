@@ -3,8 +3,10 @@ import { optionalAuth } from '../../middlewares/optionalAuth.js';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
 import { upload } from '../../middlewares/upload.js';
+import { parseJsonPayload } from '../../middlewares/parseJsonPayload.js';
+import { resolveImageFields } from '../../middlewares/resolveImageFields.js';
 import { validate } from '../../middlewares/validate.js';
-import { bannerSchema } from './home.schema.js';
+import { createBannerSchema, updateBannerSchema } from './home.schema.js';
 import { 
   getBannerController, 
   getExploreController,
@@ -32,7 +34,7 @@ router.get('/banner', getBannerController);
  * /api/home/banner:
  *   post:
  *     tags: [Home]
- *     summary: Create a banner slide
+ *     summary: Create a banner slide (admin)
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -40,7 +42,13 @@ router.get('/banner', getBannerController);
  *       content:
  *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/BannerInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching CreateBannerInput (see components.schemas), minus the image field below
+ *               image: { type: string, format: binary }
  *     responses:
  *       201: { description: Banner created }
  */
@@ -48,9 +56,11 @@ router.post(
   '/banner',
   requireAuth,
   requireRole('ADMIN'),
-  upload.single('image'),
-  validate({ body: bannerSchema }),
-  createBannerController
+  upload.fields([{ name: 'image', maxCount: 1 }]),
+  parseJsonPayload,
+  resolveImageFields('banners', [{ field: 'image', kind: 'single', required: true }]),
+  validate({ body: createBannerSchema }),
+  createBannerController,
 );
 
 /**
@@ -58,7 +68,7 @@ router.post(
  * /api/home/banner/{id}:
  *   put:
  *     tags: [Home]
- *     summary: Update a banner slide
+ *     summary: Update a banner slide (admin)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -71,7 +81,13 @@ router.post(
  *       content:
  *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/BannerInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching UpdateBannerInput (see components.schemas), minus the image field below
+ *               image: { type: string, format: binary }
  *     responses:
  *       200: { description: Banner updated }
  */
@@ -79,9 +95,11 @@ router.put(
   '/banner/:id',
   requireAuth,
   requireRole('ADMIN'),
-  upload.single('image'),
-  validate({ body: bannerSchema }),
-  updateBannerController
+  upload.fields([{ name: 'image', maxCount: 1 }]),
+  parseJsonPayload,
+  resolveImageFields('banners', [{ field: 'image', kind: 'single' }]),
+  validate({ body: updateBannerSchema }),
+  updateBannerController,
 );
 
 /**

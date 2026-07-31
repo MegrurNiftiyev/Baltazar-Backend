@@ -1,6 +1,10 @@
 ﻿import { Router } from 'express';
+import { optionalAuth } from '../../middlewares/optionalAuth.js';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
+import { upload } from '../../middlewares/upload.js';
+import { parseJsonPayload } from '../../middlewares/parseJsonPayload.js';
+import { resolveImageFields } from '../../middlewares/resolveImageFields.js';
 import { validate } from '../../middlewares/validate.js';
 import {
   carsQuerySchema,
@@ -54,7 +58,7 @@ router.get('/companies', getCompaniesController);
  *       200: { description: Company details }
  *       404: { description: Company not found }
  */
-router.get('/companies/:id', getCompanyByIdController);
+router.get('/companies/:id', optionalAuth, getCompanyByIdController);
 
 /**
  * @swagger
@@ -109,7 +113,7 @@ router.get('/cars', validate({ query: carsQuerySchema }), getCarsController);
  *       200: { description: Full car document }
  *       404: { description: Car not found }
  */
-router.get('/cars/:id', getCarByIdController);
+router.get('/cars/:id', optionalAuth, getCarByIdController);
 
 // Admin CRUD
 
@@ -118,15 +122,25 @@ router.get('/cars/:id', getCarByIdController);
  * /api/services/rentacar/companies:
  *   post:
  *     tags: [RentACar]
- *     summary: Create rent-a-car company
+ *     summary: Create rent-a-car company (admin)
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreateRentACarCompanyInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching CreateRentACarCompanyInput (see components.schemas), minus the image fields below
+ *               profileImage: { type: string, format: binary }
+ *               bannerImage: { type: string, format: binary }
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -135,6 +149,17 @@ router.post(
   '/companies',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'profileImage', maxCount: 1 },
+    { name: 'bannerImage', maxCount: 1 },
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('rentacarCompanies', [
+    { field: 'profileImage', kind: 'single' },
+    { field: 'bannerImage', kind: 'single' },
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: createCompanySchema }),
   createCompanyController,
 );
@@ -144,7 +169,7 @@ router.post(
  * /api/services/rentacar/companies/{id}:
  *   put:
  *     tags: [RentACar]
- *     summary: Update rent-a-car company
+ *     summary: Update rent-a-car company (admin)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -155,9 +180,19 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/UpdateRentACarCompanyInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching UpdateRentACarCompanyInput (see components.schemas), minus the image fields below
+ *               profileImage: { type: string, format: binary }
+ *               bannerImage: { type: string, format: binary }
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -166,6 +201,17 @@ router.put(
   '/companies/:id',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'profileImage', maxCount: 1 },
+    { name: 'bannerImage', maxCount: 1 },
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('rentacarCompanies', [
+    { field: 'profileImage', kind: 'single' },
+    { field: 'bannerImage', kind: 'single' },
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: updateCompanySchema }),
   updateCompanyController,
 );
@@ -195,15 +241,23 @@ router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompany
  * /api/services/rentacar/cars:
  *   post:
  *     tags: [RentACar]
- *     summary: Create car
+ *     summary: Create car (admin)
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreateCarInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching CreateCarInput (see components.schemas), minus the image fields below
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -212,6 +266,13 @@ router.post(
   '/cars',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('cars', [
+    { field: 'images', kind: 'multi', required: true },
+  ]),
   validate({ body: createCarSchema }),
   createCarController,
 );
@@ -221,7 +282,7 @@ router.post(
  * /api/services/rentacar/cars/{id}:
  *   put:
  *     tags: [RentACar]
- *     summary: Update car
+ *     summary: Update car (admin)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -232,9 +293,17 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/UpdateCarInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching UpdateCarInput (see components.schemas), minus the image fields below
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -243,6 +312,13 @@ router.put(
   '/cars/:id',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('cars', [
+    { field: 'images', kind: 'multi', required: true },
+  ]),
   validate({ body: updateCarSchema }),
   updateCarController,
 );

@@ -2,7 +2,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { db } from '../../config/firebase.js';
 import { COLLECTIONS } from '../../config/collections.js';
 import { AppError } from '../../errors/AppError.js';
-import type { BannerInput } from './home.schema.js';
+import type { CreateBannerInput, UpdateBannerInput } from './home.schema.js';
 
 const titleMap = {
   RENT_A_CAR: { az: 'Avtomobil icaresi', en: 'Car Rental', ru: 'Arenda avto' },
@@ -20,12 +20,12 @@ export async function getBanners() {
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
-export async function createBanner(data: BannerInput) {
+export async function createBanner(data: CreateBannerInput) {
   const docRef = await db.collection(COLLECTIONS.BANNERS).add(data);
   return { id: docRef.id, ...data };
 }
 
-export async function updateBanner(id: string, data: Partial<BannerInput>) {
+export async function updateBanner(id: string, data: UpdateBannerInput) {
   const doc = await db.collection(COLLECTIONS.BANNERS).doc(id).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
 

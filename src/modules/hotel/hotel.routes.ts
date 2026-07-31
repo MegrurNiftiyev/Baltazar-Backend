@@ -1,6 +1,10 @@
 ﻿import { Router } from 'express';
+import { optionalAuth } from '../../middlewares/optionalAuth.js';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
+import { upload } from '../../middlewares/upload.js';
+import { parseJsonPayload } from '../../middlewares/parseJsonPayload.js';
+import { resolveImageFields } from '../../middlewares/resolveImageFields.js';
 import { validate } from '../../middlewares/validate.js';
 import {
   hotelQuerySchema,
@@ -73,7 +77,7 @@ router.get('/', validate({ query: hotelQuerySchema }), getHotelsController);
  *       200: { description: Hotel details }
  *       404: { description: Hotel not found }
  */
-router.get('/:id', getHotelByIdController);
+router.get('/:id', optionalAuth, getHotelByIdController);
 
 /**
  * @swagger
@@ -102,15 +106,24 @@ router.get('/:id/rooms', validate({ query: roomQuerySchema }), getRoomsControlle
  * /api/services/hotel:
  *   post:
  *     tags: [Hotel]
- *     summary: Create hotel
+ *     summary: Create hotel (admin)
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreateHotelInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching CreateHotelInput (see components.schemas), minus the image fields below
+ *               logo: { type: string, format: binary }
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -119,6 +132,15 @@ router.post(
   '/',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('hotels', [
+    { field: 'logo', kind: 'single' },
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: createHotelSchema }),
   createHotelController,
 );
@@ -128,7 +150,7 @@ router.post(
  * /api/services/hotel/{id}:
  *   put:
  *     tags: [Hotel]
- *     summary: Update hotel
+ *     summary: Update hotel (admin)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -139,9 +161,18 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/UpdateHotelInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching UpdateHotelInput (see components.schemas), minus the image fields below
+ *               logo: { type: string, format: binary }
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -150,6 +181,15 @@ router.put(
   '/:id',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('hotels', [
+    { field: 'logo', kind: 'single' },
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: updateHotelSchema }),
   updateHotelController,
 );
@@ -179,15 +219,23 @@ router.delete('/:id', requireAuth, requireRole('ADMIN'), deleteHotelController);
  * /api/services/hotel/rooms:
  *   post:
  *     tags: [Hotel]
- *     summary: Create room
+ *     summary: Create room (admin)
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreateRoomInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching CreateRoomInput (see components.schemas), minus the image fields below
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -196,6 +244,13 @@ router.post(
   '/rooms',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('rooms', [
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: createRoomSchema }),
   createRoomController,
 );
@@ -205,7 +260,7 @@ router.post(
  * /api/services/hotel/rooms/{id}:
  *   put:
  *     tags: [Hotel]
- *     summary: Update room
+ *     summary: Update room (admin)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -216,9 +271,17 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/UpdateRoomInput'
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 description: JSON-stringified body matching UpdateRoomInput (see components.schemas), minus the image fields below
+ *               images:
+ *                 type: array
+ *                 items: { type: string, format: binary }
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -227,6 +290,13 @@ router.put(
   '/rooms/:id',
   requireAuth,
   requireRole('ADMIN'),
+  upload.fields([
+    { name: 'images', maxCount: 10 },
+  ]),
+  parseJsonPayload,
+  resolveImageFields('rooms', [
+    { field: 'images', kind: 'multi' },
+  ]),
   validate({ body: updateRoomSchema }),
   updateRoomController,
 );

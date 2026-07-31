@@ -34,8 +34,6 @@ export const createTravelCompanySchema = z.object({
   profileImage: z.string().url().optional(),
   bannerImage: z.string().url().optional(),
   images: z.array(z.string()).optional(),
-  rating: z.number().min(0).max(5).default(0),
-  reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
 }).openapi('CreateTravelCompanyInput');
 
@@ -60,8 +58,6 @@ export const createTourSchema = z.object({
   endDate: z.string().min(1),
   includedServices: z.array(z.string()).optional(),
   price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
-  rating: z.number().min(0).max(5).default(0),
-  reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['ACTIVE', 'INACTIVE', 'SOLD_OUT']).default('ACTIVE'),
 }).openapi('CreateTourInput');
 

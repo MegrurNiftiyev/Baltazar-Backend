@@ -38,8 +38,6 @@ export const createHotelSchema = z.object({
   sectionsOrder: z.array(z.string()).optional(),
   serviceType: z.literal('HOTEL').default('HOTEL'),
   price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
-  rating: z.number().min(0).max(5).default(0),
-  reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
 }).openapi('CreateHotelInput');
 

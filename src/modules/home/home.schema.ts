@@ -3,14 +3,14 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 
 extendZodWithOpenApi(z);
 
-export const bannerSchema = z.object({
+export const createBannerSchema = z.object({
   link: z.string().min(1),
-  order: z.coerce.number(),
-  isActive: z.preprocess(
-    (val) => val === 'true' || val === true || val === '1',
-    z.boolean()
-  ).optional().default(true),
-  image: z.string().optional(),
-}).openapi('BannerInput');
+  order: z.number(),
+  isActive: z.boolean().optional().default(true),
+  image: z.string().min(1),
+}).openapi('CreateBannerInput');
 
-export type BannerInput = z.infer<typeof bannerSchema>;
+export const updateBannerSchema = createBannerSchema.partial().openapi('UpdateBannerInput');
+
+export type CreateBannerInput = z.infer<typeof createBannerSchema>;
+export type UpdateBannerInput = z.infer<typeof updateBannerSchema>;

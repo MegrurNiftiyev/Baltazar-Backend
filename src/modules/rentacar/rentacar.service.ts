@@ -1,6 +1,7 @@
 import { db } from '../../config/firebase.js';
 import { AppError } from '../../errors/AppError.js';
 import { COLLECTIONS } from '../../config/collections.js';
+import { getReviewEligibility } from '../reviews/reviews.service.js';
 import type {
   CarsQuery,
   CreateCompanyInput,
@@ -45,21 +46,26 @@ export async function getCompanies() {
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
-export async function getCompanyById(id: string) {
+export async function getCompanyById(id: string, userId?: string) {
   const doc = await companiesCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
-  return { id: doc.id, ...doc.data() };
+  const { ratingSum, ...data } = doc.data()!;
+  const reviewEligibility = await getReviewEligibility(userId, 'COMPANY', id);
+  return { id: doc.id, ...data, reviewEligibility };
 }
 
 export async function createCompany(input: CreateCompanyInput) {
   const docRef = await companiesCollection.add({
     ...input,
     serviceType: 'RENT_A_CAR',
+    rating: 5,
+    reviewCount: 0,
+    ratingSum: 0,
     createdAt: new Date().toISOString(),
   });
-  return { id: docRef.id, ...input };
+  return { id: docRef.id, ...input, rating: 5, reviewCount: 0 };
 }
 
 export async function updateCompany(id: string, input: UpdateCompanyInput) {
@@ -143,20 +149,25 @@ export async function getCars(filters: CarsQuery) {
 /**
  * Get full car details by ID.
  */
-export async function getCarById(id: string) {
+export async function getCarById(id: string, userId?: string) {
   const doc = await carsCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
-  return { id: doc.id, ...doc.data() };
+  const { ratingSum, ...data } = doc.data()!;
+  const reviewEligibility = await getReviewEligibility(userId, 'RENT_A_CAR', id);
+  return { id: doc.id, ...data, reviewEligibility };
 }
 
 export async function createCar(input: CreateCarInput) {
   const docRef = await carsCollection.add({
     ...input,
+    rating: 5,
+    reviewCount: 0,
+    ratingSum: 0,
     createdAt: new Date().toISOString(),
   });
-  return { id: docRef.id, ...input };
+  return { id: docRef.id, ...input, rating: 5, reviewCount: 0 };
 }
 
 export async function updateCar(id: string, input: UpdateCarInput) {

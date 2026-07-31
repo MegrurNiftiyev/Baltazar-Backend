@@ -29,8 +29,6 @@ export const createFoodCompanySchema = z.object({
   images: z.array(z.string()).optional(),
   cuisineTypes: z.array(z.string()).optional(),
   address: z.string().optional(),
-  rating: z.number().min(0).max(5).default(0),
-  reviewCount: z.number().int().min(0).default(0),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
 }).openapi('CreateFoodCompanyInput');
 

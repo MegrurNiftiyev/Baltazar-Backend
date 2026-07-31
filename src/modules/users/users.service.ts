@@ -23,6 +23,7 @@ export async function getProfile(userId: string) {
     phone: data.phone || null,
     region: data.region || null,
     language: data.language || 'en',
+    avatarUrl: data.avatarUrl || null,
     wishlist: data.wishlist || [],
     profileCompleteness: data.profileCompleteness || {
       personalInfo: false,
@@ -36,6 +37,13 @@ export async function getProfile(userId: string) {
 /**
  * Update user profile — only the fields present in the input are updated.
  */
+export async function updateAvatar(userId: string, avatarUrl: string) {
+  const doc = await usersCollection.doc(userId).get();
+  if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
+  await usersCollection.doc(userId).update({ avatarUrl });
+  return getProfile(userId);
+}
+
 export async function updateProfile(userId: string, input: UpdateProfileInput) {
   const doc = await usersCollection.doc(userId).get();
   if (!doc.exists) {

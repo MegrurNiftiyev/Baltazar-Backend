@@ -12,7 +12,7 @@ export const getHotelsController = catchAsync(async (req: Request, res: Response
 });
 
 export const getHotelByIdController = catchAsync(async (req: Request, res: Response) => {
-  const hotel = await hotelService.getHotelById(req.params.id as string);
+  const hotel = await hotelService.getHotelById(req.params.id as string, req.user?.userId);
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'HOTEL').catch(() => {});
   }

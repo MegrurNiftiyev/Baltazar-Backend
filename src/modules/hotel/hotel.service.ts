@@ -1,6 +1,7 @@
 import { db } from '../../config/firebase.js';
 import { AppError } from '../../errors/AppError.js';
 import { COLLECTIONS } from '../../config/collections.js';
+import { getReviewEligibility } from '../reviews/reviews.service.js';
 import type {
   HotelQuery,
   RoomQuery,
@@ -88,21 +89,26 @@ export async function getHotels(filters: HotelQuery) {
   return results;
 }
 
-export async function getHotelById(id: string) {
+export async function getHotelById(id: string, userId?: string) {
   const doc = await hotelsCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
-  return { id: doc.id, ...doc.data() };
+  const { ratingSum, ...data } = doc.data()!;
+  const reviewEligibility = await getReviewEligibility(userId, 'HOTEL', id);
+  return { id: doc.id, ...data, reviewEligibility };
 }
 
 export async function createHotel(input: CreateHotelInput) {
   const docRef = await hotelsCollection.add({
     ...input,
     serviceType: 'HOTEL',
+    rating: 5,
+    reviewCount: 0,
+    ratingSum: 0,
     createdAt: new Date().toISOString(),
   });
-  return { id: docRef.id, ...input };
+  return { id: docRef.id, ...input, rating: 5, reviewCount: 0 };
 }
 
 export async function updateHotel(id: string, input: UpdateHotelInput) {
