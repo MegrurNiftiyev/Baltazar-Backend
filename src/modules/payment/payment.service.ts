@@ -1,10 +1,10 @@
 import { db } from '../../config/firebase.js';
 import { env } from '../../config/env.js';
 import { AppError } from '../../errors/AppError.js';
-import type { AddCardInput, PayInput } from './payment.schema.js';
+import type { PayInput } from './payment.schema.js';
 import { COLLECTIONS } from '../../config/collections.js';
 
-const paymentMethodsCollection = db.collection(COLLECTIONS.PAYMENT_METHODS);
+
 const transactionsCollection = db.collection(COLLECTIONS.TRANSACTIONS);
 const ordersCollection = db.collection(COLLECTIONS.ORDERS);
 
@@ -27,36 +27,6 @@ async function gatewayRequest(path: string, body: Record<string, unknown>) {
   return response.json();
 }
 
-export async function getAllCards(userId: string) {
-  const snapshot = await paymentMethodsCollection.where('userId', '==', userId).get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-}
-
-export async function addCard(userId: string, input: AddCardInput) {
-  const gatewayResponse = (await gatewayRequest('/api/payments/methods', {
-    cardNumber: input.cardNumber,
-    expiryMonth: input.expiryMonth,
-    expiryYear: input.expiryYear,
-    cvv: input.cvv,
-    cardholderName: input.cardholderName,
-  })) as { paymentMethodId: string; brand: string; last4: string };
-
-  const docRef = await paymentMethodsCollection.add({
-    userId,
-    paymentMethodId: gatewayResponse.paymentMethodId,
-    brand: gatewayResponse.brand,
-    last4: gatewayResponse.last4,
-    cardholderName: input.cardholderName,
-    createdAt: new Date().toISOString(),
-  });
-
-  return {
-    id: docRef.id,
-    paymentMethodId: gatewayResponse.paymentMethodId,
-    brand: gatewayResponse.brand,
-    last4: gatewayResponse.last4,
-  };
-}
 
 export async function processPayment(userId: string, orderId: string, input: PayInput) {
   await db.runTransaction(async (tx) => {
@@ -83,13 +53,6 @@ export async function processPayment(userId: string, orderId: string, input: Pay
   let chargeResponse: { chargeId: string; status: string };
   let amount: number;
   try {
-    const methodSnapshot = await paymentMethodsCollection
-      .where('userId', '==', userId)
-      .where('paymentMethodId', '==', input.paymentMethodId)
-      .limit(1)
-      .get();
-
-    if (methodSnapshot.empty) throw new AppError(404, 'NOT_FOUND');
 
     amount = order.details?.serverComputedPrice;
     if (typeof amount !== 'number' || amount <= 0) throw new AppError(400, 'PRICE_NOT_COMPUTED');
@@ -97,7 +60,7 @@ export async function processPayment(userId: string, orderId: string, input: Pay
     chargeResponse = (await gatewayRequest('/api/payments/charges', {
       paymentMethodId: input.paymentMethodId,
       amount,
-      currency: 'USD',
+      currency: 'AZN',
       description: `Order ${orderId}`,
     })) as { chargeId: string; status: string };
   } catch (err) {
@@ -120,7 +83,7 @@ export async function processPayment(userId: string, orderId: string, input: Pay
     orderId,
     paymentMethodId: input.paymentMethodId,
     amount,
-    currency: 'USD',
+    currency: 'AZN',
     providerEventId: chargeResponse.chargeId,
     status,
     createdAt: new Date().toISOString(),
@@ -139,7 +102,7 @@ export async function processPayment(userId: string, orderId: string, input: Pay
     id: txRef.id,
     orderId,
     amount,
-    currency: 'USD',
+    currency: 'AZN',
     status,
   };
 }

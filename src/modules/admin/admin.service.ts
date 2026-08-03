@@ -17,7 +17,6 @@ export async function promoteToAdmin(userId: string) {
   return { userId, role: 'ADMIN' };
 }
 
-
 export async function getAllTransactions(filters: {
   status?: string;
   userId?: string;
@@ -42,3 +41,28 @@ export async function getAllTransactions(filters: {
   return transactions;
 }
 
+export async function getAllUsers(params: {
+  limit: number;
+  startAfterId?: string;
+  role?: 'USER' | 'ADMIN';
+}) {
+  let query: FirebaseFirestore.Query = usersCollection.orderBy('createdAt', 'desc');
+
+  if (params.role) {
+    query = query.where('role', '==', params.role).orderBy('createdAt', 'desc');
+  }
+
+  if (params.startAfterId) {
+    const cursorDoc = await usersCollection.doc(params.startAfterId).get();
+    if (cursorDoc.exists) query = query.startAfter(cursorDoc);
+  }
+
+  const snapshot = await query.limit(params.limit).get();
+  const users = snapshot.docs.map((doc) => {
+    const { passwordHash, ...safe } = doc.data(); // never expose password hash
+    return { id: doc.id, ...safe };
+  });
+
+  const nextCursor = users.length === params.limit ? users[users.length - 1]!.id : null;
+  return { users, nextCursor };
+}

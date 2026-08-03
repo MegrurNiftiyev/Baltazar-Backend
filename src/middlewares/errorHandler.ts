@@ -1,5 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
+import { MulterError } from 'multer';
 import { AppError } from '../errors/AppError.js';
+import { MAX_FILE_SIZE_BYTES } from './upload.js';
 import { logger } from '../config/logger.js';
 import { t, type SupportedLang } from '../config/locales.js';
 
@@ -28,6 +30,15 @@ export const errorHandler = (
       errorCode: err.errorCode,
       message: t(err.errorCode, lang),
     });
+    return;
+  }
+
+  if (err instanceof MulterError) {
+    const message =
+      err.code === 'LIMIT_FILE_SIZE'
+        ? `File too large. Max size is ${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB.`
+        : err.message;
+    res.status(400).json({ success: false, errorCode: 'INVALID_FILE', message });
     return;
   }
 

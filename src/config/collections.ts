@@ -15,4 +15,5 @@ export const COLLECTIONS = {
   USER_INTERESTS: 'userInterests',
   APP_CONFIG: 'appConfig',
   BANNERS: 'banners',
+  UPLOADS: 'uploads',
 } as const;

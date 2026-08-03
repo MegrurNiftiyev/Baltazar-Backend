@@ -1,11 +1,9 @@
-﻿import { Router } from 'express';
+import { Router } from 'express';
 import { optionalAuth } from '../../middlewares/optionalAuth.js';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
-import { upload } from '../../middlewares/upload.js';
-import { parseJsonPayload } from '../../middlewares/parseJsonPayload.js';
-import { resolveImageFields } from '../../middlewares/resolveImageFields.js';
 import { validate } from '../../middlewares/validate.js';
+import { validateImageReferences } from '../../middlewares/validateImageReferences.js';
 import {
   hotelQuerySchema,
   roomQuerySchema,
@@ -112,36 +110,22 @@ router.get('/:id/rooms', optionalAuth, validate({ query: roomQuerySchema }), get
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
- *             type: object
- *             required: [data]
- *             properties:
- *               data:
- *                 type: string
- *                 description: JSON-stringified body matching CreateHotelInput (see components.schemas), minus the image fields below
- *               logo: { type: string, format: binary }
- *               images:
- *                 type: array
- *                 items: { type: string, format: binary }
+ *             $ref: '#/components/schemas/CreateHotelInput'
  *     responses:
- *       200: { description: Success }
+ *       201: { description: Success }
  *       403: { description: Forbidden, admin only }
  */
 router.post(
   '/',
   requireAuth,
   requireRole('ADMIN'),
-  upload.fields([
-    { name: 'logo', maxCount: 1 },
-    { name: 'images', maxCount: 10 },
-  ]),
-  parseJsonPayload,
-  resolveImageFields('hotels', [
-    { field: 'logo', kind: 'single' },
-    { field: 'images', kind: 'multi' },
-  ]),
   validate({ body: createHotelSchema }),
+  validateImageReferences([
+    { bodyField: 'logo', kind: 'single' },
+    { bodyField: 'images', kind: 'multi' },
+  ]),
   createHotelController,
 );
 
@@ -161,18 +145,9 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
- *             type: object
- *             required: [data]
- *             properties:
- *               data:
- *                 type: string
- *                 description: JSON-stringified body matching UpdateHotelInput (see components.schemas), minus the image fields below
- *               logo: { type: string, format: binary }
- *               images:
- *                 type: array
- *                 items: { type: string, format: binary }
+ *             $ref: '#/components/schemas/UpdateHotelInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -181,16 +156,11 @@ router.put(
   '/:id',
   requireAuth,
   requireRole('ADMIN'),
-  upload.fields([
-    { name: 'logo', maxCount: 1 },
-    { name: 'images', maxCount: 10 },
-  ]),
-  parseJsonPayload,
-  resolveImageFields('hotels', [
-    { field: 'logo', kind: 'single' },
-    { field: 'images', kind: 'multi' },
-  ]),
   validate({ body: updateHotelSchema }),
+  validateImageReferences([
+    { bodyField: 'logo', kind: 'single' },
+    { bodyField: 'images', kind: 'multi' },
+  ]),
   updateHotelController,
 );
 
@@ -225,33 +195,21 @@ router.delete('/:id', requireAuth, requireRole('ADMIN'), deleteHotelController);
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
- *             type: object
- *             required: [data]
- *             properties:
- *               data:
- *                 type: string
- *                 description: JSON-stringified body matching CreateRoomInput (see components.schemas), minus the image fields below
- *               images:
- *                 type: array
- *                 items: { type: string, format: binary }
+ *             $ref: '#/components/schemas/CreateRoomInput'
  *     responses:
- *       200: { description: Success }
+ *       201: { description: Success }
  *       403: { description: Forbidden, admin only }
  */
 router.post(
   '/rooms',
   requireAuth,
   requireRole('ADMIN'),
-  upload.fields([
-    { name: 'images', maxCount: 10 },
-  ]),
-  parseJsonPayload,
-  resolveImageFields('rooms', [
-    { field: 'images', kind: 'multi' },
-  ]),
   validate({ body: createRoomSchema }),
+  validateImageReferences([
+    { bodyField: 'images', kind: 'multi' },
+  ]),
   createRoomController,
 );
 
@@ -271,17 +229,9 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
- *             type: object
- *             required: [data]
- *             properties:
- *               data:
- *                 type: string
- *                 description: JSON-stringified body matching UpdateRoomInput (see components.schemas), minus the image fields below
- *               images:
- *                 type: array
- *                 items: { type: string, format: binary }
+ *             $ref: '#/components/schemas/UpdateRoomInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -290,14 +240,10 @@ router.put(
   '/rooms/:id',
   requireAuth,
   requireRole('ADMIN'),
-  upload.fields([
-    { name: 'images', maxCount: 10 },
-  ]),
-  parseJsonPayload,
-  resolveImageFields('rooms', [
-    { field: 'images', kind: 'multi' },
-  ]),
   validate({ body: updateRoomSchema }),
+  validateImageReferences([
+    { bodyField: 'images', kind: 'multi' },
+  ]),
   updateRoomController,
 );
 
@@ -322,4 +268,3 @@ router.put(
 router.delete('/rooms/:id', requireAuth, requireRole('ADMIN'), deleteRoomController);
 
 export default router;
-

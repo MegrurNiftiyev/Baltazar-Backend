@@ -7,7 +7,7 @@ export const createBannerSchema = z.object({
   link: z.string().min(1),
   order: z.number(),
   isActive: z.boolean().optional().default(true),
-  image: z.string().min(1),
+  image: z.string().url(),
 }).openapi('CreateBannerInput');
 
 export const updateBannerSchema = createBannerSchema.partial().openapi('UpdateBannerInput');

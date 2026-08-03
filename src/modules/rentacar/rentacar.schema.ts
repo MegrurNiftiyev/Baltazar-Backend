@@ -31,7 +31,7 @@ export const createCompanySchema = z.object({
   sectionsOrder: z.array(z.string()).optional(),
   profileImage: z.string().url().optional(),
   bannerImage: z.string().url().optional(),
-  images: z.array(z.string()).optional(),
+  images: z.array(z.string().url()).max(10).optional(),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
 }).openapi('CreateRentACarCompanyInput');
 
@@ -47,7 +47,7 @@ export const createCarSchema = z.object({
   fuelType: z.enum(['PETROL', 'DIESEL', 'ELECTRIC', 'HYBRID']),
   seats: z.number().int().min(1).max(50),
   price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
-  images: z.array(z.string()).min(1),
+  images: z.array(z.string().url()).max(10).optional(),
   features: z.array(z.string()).optional(),
   status: z.enum(['AVAILABLE', 'UNAVAILABLE']).default('AVAILABLE'),
 }).openapi('CreateCarInput');

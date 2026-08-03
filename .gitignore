@@ -31,6 +31,9 @@ pids
 dist/
 build/
 
+# Admin Panel
+admin/
+
 # IDE / OS files
 .vscode/
 .idea/

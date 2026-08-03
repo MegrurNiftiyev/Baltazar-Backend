@@ -33,7 +33,7 @@ export const createTravelCompanySchema = z.object({
   sectionsOrder: z.array(z.string()).optional(),
   profileImage: z.string().url().optional(),
   bannerImage: z.string().url().optional(),
-  images: z.array(z.string()).optional(),
+  images: z.array(z.string().url()).max(10).optional(),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
 }).openapi('CreateTravelCompanyInput');
 
@@ -52,7 +52,7 @@ export const createTourSchema = z.object({
       }),
     )
     .optional(),
-  images: z.array(z.string()).min(1),
+  images: z.array(z.string().url()).max(10).optional(),
   duration: z.string().min(1),
   startDate: z.string().min(1),
   endDate: z.string().min(1),

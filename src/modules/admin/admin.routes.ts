@@ -5,10 +5,12 @@ import { validate } from '../../middlewares/validate.js';
 import {
   addAdminSchema,
   adminTransactionQuerySchema,
+  listUsersQuerySchema,
 } from './admin.schema.js';
 import {
   addAdminController,
   getAllTransactionsController,
+  getAllUsersController,
 } from './admin.controller.js';
 
 const router = Router();
@@ -35,6 +37,44 @@ router.use(requireAuth, requireRole('ADMIN'));
  *       404: { description: User not found }
  */
 router.post('/users/add-admin', validate({ body: addAdminSchema }), addAdminController);
+
+/**
+ * @swagger
+ * /api/admin/users:
+ *   get:
+ *     tags: [Admin]
+ *     summary: List all users (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 50, maximum: 100 }
+ *       - in: query
+ *         name: cursor
+ *         schema: { type: string }
+ *       - in: query
+ *         name: role
+ *         schema: { type: string, enum: [USER, ADMIN] }
+ *     responses:
+ *       200:
+ *         description: Paginated list of users (password hash never included)
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               data:
+ *                 - id: "u_9f2c1a"
+ *                   email: "user@example.com"
+ *                   role: "USER"
+ *                   language: "az"
+ *                   createdAt: "2026-05-10T08:00:00.000Z"
+ *               meta:
+ *                 nextCursor: "u_71ab02"
+ *       403:
+ *         description: Forbidden, admin only
+ */
+router.get('/users', validate({ query: listUsersQuerySchema }), getAllUsersController);
 
 /**
  * @swagger

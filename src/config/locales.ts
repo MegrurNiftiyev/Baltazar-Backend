@@ -144,7 +144,23 @@ const messages: Record<string, LocalizedMap> = {
     az: 'Bu sifaris ucun odenis artiq icra olunur',
     en: 'Payment is already in progress for this order',
     ru: 'Platezh po etomu zakazu uzhe obrabatyvaetsya',
-  },};
+  },
+  IMAGE_NOT_FOUND: {
+    az: 'İstinad edilən şəkil tapılmadı, vaxtı bitib və ya sizə aid deyil',
+    en: 'The referenced image could not be found, has expired, or does not belong to you',
+    ru: 'Указанное изображение не найдено, срок его действия истек, или оно вам не принадлежит',
+  },
+  INVALID_FILE_TYPE: {
+    az: 'Yalnız şəkil fayllarına (jpeg, png, webp, gif) icazə verilir',
+    en: 'Only image files (jpeg, png, webp, gif) are allowed',
+    ru: 'Разрешены только файлы изображений (jpeg, png, webp, gif)',
+  },
+  INVALID_FILE: {
+    az: 'Yüklənmiş fayl etibarsızdır',
+    en: 'The uploaded file is invalid',
+    ru: 'Загруженный файл недействителен',
+  },
+};
 
 /**
  * Get a localized system message by error/message code.

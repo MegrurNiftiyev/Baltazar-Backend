@@ -38,5 +38,10 @@ export const profileCompletenessSchema = z.object({
   passport: z.boolean().default(false),
 }).openapi('ProfileCompleteness');
 
+export const updateAvatarSchema = z.object({
+  avatar: z.string().url(),
+}).openapi('UpdateAvatarInput');
+
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type ProfileCompleteness = z.infer<typeof profileCompletenessSchema>;
+export type UpdateAvatarInput = z.infer<typeof updateAvatarSchema>;

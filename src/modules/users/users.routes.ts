@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
-import { upload } from '../../middlewares/upload.js';
 import { validate } from '../../middlewares/validate.js';
-import { updateProfileSchema } from './users.schema.js';
+import { validateImageReferences } from '../../middlewares/validateImageReferences.js';
+import { updateProfileSchema, updateAvatarSchema } from './users.schema.js';
 import { getProfileController, updateProfileController, disableUserController, updateAvatarController } from './users.controller.js';
 
 const router = Router();
@@ -52,18 +52,21 @@ router.put('/me', requireAuth, validate({ body: updateProfileSchema }), updatePr
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
- *             type: object
- *             required: [avatar]
- *             properties:
- *               avatar: { type: string, format: binary }
+ *             $ref: '#/components/schemas/UpdateAvatarInput'
  *     responses:
  *       200: { description: Avatar updated, returns full profile }
- *       400: { description: No file provided }
+ *       400: { description: No uploadId provided }
  *       401: { description: Authentication required }
  */
-router.put('/me/avatar', requireAuth, upload.single('avatar'), updateAvatarController);
+router.put(
+  '/me/avatar', 
+  requireAuth, 
+  validate({ body: updateAvatarSchema }),
+  validateImageReferences([{ bodyField: 'avatar', kind: 'single' }]),
+  updateAvatarController
+);
 
 /**
  * @swagger

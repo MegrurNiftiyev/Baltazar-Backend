@@ -2,10 +2,8 @@ import { Router } from 'express';
 import { optionalAuth } from '../../middlewares/optionalAuth.js';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
-import { upload } from '../../middlewares/upload.js';
-import { parseJsonPayload } from '../../middlewares/parseJsonPayload.js';
-import { resolveImageFields } from '../../middlewares/resolveImageFields.js';
 import { validate } from '../../middlewares/validate.js';
+import { validateImageReferences } from '../../middlewares/validateImageReferences.js';
 import { createBannerSchema, updateBannerSchema } from './home.schema.js';
 import { 
   getBannerController, 
@@ -40,15 +38,9 @@ router.get('/banner', getBannerController);
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
- *             type: object
- *             required: [data]
- *             properties:
- *               data:
- *                 type: string
- *                 description: JSON-stringified body matching CreateBannerInput (see components.schemas), minus the image field below
- *               image: { type: string, format: binary }
+ *             $ref: '#/components/schemas/CreateBannerInput'
  *     responses:
  *       201: { description: Banner created }
  */
@@ -56,10 +48,8 @@ router.post(
   '/banner',
   requireAuth,
   requireRole('ADMIN'),
-  upload.fields([{ name: 'image', maxCount: 1 }]),
-  parseJsonPayload,
-  resolveImageFields('banners', [{ field: 'image', kind: 'single', required: true }]),
   validate({ body: createBannerSchema }),
+  validateImageReferences([{ bodyField: 'image', kind: 'single' }]),
   createBannerController,
 );
 
@@ -79,15 +69,9 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
- *             type: object
- *             required: [data]
- *             properties:
- *               data:
- *                 type: string
- *                 description: JSON-stringified body matching UpdateBannerInput (see components.schemas), minus the image field below
- *               image: { type: string, format: binary }
+ *             $ref: '#/components/schemas/UpdateBannerInput'
  *     responses:
  *       200: { description: Banner updated }
  */
@@ -95,10 +79,8 @@ router.put(
   '/banner/:id',
   requireAuth,
   requireRole('ADMIN'),
-  upload.fields([{ name: 'image', maxCount: 1 }]),
-  parseJsonPayload,
-  resolveImageFields('banners', [{ field: 'image', kind: 'single' }]),
   validate({ body: updateBannerSchema }),
+  validateImageReferences([{ bodyField: 'image', kind: 'single' }]),
   updateBannerController,
 );
 

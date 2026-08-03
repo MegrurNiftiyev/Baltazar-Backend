@@ -33,8 +33,8 @@ export const createHotelSchema = z.object({
   address: z.string().optional(),
   starRating: z.number().int().min(1).max(5),
   amenities: z.array(z.string()).optional(),
-  images: z.array(z.string()).optional(),
-  logo: z.string().optional(),
+  images: z.array(z.string().url()).max(10).optional(),
+  logo: z.string().url().optional(),
   sectionsOrder: z.array(z.string()).optional(),
   serviceType: z.literal('HOTEL').default('HOTEL'),
   price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
@@ -42,6 +42,7 @@ export const createHotelSchema = z.object({
 }).openapi('CreateHotelInput');
 
 export const updateHotelSchema = createHotelSchema.partial().openapi('UpdateHotelInput');
+
 
 export const createRoomSchema = z.object({
   hotelId: z.string().min(1),
@@ -51,7 +52,7 @@ export const createRoomSchema = z.object({
   price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
   capacity: z.number().int().min(1),
   amenities: z.array(z.string()).optional(),
-  images: z.array(z.string()).optional(),
+  images: z.array(z.string().url()).max(10).optional(),
   status: z.enum(['AVAILABLE', 'UNAVAILABLE']).default('AVAILABLE'),
 }).openapi('CreateRoomInput');
 

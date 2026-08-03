@@ -30,6 +30,7 @@ const options: swaggerJSDoc.Options = {
       { name: 'Home' },
       { name: 'AppConfig' },
       { name: 'Admin' },
+      { name: 'Uploads' },
     ],
     components: {
       securitySchemes: {

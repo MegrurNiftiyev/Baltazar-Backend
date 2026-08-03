@@ -28,6 +28,7 @@ import reviewsRouter from './modules/reviews/reviews.routes.js';
 import wishlistRouter from './modules/wishlist/wishlist.routes.js';
 import homeRouter from './modules/home/home.routes.js';
 import appConfigRouter from './modules/appConfig/appConfig.routes.js';
+import uploadsRouter from './modules/uploads/uploads.routes.js';
 
 // ── App initialization ────────────────────────────────────────────────
 export const app = express();
@@ -85,6 +86,7 @@ app.use('/api/payment', paymentRouter);
 app.use('/api/home', homeRouter);
 app.use('/api/app/config', appConfigRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/uploads', uploadsRouter);
 
 // ── 404 catch-all ─────────────────────────────────────────────────────
 app.use((req, res) => {

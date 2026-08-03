@@ -3,8 +3,10 @@ import { env } from './config/env.js';
 import { app } from './app.js';
 import { logger } from './config/logger.js';
 import { scheduleExchangeRateRefresh } from './jobs/refreshExchangeRates.js';
+import { scheduleUploadCleanup } from './jobs/cleanupExpiredUploads.js';
 
 scheduleExchangeRateRefresh();
+scheduleUploadCleanup();
 
 const server = app.listen(env.PORT, () => {
   logger.info(`🚀 Server running: http://localhost:${env.PORT}`);

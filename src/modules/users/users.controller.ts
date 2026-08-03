@@ -1,7 +1,5 @@
 import type { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsync.js';
-import { uploadImage } from '../../utils/uploadImage.js';
-import { AppError } from '../../errors/AppError.js';
 import * as usersService from './users.service.js';
 import * as authService from '../auth/auth.service.js';
 
@@ -11,10 +9,7 @@ export const getProfileController = catchAsync(async (req: Request, res: Respons
 });
 
 export const updateAvatarController = catchAsync(async (req: Request, res: Response) => {
-  if (!req.file) {
-    throw new AppError(400, 'VALIDATION_ERROR', 'An image file is required');
-  }
-  const avatarUrl = await uploadImage(req.file, 'avatars');
+  const avatarUrl = req.body.avatar;
   const profile = await usersService.updateAvatar(req.user!.userId, avatarUrl);
   res.status(200).json({ success: true, data: profile });
 });

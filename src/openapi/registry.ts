@@ -6,7 +6,7 @@ import { foodItemsQuerySchema, createFoodCompanySchema, updateFoodCompanySchema,
 import { createBannerSchema, updateBannerSchema } from '../modules/home/home.schema.js';
 import { hotelQuerySchema, roomQuerySchema, createHotelSchema, updateHotelSchema, createRoomSchema, updateRoomSchema } from '../modules/hotel/hotel.schema.js';
 import { createOrderSchema, advanceStepSchema, updateOrderStatusSchema, adminOrderQuerySchema } from '../modules/order/order.schema.js';
-import { addCardSchema, paySchema } from '../modules/payment/payment.schema.js';
+import { paySchema } from '../modules/payment/payment.schema.js';
 import { carsQuerySchema, createCompanySchema, updateCompanySchema, createCarSchema, updateCarSchema } from '../modules/rentacar/rentacar.schema.js';
 import { createReviewSchema, reviewQuerySchema, updateReviewSchema } from '../modules/reviews/reviews.schema.js';
 import { toursQuerySchema, includedServicesParamsSchema, createTravelCompanySchema, updateTravelCompanySchema, createTourSchema, updateTourSchema, createIncludedServiceSchema, updateIncludedServiceSchema, includedServiceIdParamsSchema } from '../modules/travel/travel.schema.js';
@@ -39,7 +39,6 @@ registry.register('CreateOrderInput', createOrderSchema);
 registry.register('AdvanceOrderStepInput', advanceStepSchema);
 registry.register('UpdateOrderStatusInput', updateOrderStatusSchema);
 registry.register('AdminOrderQuery', adminOrderQuerySchema);
-registry.register('AddCardInput', addCardSchema);
 registry.register('PayInput', paySchema);
 registry.register('CarsQuery', carsQuerySchema);
 registry.register('CreateRentACarCompanyInput', createCompanySchema);

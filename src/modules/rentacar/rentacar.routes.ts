@@ -1,11 +1,9 @@
-﻿import { Router } from 'express';
+import { Router } from 'express';
 import { optionalAuth } from '../../middlewares/optionalAuth.js';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
-import { upload } from '../../middlewares/upload.js';
-import { parseJsonPayload } from '../../middlewares/parseJsonPayload.js';
-import { resolveImageFields } from '../../middlewares/resolveImageFields.js';
 import { validate } from '../../middlewares/validate.js';
+import { validateImageReferences } from '../../middlewares/validateImageReferences.js';
 import {
   carsQuerySchema,
   createCompanySchema,
@@ -128,39 +126,23 @@ router.get('/cars/:id', optionalAuth, getCarByIdController);
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
- *             type: object
- *             required: [data]
- *             properties:
- *               data:
- *                 type: string
- *                 description: JSON-stringified body matching CreateRentACarCompanyInput (see components.schemas), minus the image fields below
- *               profileImage: { type: string, format: binary }
- *               bannerImage: { type: string, format: binary }
- *               images:
- *                 type: array
- *                 items: { type: string, format: binary }
+ *             $ref: '#/components/schemas/CreateRentACarCompanyInput'
  *     responses:
- *       200: { description: Success }
+ *       201: { description: Success }
  *       403: { description: Forbidden, admin only }
  */
 router.post(
   '/companies',
   requireAuth,
   requireRole('ADMIN'),
-  upload.fields([
-    { name: 'profileImage', maxCount: 1 },
-    { name: 'bannerImage', maxCount: 1 },
-    { name: 'images', maxCount: 10 },
-  ]),
-  parseJsonPayload,
-  resolveImageFields('rentacarCompanies', [
-    { field: 'profileImage', kind: 'single' },
-    { field: 'bannerImage', kind: 'single' },
-    { field: 'images', kind: 'multi' },
-  ]),
   validate({ body: createCompanySchema }),
+  validateImageReferences([
+    { bodyField: 'profileImage', kind: 'single' },
+    { bodyField: 'bannerImage', kind: 'single' },
+    { bodyField: 'images', kind: 'multi' },
+  ]),
   createCompanyController,
 );
 
@@ -180,19 +162,9 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
- *             type: object
- *             required: [data]
- *             properties:
- *               data:
- *                 type: string
- *                 description: JSON-stringified body matching UpdateRentACarCompanyInput (see components.schemas), minus the image fields below
- *               profileImage: { type: string, format: binary }
- *               bannerImage: { type: string, format: binary }
- *               images:
- *                 type: array
- *                 items: { type: string, format: binary }
+ *             $ref: '#/components/schemas/UpdateRentACarCompanyInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -201,18 +173,12 @@ router.put(
   '/companies/:id',
   requireAuth,
   requireRole('ADMIN'),
-  upload.fields([
-    { name: 'profileImage', maxCount: 1 },
-    { name: 'bannerImage', maxCount: 1 },
-    { name: 'images', maxCount: 10 },
-  ]),
-  parseJsonPayload,
-  resolveImageFields('rentacarCompanies', [
-    { field: 'profileImage', kind: 'single' },
-    { field: 'bannerImage', kind: 'single' },
-    { field: 'images', kind: 'multi' },
-  ]),
   validate({ body: updateCompanySchema }),
+  validateImageReferences([
+    { bodyField: 'profileImage', kind: 'single' },
+    { bodyField: 'bannerImage', kind: 'single' },
+    { bodyField: 'images', kind: 'multi' },
+  ]),
   updateCompanyController,
 );
 
@@ -247,33 +213,21 @@ router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompany
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
- *             type: object
- *             required: [data]
- *             properties:
- *               data:
- *                 type: string
- *                 description: JSON-stringified body matching CreateCarInput (see components.schemas), minus the image fields below
- *               images:
- *                 type: array
- *                 items: { type: string, format: binary }
+ *             $ref: '#/components/schemas/CreateCarInput'
  *     responses:
- *       200: { description: Success }
+ *       201: { description: Success }
  *       403: { description: Forbidden, admin only }
  */
 router.post(
   '/cars',
   requireAuth,
   requireRole('ADMIN'),
-  upload.fields([
-    { name: 'images', maxCount: 10 },
-  ]),
-  parseJsonPayload,
-  resolveImageFields('cars', [
-    { field: 'images', kind: 'multi', required: true },
-  ]),
   validate({ body: createCarSchema }),
+  validateImageReferences([
+    { bodyField: 'images', kind: 'multi' },
+  ]),
   createCarController,
 );
 
@@ -293,17 +247,9 @@ router.post(
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
- *             type: object
- *             required: [data]
- *             properties:
- *               data:
- *                 type: string
- *                 description: JSON-stringified body matching UpdateCarInput (see components.schemas), minus the image fields below
- *               images:
- *                 type: array
- *                 items: { type: string, format: binary }
+ *             $ref: '#/components/schemas/UpdateCarInput'
  *     responses:
  *       200: { description: Success }
  *       403: { description: Forbidden, admin only }
@@ -312,14 +258,10 @@ router.put(
   '/cars/:id',
   requireAuth,
   requireRole('ADMIN'),
-  upload.fields([
-    { name: 'images', maxCount: 10 },
-  ]),
-  parseJsonPayload,
-  resolveImageFields('cars', [
-    { field: 'images', kind: 'multi', required: true },
-  ]),
   validate({ body: updateCarSchema }),
+  validateImageReferences([
+    { bodyField: 'images', kind: 'multi' },
+  ]),
   updateCarController,
 );
 
@@ -344,4 +286,3 @@ router.put(
 router.delete('/cars/:id', requireAuth, requireRole('ADMIN'), deleteCarController);
 
 export default router;
-
