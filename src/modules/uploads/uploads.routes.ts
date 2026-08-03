@@ -32,7 +32,7 @@ const router = Router();
  *         required: true
  *         schema:
  *           type: string
- *           enum: [avatars, foodCompanies, hotels, rentacar, travel]
+ *           enum: [avatars, banners, food, foodCompanies, foodItems, hotels, rentacar, rentacarCompanies, rentacarCars, travel, travelCompanies, travelTours]
  *         example: foodCompanies
  *     requestBody:
  *       required: true
@@ -75,7 +75,7 @@ router.post('/image', requireAuth, upload.single('image'), uploadSingleImageCont
  *         required: true
  *         schema:
  *           type: string
- *           enum: [avatars, foodCompanies, hotels, rentacar, travel]
+ *           enum: [avatars, banners, food, foodCompanies, foodItems, hotels, rentacar, rentacarCompanies, rentacarCars, travel, travelCompanies, travelTours]
  *         example: hotels
  *     requestBody:
  *       required: true

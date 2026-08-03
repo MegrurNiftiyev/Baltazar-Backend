@@ -1,0 +1,58 @@
+[
+  {
+    "serviceType": "FOOD",
+    "name": { "az": "Fast Food", "en": "Fast Food", "ru": "Фастфуд" }
+  },
+  {
+    "serviceType": "FOOD",
+    "name": { "az": "Suşi və Asiya", "en": "Sushi & Asian", "ru": "Суши и Азиатская" }
+  },
+  {
+    "serviceType": "FOOD",
+    "name": { "az": "Şirniyyatlar", "en": "Desserts", "ru": "Десерты" }
+  },
+  {
+    "serviceType": "FOOD",
+    "name": { "az": "İçkilər", "en": "Drinks", "ru": "Напитки" }
+  },
+  {
+    "serviceType": "RENT_A_CAR",
+    "name": { "az": "Sedan", "en": "Sedan", "ru": "Седан" }
+  },
+  {
+    "serviceType": "RENT_A_CAR",
+    "name": { "az": "SUV və Krossover", "en": "SUV & Crossover", "ru": "Внедорожник" }
+  },
+  {
+    "serviceType": "RENT_A_CAR",
+    "name": { "az": "Lüks", "en": "Luxury", "ru": "Люкс" }
+  },
+  {
+    "serviceType": "RENT_A_CAR",
+    "name": { "az": "Ekonom", "en": "Economy", "ru": "Эконом" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "5 Ulduzlu Kurort", "en": "5 Star Resort", "ru": "5-звездочный курорт" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Butik Otel", "en": "Boutique Hotel", "ru": "Бутик-отель" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Biznes Otel", "en": "Business Hotel", "ru": "Бизнес-отель" }
+  },
+  {
+    "serviceType": "TRAVEL",
+    "name": { "az": "Tarixi və Mədəni", "en": "Historical & Cultural", "ru": "Исторические и культурные" }
+  },
+  {
+    "serviceType": "TRAVEL",
+    "name": { "az": "Təbiət və Macəra", "en": "Nature & Adventure", "ru": "Природа и приключения" }
+  },
+  {
+    "serviceType": "TRAVEL",
+    "name": { "az": "Şəhər Turu", "en": "City Tour", "ru": "Городской тур" }
+  }
+]

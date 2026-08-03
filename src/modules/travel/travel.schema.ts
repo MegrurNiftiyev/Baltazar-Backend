@@ -65,7 +65,6 @@ export const updateTourSchema = createTourSchema.partial().openapi('UpdateTourIn
 
 export const createIncludedServiceSchema = z.object({
   name: localizedMapSchema,
-  icon: z.string().optional(),
   serviceType: z.enum(['TRAVEL', 'HOTEL']),
 }).openapi('CreateIncludedServiceInput');
 

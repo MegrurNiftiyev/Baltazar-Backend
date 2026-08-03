@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import path from 'path';
 import { bucket } from '../config/firebase.js';
 
-export type ImageFolder = 'avatars' | 'foodCompanies' | 'hotels' | 'rentacar' | 'travel';
+export type ImageFolder = 'avatars' | 'banners' | 'food' | 'foodCompanies' | 'foodItems' | 'hotels' | 'rentacar' | 'rentacarCompanies' | 'rentacarCars' | 'travel' | 'travelCompanies' | 'travelTours';
 
 export interface StoredImage {
   id: string;          // uuid — becomes the uploads-collection doc id

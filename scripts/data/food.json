@@ -1,0 +1,102 @@
+{
+  "companies": [
+    {
+      "name": { "az": "Baku Burger House", "en": "Baku Burger House", "ru": "Baku Burger House" },
+      "about": { "az": "Bakının ən ləzzətli premium burgerləri.", "en": "Most delicious premium burgers in Baku.", "ru": "Самые вкусные премиум бургеры в Баку." },
+      "cuisineTypes": ["Fast Food", "Burgers", "American"],
+      "address": "Nizami Street 42, Baku"
+    },
+    {
+      "name": { "az": "Sakura Sushi Bar", "en": "Sakura Sushi Bar", "ru": "Sakura Sushi Bar" },
+      "about": { "az": "Təzə dəniz məhsulları və yapon mətbəxi.", "en": "Fresh seafood and authentic Japanese cuisine.", "ru": "Свежие морепродукты и японская кухня." },
+      "cuisineTypes": ["Sushi", "Japanese", "Asian"],
+      "address": "Fountain Square 12, Baku"
+    },
+    {
+      "name": { "az": "Mangal Steak House", "en": "Mangal Steak House", "ru": "Mangal Steak House" },
+      "about": { "az": "Ənənəvi Manqal üstü steyklər və kabablar.", "en": "Traditional grilled steaks and kebabs.", "ru": "Традиционные стейки и шашлыки." },
+      "cuisineTypes": ["Steak", "Kebab", "National"],
+      "address": "Tarlan Aliyarbeyov 8, Baku"
+    },
+    {
+      "name": { "az": "Pizza Bella Baku", "en": "Pizza Bella Baku", "ru": "Pizza Bella Baku" },
+      "about": { "az": "Ocaqda bişən həqiqi İtalyan pizzası.", "en": "Authentic Italian wood-fired pizza.", "ru": "Настоящая итальянская пицца на дровах." },
+      "cuisineTypes": ["Pizza", "Italian"],
+      "address": "Rashid Behbudov 15, Baku"
+    }
+  ],
+  "items": [
+    {
+      "companyIndex": 0,
+      "name": { "az": "Çizburger Xüsusi", "en": "Special Cheeseburger", "ru": "Специальный чизбургер" },
+      "description": { "az": "Təzə mal əti, çedar pendiri, xüsusi sous.", "en": "Fresh beef patty, cheddar cheese, special sauce.", "ru": "Говяжья котлета, сыр чеддер, соус." },
+      "category": "Fast Food",
+      "price": 12.50,
+      "ingredients": ["Beef", "Cheddar", "Lettuce", "Tomato", "Burger Bun"],
+      "calories": 650,
+      "protein": 32,
+      "fat": 28,
+      "carb": 45
+    },
+    {
+      "companyIndex": 0,
+      "name": { "az": "Qızardılmış Hindi Əti", "en": "Roast Turkey Plate", "ru": "Жареная индейка" },
+      "description": { "az": "Xüsusi sousla sobada qızardılmış hindi əti.", "en": "Oven roasted turkey served with gravy.", "ru": "Запеченная индейка с соусом." },
+      "category": "Fast Food",
+      "price": 18.00,
+      "ingredients": ["Turkey Meat", "Herbs", "Gravy", "Potatoes"],
+      "calories": 520,
+      "protein": 45,
+      "fat": 18,
+      "carb": 22
+    },
+    {
+      "companyIndex": 1,
+      "name": { "az": "Filadelfiya Roll Dəsti", "en": "Philadelphia Roll Set", "ru": "Сет Филадельфия" },
+      "description": { "az": "Qızılbalıq, krem pendir, xiyar və avokado.", "en": "Fresh salmon, cream cheese, cucumber, avocado.", "ru": "Свежий лосось, сливочный сыр, огурец." },
+      "category": "Suşi və Asiya",
+      "price": 24.00,
+      "ingredients": ["Salmon", "Rice", "Nori", "Cream Cheese", "Avocado"],
+      "calories": 480,
+      "protein": 22,
+      "fat": 16,
+      "carb": 58
+    },
+    {
+      "companyIndex": 1,
+      "name": { "az": "Premium Suşi Seti", "en": "Premium Sushi Set", "ru": "Премиум суши сет" },
+      "description": { "az": "Qarışıq niqiri və rollar toplusu (24 ədəd).", "en": "Assorted nigiri and rolls combination (24 pcs).", "ru": "Ассорти нигири и роллов (24 шт)." },
+      "category": "Suşi və Asiya",
+      "price": 45.00,
+      "ingredients": ["Salmon", "Tuna", "Shrimp", "Rice", "Wasabi"],
+      "calories": 850,
+      "protein": 42,
+      "fat": 20,
+      "carb": 95
+    },
+    {
+      "companyIndex": 2,
+      "name": { "az": "Tika Kabab Portsiya", "en": "Tika Kebab Portion", "ru": "Порция Тика Кебаб" },
+      "description": { "az": "Kömür üzərində bişmiş quzu əti tikələri.", "en": "Charcoal grilled tender lamb chunks.", "ru": "Сочные кусочки ягненка на углях." },
+      "category": "Fast Food",
+      "price": 16.00,
+      "ingredients": ["Lamb", "Onion", "Sumac", "Lavash"],
+      "calories": 580,
+      "protein": 38,
+      "fat": 32,
+      "carb": 15
+    },
+    {
+      "companyIndex": 3,
+      "name": { "az": "Margarita Pizza 30cm", "en": "Margherita Pizza 30cm", "ru": "Пицца Маргарита 30см" },
+      "description": { "az": "Mozzarella pendiri, pomidor sousu və təzə reyhan.", "en": "Fresh mozzarella, tomato sauce and basil.", "ru": "Свежая моцарелла, томатный соус и базилик." },
+      "category": "Fast Food",
+      "price": 14.00,
+      "ingredients": ["Dough", "Mozzarella", "Tomato Sauce", "Basil"],
+      "calories": 720,
+      "protein": 28,
+      "fat": 24,
+      "carb": 82
+    }
+  ]
+}

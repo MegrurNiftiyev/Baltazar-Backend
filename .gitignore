@@ -31,8 +31,13 @@ pids
 dist/
 build/
 
+#seed images
+
+testimages/
+
 # Admin Panel
 admin/
+
 
 # IDE / OS files
 .vscode/

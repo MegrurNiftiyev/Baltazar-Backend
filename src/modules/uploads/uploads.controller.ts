@@ -5,7 +5,7 @@ import { storeImage, storeImages, type ImageFolder } from '../../utils/uploadIma
 import { createUploadRecord, listAllUploads } from './uploads.service.js';
 import type { ListUploadsQuery } from './uploads.schema.js';
 
-const VALID_FOLDERS: ImageFolder[] = ['avatars', 'foodCompanies', 'hotels', 'rentacar', 'travel'];
+const VALID_FOLDERS: ImageFolder[] = ['avatars', 'banners', 'food', 'foodCompanies', 'foodItems', 'hotels', 'rentacar', 'rentacarCompanies', 'rentacarCars', 'travel', 'travelCompanies', 'travelTours'];
 const MAX_MULTI_FILES = 10;
 
 function resolveFolder(req: Request): ImageFolder {

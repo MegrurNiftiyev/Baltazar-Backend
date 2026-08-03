@@ -16,4 +16,5 @@ export const COLLECTIONS = {
   APP_CONFIG: 'appConfig',
   BANNERS: 'banners',
   UPLOADS: 'uploads',
+  CATEGORIES: 'categories',
 } as const;

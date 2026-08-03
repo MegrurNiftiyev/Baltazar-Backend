@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
+    "seed": "tsx scripts/seedAll.ts",
     "docs:build": "tsx scripts/generateSwagger.ts"
   },
   "dependencies": {

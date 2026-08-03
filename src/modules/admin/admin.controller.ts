@@ -23,3 +23,9 @@ export const getAllUsersController = catchAsync(async (req: Request, res: Respon
   });
   res.status(200).json({ success: true, data: users, meta: { nextCursor } });
 });
+
+export const resetDatabaseController = catchAsync(async (req: Request, res: Response) => {
+  const adminId = req.user!.userId;
+  await adminService.resetDatabase(adminId);
+  res.status(200).json({ success: true, message: 'Database reset successfully' });
+});

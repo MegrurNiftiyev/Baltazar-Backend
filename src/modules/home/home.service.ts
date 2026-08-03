@@ -12,17 +12,27 @@ const titleMap = {
 };
 
 export async function getBanners() {
-  const snapshot = await db.collection(COLLECTIONS.BANNERS)
-    .where('isActive', '==', true)
-    .orderBy('order', 'asc')
-    .get();
-
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const snapshot = await db.collection(COLLECTIONS.BANNERS).get();
+  const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return docs
+    .filter((d: any) => d.isActive !== false)
+    .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
 }
 
 export async function createBanner(data: CreateBannerInput) {
-  const docRef = await db.collection(COLLECTIONS.BANNERS).add(data);
-  return { id: docRef.id, ...data };
+  const bannerData = {
+    ...data,
+    createdAt: new Date().toISOString(),
+  };
+  const docRef = await db.collection(COLLECTIONS.BANNERS).add(bannerData);
+  return { id: docRef.id, ...bannerData };
+}
+
+export async function clearBanners() {
+  const snapshot = await db.collection(COLLECTIONS.BANNERS).get();
+  const batch = db.batch();
+  snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+  await batch.commit();
 }
 
 export async function updateBanner(id: string, data: UpdateBannerInput) {

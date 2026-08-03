@@ -1,10 +1,10 @@
 import { db } from '../../config/firebase.js';
 import { env } from '../../config/env.js';
 import { AppError } from '../../errors/AppError.js';
-import type { PayInput } from './payment.schema.js';
+import type { AddCardInput, PayInput } from './payment.schema.js';
 import { COLLECTIONS } from '../../config/collections.js';
 
-
+const paymentMethodsCollection = db.collection(COLLECTIONS.PAYMENT_METHODS);
 const transactionsCollection = db.collection(COLLECTIONS.TRANSACTIONS);
 const ordersCollection = db.collection(COLLECTIONS.ORDERS);
 
@@ -25,6 +25,33 @@ async function gatewayRequest(path: string, body: Record<string, unknown>) {
   }
 
   return response.json();
+}
+
+export async function getAllCards(userId: string) {
+  const snapshot = await paymentMethodsCollection
+    .where('userId', '==', userId)
+    .orderBy('createdAt', 'desc')
+    .get();
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+}
+
+export async function addCard(userId: string, input: AddCardInput) {
+  const docRef = await paymentMethodsCollection.add({
+    userId,
+    paymentMethodId: input.paymentMethodId,
+    brand: input.brand,
+    last4: input.last4,
+    expiryMonth: input.expiryMonth,
+    expiryYear: input.expiryYear,
+    createdAt: new Date().toISOString(),
+  });
+
+  return {
+    id: docRef.id,
+    paymentMethodId: input.paymentMethodId,
+    brand: input.brand,
+    last4: input.last4,
+  };
 }
 
 
@@ -53,6 +80,13 @@ export async function processPayment(userId: string, orderId: string, input: Pay
   let chargeResponse: { chargeId: string; status: string };
   let amount: number;
   try {
+    const methodSnapshot = await paymentMethodsCollection
+      .where('userId', '==', userId)
+      .where('paymentMethodId', '==', input.paymentMethodId)
+      .limit(1)
+      .get();
+
+    if (methodSnapshot.empty) throw new AppError(404, 'NOT_FOUND', 'Payment method not found or not owned by user');
 
     amount = order.details?.serverComputedPrice;
     if (typeof amount !== 'number' || amount <= 0) throw new AppError(400, 'PRICE_NOT_COMPUTED');

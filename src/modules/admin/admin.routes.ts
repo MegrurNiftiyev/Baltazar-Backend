@@ -11,6 +11,7 @@ import {
   addAdminController,
   getAllTransactionsController,
   getAllUsersController,
+  resetDatabaseController,
 } from './admin.controller.js';
 
 const router = Router();
@@ -95,5 +96,19 @@ router.get('/users', validate({ query: listUsersQuerySchema }), getAllUsersContr
  *       200: { description: List of transactions }
  */
 router.get('/transactions', validate({ query: adminTransactionQuerySchema }), getAllTransactionsController);
+
+/**
+ * @swagger
+ * /api/admin/reset-database:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Reset the entire database (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200: { description: Database reset successfully }
+ *       403: { description: Forbidden, admin only }
+ */
+router.post('/reset-database', resetDatabaseController);
 
 export default router;

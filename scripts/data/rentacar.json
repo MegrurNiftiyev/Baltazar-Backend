@@ -1,0 +1,146 @@
+{
+  "companies": [
+    {
+      "name": { "az": "Baku Auto Rental", "en": "Baku Auto Rental", "ru": "Baku Auto Rental" },
+      "about": { "az": "Bakıda lüks və ekonomsinif avtomobil icarəsi.", "en": "Luxury and economy car rentals in Baku.", "ru": "Аренда авто класса люкс и эконом в Баку." },
+      "sectionsOrder": ["fleet", "pricing", "terms"]
+    },
+    {
+      "name": { "az": "Caspian Car Hire", "en": "Caspian Car Hire", "ru": "Caspian Car Hire" },
+      "about": { "az": "Sərfəli qiymətlərlə etibarlı icarə xidməti.", "en": "Reliable rental service with affordable rates.", "ru": "Надежный сервис аренды по доступным ценам." },
+      "sectionsOrder": ["cars", "reviews"]
+    },
+    {
+      "name": { "az": "VIP Express Car Rental", "en": "VIP Express Car Rental", "ru": "VIP Express Car Rental" },
+      "about": { "az": "VİP avtomobillər və şəxsi sürücü xidməti.", "en": "VIP vehicles and personal chauffeur services.", "ru": "ВИП автомобили и услуги личного водителя." },
+      "sectionsOrder": ["vip-fleet", "services"]
+    },
+    {
+      "name": { "az": "Azerbaijan Luxury Drive", "en": "Azerbaijan Luxury Drive", "ru": "Azerbaijan Luxury Drive" },
+      "about": { "az": "Sport və premium klass avtomobillərin icarəsi.", "en": "Sports and premium class car rental.", "ru": "Аренда спортивных и премиум автомобилей." },
+      "sectionsOrder": ["premium-cars", "booking"]
+    }
+  ],
+  "cars": [
+    {
+      "companyIndex": 0,
+      "brand": "Toyota",
+      "model": "Camry",
+      "year": 2023,
+      "category": "Sedan",
+      "transmission": "AUTOMATIC",
+      "fuelType": "HYBRID",
+      "seats": 5,
+      "price": 85.00,
+      "features": ["Leather Seats", "Apple CarPlay", "Climate Control"]
+    },
+    {
+      "companyIndex": 0,
+      "brand": "Mercedes-Benz",
+      "model": "S-Class",
+      "year": 2024,
+      "category": "Lüks",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 5,
+      "price": 350.00,
+      "features": ["Massage Seats", "Burmester Sound", "Panoramic Roof"]
+    },
+    {
+      "companyIndex": 0,
+      "brand": "BMW",
+      "model": "530i",
+      "year": 2023,
+      "category": "Lüks",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 5,
+      "price": 220.00,
+      "features": ["HUD Display", "M Package", "Harman Kardon"]
+    },
+    {
+      "companyIndex": 1,
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "year": 2023,
+      "category": "SUV və Krossover",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 5,
+      "price": 110.00,
+      "features": ["All-Wheel Drive", "Rear Camera", "Heated Seats"]
+    },
+    {
+      "companyIndex": 1,
+      "brand": "Chevrolet",
+      "model": "Cobalt",
+      "year": 2022,
+      "category": "Ekonom",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 5,
+      "price": 45.00,
+      "features": ["Economy Fuel", "Bluetooth", "Aircon"]
+    },
+    {
+      "companyIndex": 1,
+      "brand": "Kia",
+      "model": "Sportage",
+      "year": 2023,
+      "category": "SUV və Krossover",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 5,
+      "price": 100.00,
+      "features": ["Rear Camera", "Cruise Control", "Parking Sensors"]
+    },
+    {
+      "companyIndex": 2,
+      "brand": "Mercedes-Benz",
+      "model": "G63 AMG",
+      "year": 2024,
+      "category": "Lüks",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 5,
+      "price": 600.00,
+      "features": ["V8 Biturbo", "Night Package", "Red Interior"]
+    },
+    {
+      "companyIndex": 2,
+      "brand": "Audi",
+      "model": "Q7 Quattro",
+      "year": 2023,
+      "category": "SUV və Krossover",
+      "transmission": "AUTOMATIC",
+      "fuelType": "DIESEL",
+      "seats": 7,
+      "price": 280.00,
+      "features": ["Matrix LED", "Air Suspension", "7 Seats"]
+    },
+    {
+      "companyIndex": 3,
+      "brand": "Porsche",
+      "model": "Panamera",
+      "year": 2024,
+      "category": "Lüks",
+      "transmission": "AUTOMATIC",
+      "fuelType": "HYBRID",
+      "seats": 4,
+      "price": 450.00,
+      "features": ["Sport Exhaust", "Bose Audio", "Carbon Trim"]
+    },
+    {
+      "companyIndex": 3,
+      "brand": "Nissan",
+      "model": "Sunny",
+      "year": 2021,
+      "category": "Ekonom",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 5,
+      "price": 40.00,
+      "features": ["Compact", "Fuel Efficient", "AUX/USB"]
+    }
+  ]
+}

@@ -6,12 +6,13 @@ import { foodItemsQuerySchema, createFoodCompanySchema, updateFoodCompanySchema,
 import { createBannerSchema, updateBannerSchema } from '../modules/home/home.schema.js';
 import { hotelQuerySchema, roomQuerySchema, createHotelSchema, updateHotelSchema, createRoomSchema, updateRoomSchema } from '../modules/hotel/hotel.schema.js';
 import { createOrderSchema, advanceStepSchema, updateOrderStatusSchema, adminOrderQuerySchema } from '../modules/order/order.schema.js';
-import { paySchema } from '../modules/payment/payment.schema.js';
+import { addCardSchema, paySchema } from '../modules/payment/payment.schema.js';
 import { carsQuerySchema, createCompanySchema, updateCompanySchema, createCarSchema, updateCarSchema } from '../modules/rentacar/rentacar.schema.js';
 import { createReviewSchema, reviewQuerySchema, updateReviewSchema } from '../modules/reviews/reviews.schema.js';
 import { toursQuerySchema, includedServicesParamsSchema, createTravelCompanySchema, updateTravelCompanySchema, createTourSchema, updateTourSchema, createIncludedServiceSchema, updateIncludedServiceSchema, includedServiceIdParamsSchema } from '../modules/travel/travel.schema.js';
 import { updateProfileSchema, profileCompletenessSchema } from '../modules/users/users.schema.js';
 import { addToWishlistSchema } from '../modules/wishlist/wishlist.schema.js';
+import { categoriesQuerySchema, createCategorySchema, updateCategorySchema } from '../modules/categories/categories.schema.js';
 
 export const registry = new OpenAPIRegistry();
 
@@ -39,6 +40,7 @@ registry.register('CreateOrderInput', createOrderSchema);
 registry.register('AdvanceOrderStepInput', advanceStepSchema);
 registry.register('UpdateOrderStatusInput', updateOrderStatusSchema);
 registry.register('AdminOrderQuery', adminOrderQuerySchema);
+registry.register('AddCardInput', addCardSchema);
 registry.register('PayInput', paySchema);
 registry.register('CarsQuery', carsQuerySchema);
 registry.register('CreateRentACarCompanyInput', createCompanySchema);
@@ -60,3 +62,6 @@ registry.register('IncludedServiceIdParams', includedServiceIdParamsSchema);
 registry.register('UpdateProfileInput', updateProfileSchema);
 registry.register('ProfileCompleteness', profileCompletenessSchema);
 registry.register('AddToWishlistInput', addToWishlistSchema);
+registry.register('CategoriesQuery', categoriesQuerySchema);
+registry.register('CreateCategoryInput', createCategorySchema);
+registry.register('UpdateCategoryInput', updateCategorySchema);

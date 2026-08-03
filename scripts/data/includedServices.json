@@ -1,0 +1,74 @@
+[
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Pulsuz Wi-Fi", "en": "Free Wi-Fi", "ru": "Бесплатный Wi-Fi" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Açıq Büfə", "en": "Buffet Breakfast", "ru": "Шведский стол" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Üzgüçülük Hovuzu", "en": "Swimming Pool", "ru": "Бассейн" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Spa və Masaj", "en": "Spa & Massage", "ru": "Спа и массаж" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Fitness Mərkəzi", "en": "Fitness Center", "ru": "Фитнес-центр" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Kondisioner", "en": "Air Conditioning", "ru": "Кондиционер" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Bar və Restoran", "en": "Bar & Restaurant", "ru": "Бар и ресторан" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Avtodayanacaq", "en": "Parking", "ru": "Парковка" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Otaq Xidməti 24/7", "en": "Room Service 24/7", "ru": "Обслуживание номеров" }
+  },
+  {
+    "serviceType": "HOTEL",
+    "name": { "az": "Dəniz Mənzərəsi", "en": "Sea View", "ru": "Вид на море" }
+  },
+  {
+    "serviceType": "TRAVEL",
+    "name": { "az": "Peşəkar Bələdçi", "en": "Professional Guide", "ru": "Профессиональный гид" }
+  },
+  {
+    "serviceType": "TRAVEL",
+    "name": { "az": "VİP Transfer", "en": "VIP Transfer", "ru": "ВИП Трансфер" }
+  },
+  {
+    "serviceType": "TRAVEL",
+    "name": { "az": "Muzey Biletləri", "en": "Museum Tickets", "ru": "Билеты в музей" }
+  },
+  {
+    "serviceType": "TRAVEL",
+    "name": { "az": "Milli Nahar", "en": "National Lunch", "ru": "Национальный обед" }
+  },
+  {
+    "serviceType": "TRAVEL",
+    "name": { "az": "Sığorta", "en": "Travel Insurance", "ru": "Страхование" }
+  },
+  {
+    "serviceType": "TRAVEL",
+    "name": { "az": "Foto Çəkiliş", "en": "Photo Service", "ru": "Фотосъемка" }
+  },
+  {
+    "serviceType": "TRAVEL",
+    "name": { "az": "Şərab Dadma", "en": "Wine Tasting", "ru": "Дегустация вин" }
+  },
+  {
+    "serviceType": "TRAVEL",
+    "name": { "az": "Qanadlı Kanat Bileti", "en": "Cable Car Ticket", "ru": "Билет на канату" }
+  }
+]

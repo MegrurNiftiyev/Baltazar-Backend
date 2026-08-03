@@ -66,3 +66,34 @@ export async function getAllUsers(params: {
   const nextCursor = users.length === params.limit ? users[users.length - 1]!.id : null;
   return { users, nextCursor };
 }
+
+export async function resetDatabase(adminId: string) {
+  const collectionsToClear = Object.values(COLLECTIONS);
+  
+  for (const collectionName of collectionsToClear) {
+    const colRef = db.collection(collectionName);
+    const snapshot = await colRef.get();
+    
+    let batch = db.batch();
+    let count = 0;
+    
+    for (const doc of snapshot.docs) {
+      if (collectionName === COLLECTIONS.USERS && doc.id === adminId) {
+        continue; // Skip the requesting admin user
+      }
+      
+      batch.delete(doc.ref);
+      count++;
+      
+      if (count >= 400) { // Max batch size is 500
+        await batch.commit();
+        batch = db.batch();
+        count = 0;
+      }
+    }
+    
+    if (count > 0) {
+      await batch.commit();
+    }
+  }
+}

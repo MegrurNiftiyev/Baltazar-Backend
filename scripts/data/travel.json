@@ -1,0 +1,96 @@
+{
+  "companies": [
+    {
+      "name": { "az": "Silk Road Travel Agency", "en": "Silk Road Travel Agency", "ru": "Silk Road Travel Agency" },
+      "about": { "az": "Azərbaycan üzrə tarixi və təbiət turları təşkilatçısı.", "en": "Historical and nature tour operator across Azerbaijan.", "ru": "Туроператор по историческим и природным турам." },
+      "sectionsOrder": ["tours", "destinations", "reviews"]
+    },
+    {
+      "name": { "az": "Caspian Voyages", "en": "Caspian Voyages", "ru": "Caspian Voyages" },
+      "about": { "az": "Bütün regionlara eksklüziv VİP səyahət xidməti.", "en": "Exclusive VIP travel service across all regions.", "ru": "Эксклюзивные ВИП туры по регионам." },
+      "sectionsOrder": ["tours", "services"]
+    },
+    {
+      "name": { "az": "Khazar Tour Operator", "en": "Khazar Tour Operator", "ru": "Khazar Tour Operator" },
+      "about": { "az": "Regional dağ və safari turları peşəkar komanda ilə.", "en": "Regional mountain and safari tours with professional team.", "ru": "Горные и сафари туры по регионам." },
+      "sectionsOrder": ["tours", "about"]
+    },
+    {
+      "name": { "az": "Caucasus Adventure Club", "en": "Caucasus Adventure Club", "ru": "Caucasus Adventure Club" },
+      "about": { "az": "Ekstremal və ekoloji turlar üzrə ixtisaslaşmış agentlik.", "en": "Specialized agency for extreme and eco tours.", "ru": "Экстремальный и эко-туризм." },
+      "sectionsOrder": ["tours", "gallery"]
+    }
+  ],
+  "tours": [
+    {
+      "companyIndex": 0,
+      "categories": ["Tarixi və Mədəni", "Təbiət və Macəra"],
+      "title": { "az": "Qəbələ və Şəki Qədim İrs Turu", "en": "Gabala & Sheki Ancient Heritage Tour", "ru": "Тур в Габалу и Шеки" },
+      "duration": "2 Days / 1 Night",
+      "startDate": "2026-09-01",
+      "endDate": "2026-09-02",
+      "price": 140.00,
+      "roadmap": [
+        { "lat": 40.4093, "long": 49.8671, "order": 1 },
+        { "lat": 40.9813, "long": 47.8458, "order": 2 },
+        { "lat": 41.1919, "long": 47.1706, "order": 3 }
+      ]
+    },
+    {
+      "companyIndex": 0,
+      "categories": ["Şəhər Turu", "Tarixi və Mədəni"],
+      "title": { "az": "Bakı İçərişəhər və Qobustan Turu", "en": "Baku Old City & Gobustan Tour", "ru": "Экскурсия по Старому городу и Гобустану" },
+      "duration": "1 Day",
+      "startDate": "2026-09-10",
+      "endDate": "2026-09-10",
+      "price": 65.00,
+      "roadmap": [
+        { "lat": 40.366, "long": 49.835, "order": 1 },
+        { "lat": 40.091, "long": 49.403, "order": 2 }
+      ]
+    },
+    {
+      "companyIndex": 1,
+      "categories": ["Təbiət və Macəra"],
+      "title": { "az": "Şahdağ Dağ və Xizək Turu", "en": "Shahdag Mountain & Ski Adventure", "ru": "Горный тур в Шахдаг" },
+      "duration": "1 Day",
+      "startDate": "2026-10-05",
+      "endDate": "2026-10-05",
+      "price": 55.00,
+      "roadmap": [
+        { "lat": 41.318, "long": 48.148, "order": 1 }
+      ]
+    },
+    {
+      "companyIndex": 2,
+      "categories": ["Təbiət və Macəra"],
+      "title": { "az": "Lənkəran və Lerik Təbiət Kəşfi", "en": "Lankaran & Lerik Nature Discovery", "ru": "Тур в Ленкорань и Лерик" },
+      "duration": "2 Days / 1 Night",
+      "startDate": "2026-09-15",
+      "endDate": "2026-09-16",
+      "price": 125.00,
+      "roadmap": [
+        { "lat": 40.409, "long": 49.867, "order": 1 },
+        { "lat": 39.208, "long": 48.835, "order": 2 },
+        { "lat": 38.753, "long": 48.854, "order": 3 },
+        { "lat": 38.774, "long": 48.416, "order": 4 }
+      ]
+    },
+    {
+      "companyIndex": 3,
+      "categories": ["Tarixi və Mədəni", "Təbiət və Macəra"],
+      "title": { "az": "Gəncə və Göygöl Mədəni Turu", "en": "Ganja & Goygol Lake Cultural Tour", "ru": "Тур в Гянджу и Гейгель" },
+      "duration": "3 Days / 2 Nights",
+      "startDate": "2026-09-20",
+      "endDate": "2026-09-22",
+      "price": 190.00,
+      "roadmap": [
+        { "lat": 40.409, "long": 49.867, "order": 1 },
+        { "lat": 40.682, "long": 46.36, "order": 2 },
+        { "lat": 40.523, "long": 46.321, "order": 3 },
+        { "lat": 40.548, "long": 46.295, "order": 4 },
+        { "lat": 40.678, "long": 46.345, "order": 5 }
+      ]
+    }
+  ]
+}

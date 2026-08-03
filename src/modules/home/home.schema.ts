@@ -4,8 +4,8 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 extendZodWithOpenApi(z);
 
 export const createBannerSchema = z.object({
-  link: z.string().min(1),
-  order: z.number(),
+  serviceType: z.enum(['RENT_A_CAR', 'HOTEL', 'TRAVEL', 'FOOD']),
+  order: z.number().optional().default(1),
   isActive: z.boolean().optional().default(true),
   image: z.string().url(),
 }).openapi('CreateBannerInput');
