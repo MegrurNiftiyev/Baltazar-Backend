@@ -4,38 +4,21 @@ import { localize } from '../../utils/localize.js';
 import * as rentacarService from './rentacar.service.js';
 import { incrementUserInterest } from '../home/home.service.js';
 
-// ── Companies ──────────────────────────────────────────────────────────
 
-export const getCompaniesController = catchAsync(async (req: Request, res: Response) => {
-  const companies = await rentacarService.getCompanies();
-  res.status(200).json({ success: true, data: localize(companies, req.lang!) });
-});
-
-export const getCompanyByIdController = catchAsync(async (req: Request, res: Response) => {
-  const company = await rentacarService.getCompanyById(req.params.id as string, req.user?.userId);
-  res.status(200).json({ success: true, data: localize(company, req.lang!) });
-});
-
-export const createCompanyController = catchAsync(async (req: Request, res: Response) => {
-  const company = await rentacarService.createCompany(req.body);
-  res.status(201).json({ success: true, data: localize(company, req.lang!) });
-});
-
-export const updateCompanyController = catchAsync(async (req: Request, res: Response) => {
-  const company = await rentacarService.updateCompany(req.params.id as string, req.body);
-  res.status(200).json({ success: true, data: localize(company, req.lang!) });
-});
-
-export const deleteCompanyController = catchAsync(async (req: Request, res: Response) => {
-  const result = await rentacarService.deleteCompany(req.params.id as string);
-  res.status(200).json({ success: true, data: result });
-});
 
 // ── Cars ───────────────────────────────────────────────────────────────
 
 export const getCarsController = catchAsync(async (req: Request, res: Response) => {
-  const cars = await rentacarService.getCars(req.validatedQuery as Record<string, string>);
-  res.status(200).json({ success: true, data: localize(cars, req.lang!) });
+  const result = await rentacarService.getCars(req.validatedQuery as any);
+  res.status(200).json({
+    success: true,
+    data: localize(result.items, req.lang!),
+    pagination: {
+      nextCursor: result.nextCursor,
+      hasMore: result.hasMore,
+      limit: Number(req.query.limit || 20),
+    },
+  });
 });
 
 export const getCarByIdController = catchAsync(async (req: Request, res: Response) => {

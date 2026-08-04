@@ -54,6 +54,12 @@ const router = Router();
  *       - in: query
  *         name: name
  *         schema: { type: string }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 20 }
+ *       - in: query
+ *         name: cursor
+ *         schema: { type: string }
  *     responses:
  *       200: { description: List of hotels }
  */
@@ -91,6 +97,12 @@ router.get('/:id', optionalAuth, getHotelByIdController);
  *         schema: { type: string }
  *       - in: query
  *         name: roomType
+ *         schema: { type: string }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 20 }
+ *       - in: query
+ *         name: cursor
  *         schema: { type: string }
  *     responses:
  *       200: { description: List of rooms }

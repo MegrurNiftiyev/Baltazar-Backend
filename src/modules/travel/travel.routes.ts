@@ -7,8 +7,6 @@ import { validateImageReferences } from '../../middlewares/validateImageReferenc
 import {
   toursQuerySchema,
   includedServicesParamsSchema,
-  createTravelCompanySchema,
-  updateTravelCompanySchema,
   createTourSchema,
   updateTourSchema,
   createIncludedServiceSchema,
@@ -16,11 +14,6 @@ import {
   includedServiceIdParamsSchema,
 } from './travel.schema.js';
 import {
-  getCompaniesController,
-  getCompanyByIdController,
-  createCompanyController,
-  updateCompanyController,
-  deleteCompanyController,
   getToursController,
   getTourByIdController,
   createTourController,
@@ -37,34 +30,7 @@ const includedServicesRouter = Router();
 
 // ── Public routes ──────────────────────────────────────────────────────
 
-/**
- * @swagger
- * /api/services/travel/companies:
- *   get:
- *     tags: [Travel]
- *     summary: Get all travel companies
- *     security: []
- *     responses:
- *       200: { description: List of travel companies }
- */
-router.get('/companies', getCompaniesController);
 
-/**
- * @swagger
- * /api/services/travel/companies/{id}:
- *   get:
- *     tags: [Travel]
- *     summary: Get a travel company by ID
- *     security: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200: { description: Company details }
- */
-router.get('/companies/:id', optionalAuth, getCompanyByIdController);
 
 /**
  * @swagger
@@ -92,6 +58,12 @@ router.get('/companies/:id', optionalAuth, getCompanyByIdController);
  *       - in: query
  *         name: name
  *         schema: { type: string }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 20 }
+ *       - in: query
+ *         name: cursor
+ *         schema: { type: string }
  *     responses:
  *       200: { description: List of tours }
  */
@@ -116,92 +88,7 @@ router.get('/tours/:id', optionalAuth, getTourByIdController);
 
 // Admin CRUD
 
-/**
- * @swagger
- * /api/services/travel/companies:
- *   post:
- *     tags: [Travel]
- *     summary: Create travel company (admin)
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateTravelCompanyInput'
- *     responses:
- *       201: { description: Success }
- *       403: { description: Forbidden, admin only }
- */
-router.post(
-  '/companies',
-  requireAuth,
-  requireRole('ADMIN'),
-  validate({ body: createTravelCompanySchema }),
-  validateImageReferences([
-    { bodyField: 'profileImage', kind: 'single' },
-    { bodyField: 'bannerImage', kind: 'single' },
-    { bodyField: 'images', kind: 'multi' },
-  ]),
-  createCompanyController,
-);
 
-/**
- * @swagger
- * /api/services/travel/companies/{id}:
- *   put:
- *     tags: [Travel]
- *     summary: Update travel company (admin)
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UpdateTravelCompanyInput'
- *     responses:
- *       200: { description: Success }
- *       403: { description: Forbidden, admin only }
- */
-router.put(
-  '/companies/:id',
-  requireAuth,
-  requireRole('ADMIN'),
-  validate({ body: updateTravelCompanySchema }),
-  validateImageReferences([
-    { bodyField: 'profileImage', kind: 'single' },
-    { bodyField: 'bannerImage', kind: 'single' },
-    { bodyField: 'images', kind: 'multi' },
-  ]),
-  updateCompanyController,
-);
-
-/**
- * @swagger
- * /api/services/travel/companies/{id}:
- *   delete:
- *     tags: [Travel]
- *     summary: Delete travel company
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200: { description: Success }
- *       403: { description: Forbidden, admin only }
- *       409: { description: Has active bookings }
- */
-router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompanyController);
 
 /**
  * @swagger

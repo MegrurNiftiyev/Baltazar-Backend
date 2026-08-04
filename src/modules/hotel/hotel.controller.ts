@@ -7,8 +7,16 @@ import { incrementUserInterest } from '../home/home.service.js';
 // ── Hotels ─────────────────────────────────────────────────────────────
 
 export const getHotelsController = catchAsync(async (req: Request, res: Response) => {
-  const hotels = await hotelService.getHotels(req.validatedQuery as Record<string, string>);
-  res.status(200).json({ success: true, data: localize(hotels, req.lang!) });
+  const result = await hotelService.getHotels(req.validatedQuery as any);
+  res.status(200).json({
+    success: true,
+    data: localize(result.items, req.lang!),
+    pagination: {
+      nextCursor: result.nextCursor,
+      hasMore: result.hasMore,
+      limit: Number(req.query.limit || 20),
+    },
+  });
 });
 
 export const getHotelByIdController = catchAsync(async (req: Request, res: Response) => {
@@ -37,8 +45,16 @@ export const deleteHotelController = catchAsync(async (req: Request, res: Respon
 // ── Rooms ──────────────────────────────────────────────────────────────
 
 export const getRoomsController = catchAsync(async (req: Request, res: Response) => {
-  const rooms = await hotelService.getRooms(req.params.id as string, req.validatedQuery as Record<string, string>);
-  res.status(200).json({ success: true, data: localize(rooms, req.lang!) });
+  const result = await hotelService.getRooms(req.params.id as string, req.validatedQuery as any);
+  res.status(200).json({
+    success: true,
+    data: localize(result.items, req.lang!),
+    pagination: {
+      nextCursor: result.nextCursor,
+      hasMore: result.hasMore,
+      limit: Number(req.query.limit || 20),
+    },
+  });
 });
 
 export const createRoomController = catchAsync(async (req: Request, res: Response) => {

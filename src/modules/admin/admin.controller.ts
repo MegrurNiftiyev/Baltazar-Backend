@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsync.js';
 import * as adminService from './admin.service.js';
-import type { ListUsersQuery } from './admin.schema.js';
+
 
 export const addAdminController = catchAsync(async (req: Request, res: Response) => {
   const result = await adminService.promoteToAdmin(req.body.userId);
@@ -10,18 +10,29 @@ export const addAdminController = catchAsync(async (req: Request, res: Response)
 
 
 export const getAllTransactionsController = catchAsync(async (req: Request, res: Response) => {
-  const transactions = await adminService.getAllTransactions(req.validatedQuery as Record<string, string>);
-  res.status(200).json({ success: true, data: transactions });
+  const result = await adminService.getAllTransactions(req.validatedQuery as any);
+  res.status(200).json({
+    success: true,
+    data: result.items,
+    pagination: {
+      nextCursor: result.nextCursor,
+      hasMore: result.hasMore,
+      limit: Number(req.query.limit || 20),
+    },
+  });
 });
 
 export const getAllUsersController = catchAsync(async (req: Request, res: Response) => {
-  const query = req.validatedQuery as unknown as ListUsersQuery;
-  const { users, nextCursor } = await adminService.getAllUsers({
-    limit: query.limit,
-    startAfterId: query.cursor,
-    role: query.role,
+  const result = await adminService.getAllUsers(req.validatedQuery as any);
+  res.status(200).json({
+    success: true,
+    data: result.items,
+    pagination: {
+      nextCursor: result.nextCursor,
+      hasMore: result.hasMore,
+      limit: Number(req.query.limit || 20),
+    },
   });
-  res.status(200).json({ success: true, data: users, meta: { nextCursor } });
 });
 
 export const resetDatabaseController = catchAsync(async (req: Request, res: Response) => {

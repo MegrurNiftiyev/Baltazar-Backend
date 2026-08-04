@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import { languageEnum } from '../../shared/language.js';
 
 extendZodWithOpenApi(z);
 
@@ -10,7 +11,7 @@ export const updateProfileSchema = z.object({
   name: z.string().min(2).max(100).optional(),
   phone: z.string().min(7).max(20).optional(),
   region: z.string().min(1).max(10).optional(),
-  language: z.enum(['az', 'en', 'ru']).optional(),
+  language: languageEnum.optional(),
   personalInfo: z
     .object({
       dateOfBirth: z.string().min(1).optional(),

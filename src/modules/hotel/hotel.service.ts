@@ -10,6 +10,7 @@ import type {
   CreateRoomInput,
   UpdateRoomInput,
 } from './hotel.schema.js';
+import { paginateQuery } from '../../shared/pagination.js';
 
 const hotelsCollection = db.collection(COLLECTIONS.HOTELS);
 const roomsCollection = db.collection(COLLECTIONS.ROOMS);
@@ -52,31 +53,35 @@ export async function getHotels(filters: HotelQuery) {
     query = query.where('rating', '>=', filters.minRating);
   }
 
-  const snapshot = await query.get();
-  let results = snapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      name: data.name,
-      city: data.city,
-      starRating: data.starRating,
-      price: data.price,
-      image: data.images?.[0] || null,
-      rating: data.rating || 0,
-      reviewCount: data.reviewCount || 0,
-    };
-  });
+  const result = await paginateQuery(
+    hotelsCollection,
+    query.orderBy('createdAt', 'desc'),
+    filters,
+    (doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        name: data.name,
+        starRating: data.starRating,
+        city: data.city,
+        rating: data.rating,
+        price: data.price,
+        image: data.images?.[0] || null,
+        reviewCount: data.reviewCount,
+      };
+    }
+  );
 
-  // Post-fetch filters for price range and name search
+  let filteredItems = result.items;
   if (filters.minPrice !== undefined) {
-    results = results.filter((h) => h.price >= filters.minPrice!);
+    filteredItems = filteredItems.filter((h) => h.price >= filters.minPrice!);
   }
   if (filters.maxPrice !== undefined) {
-    results = results.filter((h) => h.price <= filters.maxPrice!);
+    filteredItems = filteredItems.filter((h) => h.price <= filters.maxPrice!);
   }
   if (filters.name) {
     const searchTerm = filters.name.toLowerCase();
-    results = results.filter((h) => {
+    filteredItems = filteredItems.filter((h) => {
       const name = h.name as Record<string, string>;
       return (
         name?.az?.toLowerCase().includes(searchTerm) ||
@@ -86,7 +91,7 @@ export async function getHotels(filters: HotelQuery) {
     });
   }
 
-  return results;
+  return { ...result, items: filteredItems };
 }
 
 export async function getHotelById(id: string, userId?: string) {
@@ -139,8 +144,12 @@ export async function getRooms(hotelId: string, filters: RoomQuery) {
     query = query.where('roomType', '==', filters.roomType);
   }
 
-  const snapshot = await query.get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return paginateQuery(
+    roomsCollection,
+    query.orderBy('createdAt', 'desc'),
+    filters,
+    (doc) => ({ id: doc.id, ...doc.data() })
+  );
 }
 
 export async function createRoom(input: CreateRoomInput) {
@@ -150,9 +159,10 @@ export async function createRoom(input: CreateRoomInput) {
 
   const docRef = await roomsCollection.add({
     ...input,
+    status: input.status || 'AVAILABLE',
     createdAt: new Date().toISOString(),
   });
-  return { id: docRef.id, ...input };
+  return { id: docRef.id, ...input, status: input.status || 'AVAILABLE' };
 }
 
 export async function updateRoom(id: string, input: UpdateRoomInput) {

@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import { serviceTypeEnum } from '../../shared/serviceType.js';
 
 extendZodWithOpenApi(z);
 
 export const createBannerSchema = z.object({
-  serviceType: z.enum(['RENT_A_CAR', 'HOTEL', 'TRAVEL', 'FOOD']),
+  serviceType: serviceTypeEnum,
   order: z.number().optional().default(1),
   isActive: z.boolean().optional().default(true),
   image: z.string().url(),

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import { paginationQuerySchema } from '../../shared/pagination.js';
+import { companyStatusEnum } from '../../shared/enums.js';
 
 extendZodWithOpenApi(z);
 
@@ -18,11 +20,11 @@ export const hotelQuerySchema = z.object({
   city: z.string().optional(),
   minRating: z.coerce.number().min(0).max(5).optional(),
   name: z.string().optional(),
-}).openapi('HotelQuery');
+}).merge(paginationQuerySchema).openapi('HotelQuery');
 
 export const roomQuerySchema = z.object({
   roomType: z.string().optional(),
-}).openapi('RoomQuery');
+}).merge(paginationQuerySchema).openapi('RoomQuery');
 
 // ── Admin CRUD Schemas ─────────────────────────────────────────────────
 
@@ -38,7 +40,7 @@ export const createHotelSchema = z.object({
   sectionsOrder: z.array(z.string()).optional(),
   serviceType: z.literal('HOTEL').default('HOTEL'),
   price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
-  status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
+  status: companyStatusEnum.default('ACTIVE'),
 }).openapi('CreateHotelInput');
 
 export const updateHotelSchema = createHotelSchema.partial().openapi('UpdateHotelInput');

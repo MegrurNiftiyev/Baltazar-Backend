@@ -30,6 +30,7 @@ import homeRouter from './modules/home/home.routes.js';
 import appConfigRouter from './modules/appConfig/appConfig.routes.js';
 import uploadsRouter from './modules/uploads/uploads.routes.js';
 import categoriesRouter from './modules/categories/categories.routes.js';
+import enumsRouter from './modules/enums/enums.routes.js';
 
 // ── App initialization ────────────────────────────────────────────────
 export const app = express();
@@ -87,6 +88,7 @@ app.use('/api/payment', paymentRouter);
 app.use('/api/home', homeRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/app/config', appConfigRouter);
+app.use('/api/enums', enumsRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/uploads', uploadsRouter);
 

@@ -4,38 +4,21 @@ import { localize } from '../../utils/localize.js';
 import * as travelService from './travel.service.js';
 import { incrementUserInterest } from '../home/home.service.js';
 
-// ── Companies ──────────────────────────────────────────────────────────
 
-export const getCompaniesController = catchAsync(async (req: Request, res: Response) => {
-  const companies = await travelService.getCompanies();
-  res.status(200).json({ success: true, data: localize(companies, req.lang!) });
-});
-
-export const getCompanyByIdController = catchAsync(async (req: Request, res: Response) => {
-  const company = await travelService.getCompanyById(req.params.id as string, req.user?.userId);
-  res.status(200).json({ success: true, data: localize(company, req.lang!) });
-});
-
-export const createCompanyController = catchAsync(async (req: Request, res: Response) => {
-  const company = await travelService.createCompany(req.body);
-  res.status(201).json({ success: true, data: localize(company, req.lang!) });
-});
-
-export const updateCompanyController = catchAsync(async (req: Request, res: Response) => {
-  const company = await travelService.updateCompany(req.params.id as string, req.body);
-  res.status(200).json({ success: true, data: localize(company, req.lang!) });
-});
-
-export const deleteCompanyController = catchAsync(async (req: Request, res: Response) => {
-  const result = await travelService.deleteCompany(req.params.id as string);
-  res.status(200).json({ success: true, data: result });
-});
 
 // ── Tours ──────────────────────────────────────────────────────────────
 
 export const getToursController = catchAsync(async (req: Request, res: Response) => {
-  const tours = await travelService.getTours(req.validatedQuery as Record<string, string>);
-  res.status(200).json({ success: true, data: localize(tours, req.lang!) });
+  const result = await travelService.getTours(req.validatedQuery as any);
+  res.status(200).json({
+    success: true,
+    data: localize(result.items, req.lang!),
+    pagination: {
+      nextCursor: result.nextCursor,
+      hasMore: result.hasMore,
+      limit: Number(req.query.limit || 20),
+    },
+  });
 });
 
 export const getTourByIdController = catchAsync(async (req: Request, res: Response) => {

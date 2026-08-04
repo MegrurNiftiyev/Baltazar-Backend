@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import { serviceTypeEnum } from '../../shared/serviceType.js';
+import { paginationQuerySchema } from '../../shared/pagination.js';
 
 extendZodWithOpenApi(z);
 
 export const createOrderSchema = z.object({
-  serviceType: z.enum(['RENT_A_CAR', 'TRAVEL', 'HOTEL_ROOM', 'FOOD']),
+  serviceType: serviceTypeEnum,
   serviceId: z.string().min(1),
 }).openapi('CreateOrderInput');
 
@@ -28,16 +30,18 @@ export type CreateOrderInput = z.infer<typeof createOrderSchema>;
 export type AdvanceStepInput = z.infer<typeof advanceStepSchema>;
 export type OrderScreenKey = z.infer<typeof orderScreenKeyEnum>;
 
+export const orderStatusEnum = z.enum(['PENDING', 'AWAITING_PAYMENT', 'PROCESSING', 'CONFIRMED', 'CANCELLED', 'EXPIRED']);
+
 export const updateOrderStatusSchema = z.object({
-  status: z.enum(['PENDING', 'AWAITING_PAYMENT', 'PROCESSING', 'CONFIRMED', 'CANCELLED', 'EXPIRED']),
+  status: orderStatusEnum,
 }).openapi('UpdateOrderStatusInput');
 
-export const adminOrderQuerySchema = z.object({
-  status: z
-    .enum(['PENDING', 'AWAITING_PAYMENT', 'PROCESSING', 'CONFIRMED', 'CANCELLED', 'EXPIRED'])
-    .optional(),
+export const orderQuerySchema = z.object({
+  status: orderStatusEnum.optional(),
   userId: z.string().optional(),
   serviceType: z.string().optional(),
-}).openapi('AdminOrderQuery');
+}).merge(paginationQuerySchema).openapi('OrderQuery');
+
+export type OrderQuery = z.infer<typeof orderQuerySchema>;
 
 export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>;

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import { serviceTypeEnum } from '../../shared/serviceType.js';
 
 extendZodWithOpenApi(z);
 
@@ -10,12 +11,12 @@ const localizedMapSchema = z.object({
 });
 
 export const categoriesQuerySchema = z.object({
-  serviceType: z.enum(['RENT_A_CAR', 'HOTEL', 'TRAVEL', 'FOOD']).optional(),
+  serviceType: serviceTypeEnum.optional(),
 }).openapi('CategoriesQuery');
 
 export const createCategorySchema = z.object({
   name: localizedMapSchema,
-  serviceType: z.enum(['RENT_A_CAR', 'HOTEL', 'TRAVEL', 'FOOD']),
+  serviceType: serviceTypeEnum,
 }).openapi('CreateCategoryInput');
 
 export const updateCategorySchema = createCategorySchema.partial().openapi('UpdateCategoryInput');

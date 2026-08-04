@@ -20,7 +20,15 @@ export async function seedRentACar(ctx: SeedContext) {
     const profileUrl = await ctx.uploadImageFile(companyImages[i % companyImages.length]!, 'rentacarCompanies');
     const bannerUrl = await ctx.uploadImageFile(companyImages[(i + 1) % companyImages.length]!, 'rentacarCompanies');
 
-    const res = await fetch(`${ctx.baseUrl}/api/services/rentacar/companies`, {
+    const sectionOrders = [
+      ['ABOUT', 'GALLERY', 'ITEMS'],
+      ['ITEMS', 'ABOUT'],
+      ['GALLERY'],
+      ['ABOUT', 'ITEMS']
+    ];
+    const sectionOrder = sectionOrders[i % sectionOrders.length];
+
+    const res = await fetch(`${ctx.baseUrl}/api/companies`, {
       method: 'POST',
       headers: { ...ctx.headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -29,6 +37,7 @@ export async function seedRentACar(ctx: SeedContext) {
         profileImage: profileUrl,
         bannerImage: bannerUrl,
         status: 'ACTIVE',
+        sectionOrder,
       }),
     });
     const result = await res.json();

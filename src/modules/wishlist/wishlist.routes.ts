@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { validate } from '../../middlewares/validate.js';
-import { addToWishlistSchema } from './wishlist.schema.js';
+import { addToWishlistSchema, wishlistQuerySchema } from './wishlist.schema.js';
 import {
   getWishlistController,
   addToWishlistController,
@@ -18,10 +18,18 @@ const router = Router();
  *     summary: Get the authenticated user's wishlist
  *     security:
  *       - bearerAuth: []
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 20 }
+ *       - in: query
+ *         name: cursor
+ *         schema: { type: string }
  *     responses:
  *       200: { description: List of wishlisted services with full details }
+ *       401: { description: Unauthorized }
+ *       400: { description: Validation error }
  */
-router.get('/wishlist', requireAuth, getWishlistController);
+router.get('/wishlist', requireAuth, validate({ query: wishlistQuerySchema }), getWishlistController);
 
 /**
  * @swagger

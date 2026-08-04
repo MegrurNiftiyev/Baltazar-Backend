@@ -47,13 +47,6 @@ router.post('/users/add-admin', validate({ body: addAdminSchema }), addAdminCont
  *     summary: List all users (admin only)
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: limit
- *         schema: { type: integer, default: 50, maximum: 100 }
- *       - in: query
- *         name: cursor
- *         schema: { type: string }
  *       - in: query
  *         name: role
  *         schema: { type: string, enum: [USER, ADMIN] }
@@ -70,8 +63,10 @@ router.post('/users/add-admin', validate({ body: addAdminSchema }), addAdminCont
  *                   role: "USER"
  *                   language: "az"
  *                   createdAt: "2026-05-10T08:00:00.000Z"
- *               meta:
- *                 nextCursor: "u_71ab02"
+ *               pagination:
+ *                 nextCursor: "eyJpZCI6InVfNzFhYjAyIn0="
+ *                 hasMore: true
+ *                 limit: 50
  *       403:
  *         description: Forbidden, admin only
  */
@@ -91,6 +86,12 @@ router.get('/users', validate({ query: listUsersQuerySchema }), getAllUsersContr
  *         schema: { type: string, enum: [SUCCESS, FAILED, PENDING] }
  *       - in: query
  *         name: userId
+ *         schema: { type: string }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 20 }
+ *       - in: query
+ *         name: cursor
  *         schema: { type: string }
  *     responses:
  *       200: { description: List of transactions }

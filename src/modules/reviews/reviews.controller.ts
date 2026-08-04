@@ -1,12 +1,20 @@
 import type { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsync.js';
 import * as reviewsService from './reviews.service.js';
-import type { ReviewQuery } from './reviews.schema.js';
+
 
 export const getReviewsController = catchAsync(async (req: Request, res: Response) => {
   const role = req.user?.role;
-  const reviews = await reviewsService.getReviews(req.validatedQuery as ReviewQuery, role);
-  res.status(200).json({ success: true, data: reviews });
+  const result = await reviewsService.getReviews(req.validatedQuery as any, role);
+  res.status(200).json({
+    success: true,
+    data: result.items,
+    pagination: {
+      nextCursor: result.nextCursor,
+      hasMore: result.hasMore,
+      limit: Number(req.query.limit || 20),
+    },
+  });
 });
 
 export const createReviewController = catchAsync(async (req: Request, res: Response) => {

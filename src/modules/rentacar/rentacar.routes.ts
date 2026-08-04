@@ -6,17 +6,10 @@ import { validate } from '../../middlewares/validate.js';
 import { validateImageReferences } from '../../middlewares/validateImageReferences.js';
 import {
   carsQuerySchema,
-  createCompanySchema,
-  updateCompanySchema,
   createCarSchema,
   updateCarSchema,
 } from './rentacar.schema.js';
 import {
-  getCompaniesController,
-  getCompanyByIdController,
-  createCompanyController,
-  updateCompanyController,
-  deleteCompanyController,
   getCarsController,
   getCarByIdController,
   createCarController,
@@ -28,35 +21,7 @@ const router = Router();
 
 // ── Public routes ──────────────────────────────────────────────────────
 
-/**
- * @swagger
- * /api/services/rentacar/companies:
- *   get:
- *     tags: [RentACar]
- *     summary: Get all rent-a-car companies
- *     security: []
- *     responses:
- *       200: { description: List of companies }
- */
-router.get('/companies', getCompaniesController);
 
-/**
- * @swagger
- * /api/services/rentacar/companies/{id}:
- *   get:
- *     tags: [RentACar]
- *     summary: Get a rent-a-car company by ID
- *     security: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200: { description: Company details }
- *       404: { description: Company not found }
- */
-router.get('/companies/:id', optionalAuth, getCompanyByIdController);
 
 /**
  * @swagger
@@ -90,6 +55,12 @@ router.get('/companies/:id', optionalAuth, getCompanyByIdController);
  *       - in: query
  *         name: fuelType
  *         schema: { type: string, enum: [PETROL, DIESEL, ELECTRIC, HYBRID] }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 20 }
+ *       - in: query
+ *         name: cursor
+ *         schema: { type: string }
  *     responses:
  *       200: { description: List of cars (DTO — id, brand, model, price, image, rating) }
  */
@@ -115,92 +86,7 @@ router.get('/cars/:id', optionalAuth, getCarByIdController);
 
 // Admin CRUD
 
-/**
- * @swagger
- * /api/services/rentacar/companies:
- *   post:
- *     tags: [RentACar]
- *     summary: Create rent-a-car company (admin)
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateRentACarCompanyInput'
- *     responses:
- *       201: { description: Success }
- *       403: { description: Forbidden, admin only }
- */
-router.post(
-  '/companies',
-  requireAuth,
-  requireRole('ADMIN'),
-  validate({ body: createCompanySchema }),
-  validateImageReferences([
-    { bodyField: 'profileImage', kind: 'single' },
-    { bodyField: 'bannerImage', kind: 'single' },
-    { bodyField: 'images', kind: 'multi' },
-  ]),
-  createCompanyController,
-);
 
-/**
- * @swagger
- * /api/services/rentacar/companies/{id}:
- *   put:
- *     tags: [RentACar]
- *     summary: Update rent-a-car company (admin)
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UpdateRentACarCompanyInput'
- *     responses:
- *       200: { description: Success }
- *       403: { description: Forbidden, admin only }
- */
-router.put(
-  '/companies/:id',
-  requireAuth,
-  requireRole('ADMIN'),
-  validate({ body: updateCompanySchema }),
-  validateImageReferences([
-    { bodyField: 'profileImage', kind: 'single' },
-    { bodyField: 'bannerImage', kind: 'single' },
-    { bodyField: 'images', kind: 'multi' },
-  ]),
-  updateCompanyController,
-);
-
-/**
- * @swagger
- * /api/services/rentacar/companies/{id}:
- *   delete:
- *     tags: [RentACar]
- *     summary: Delete rent-a-car company
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200: { description: Success }
- *       403: { description: Forbidden, admin only }
- *       409: { description: Has active bookings }
- */
-router.delete('/companies/:id', requireAuth, requireRole('ADMIN'), deleteCompanyController);
 
 /**
  * @swagger

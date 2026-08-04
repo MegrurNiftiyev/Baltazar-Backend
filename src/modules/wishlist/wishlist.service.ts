@@ -20,7 +20,7 @@ const collectionMap: Record<string, string> = {
  * Get the user's wishlist — reads User.wishlist[], then batch-fetches
  * the referenced service documents via Firestore getAll().
  */
-export async function getWishlist(userId: string) {
+export async function getWishlist(userId: string, query: { limit?: number, cursor?: string } = {}) {
   const userDoc = await usersCollection.doc(userId).get();
   if (!userDoc.exists) {
     throw new AppError(404, 'NOT_FOUND');
@@ -30,12 +30,23 @@ export async function getWishlist(userId: string) {
   const wishlist: Array<{ serviceId: string; serviceType: string }> = userData.wishlist || [];
 
   if (wishlist.length === 0) {
-    return [];
+    return { items: [], hasMore: false, nextCursor: undefined };
+  }
+
+  // Reverse so newest additions appear first
+  const reversed = wishlist.slice().reverse();
+  const limit = query.limit ? Number(query.limit) : 20;
+  const cursor = query.cursor ? parseInt(query.cursor) : 0;
+  const pageWishlist = reversed.slice(cursor, cursor + limit);
+  const hasMore = cursor + limit < reversed.length;
+
+  if (pageWishlist.length === 0) {
+    return { items: [], hasMore: false, nextCursor: undefined };
   }
 
   // Group by serviceType for efficient batch fetching
   const grouped = new Map<string, string[]>();
-  for (const item of wishlist) {
+  for (const item of pageWishlist) {
     const existing = grouped.get(item.serviceType) || [];
     existing.push(item.serviceId);
     grouped.set(item.serviceType, existing);
@@ -55,11 +66,11 @@ export async function getWishlist(userId: string) {
     }
   }
 
-  if (refs.length === 0) return [];
+  if (refs.length === 0) return { items: [], hasMore: false, nextCursor: undefined };
 
   const docs = await db.getAll(...refs);
 
-  return docs
+  const items = docs
     .map((doc, index) => {
       if (!doc.exists) return null;
       return {
@@ -70,6 +81,12 @@ export async function getWishlist(userId: string) {
       };
     })
     .filter(Boolean);
+    
+  return {
+    items,
+    hasMore,
+    nextCursor: hasMore ? String(cursor + limit) : undefined,
+  };
 }
 
 /**

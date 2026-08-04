@@ -17,18 +17,27 @@ export async function seedFood(ctx: SeedContext) {
 
   for (let i = 0; i < foodData.companies.length; i++) {
     const comp = foodData.companies[i];
-    const logoUrl = await ctx.uploadImageFile(companyImages[i % companyImages.length]!, 'foodCompanies');
+    const profileUrl = await ctx.uploadImageFile(companyImages[i % companyImages.length]!, 'foodCompanies');
     const bannerUrl = await ctx.uploadImageFile(companyImages[(i + 1) % companyImages.length]!, 'foodCompanies');
 
-    const res = await fetch(`${ctx.baseUrl}/api/services/food/companies`, {
+    const sectionOrders = [
+      ['ABOUT', 'GALLERY', 'ITEMS'],
+      ['ITEMS', 'ABOUT'],
+      ['GALLERY'],
+      ['ABOUT', 'ITEMS']
+    ];
+    const sectionOrder = sectionOrders[i % sectionOrders.length];
+
+    const res = await fetch(`${ctx.baseUrl}/api/companies`, {
       method: 'POST',
       headers: { ...ctx.headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...comp,
         serviceType: 'FOOD',
-        logo: logoUrl,
+        logo: profileUrl,
         images: [bannerUrl],
         status: 'ACTIVE',
+        sectionOrder,
       }),
     });
     const result = await res.json();

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
-import { createOrderSchema, advanceStepSchema, updateOrderStatusSchema } from './order.schema.js';
+import { createOrderSchema, advanceStepSchema, updateOrderStatusSchema, orderQuerySchema } from './order.schema.js';
 import {
   createOrderController,
   getOrdersController,
@@ -42,10 +42,27 @@ router.post('/', requireAuth, validate({ body: createOrderSchema }), createOrder
  *     summary: Get all orders for the authenticated user
  *     security:
  *       - bearerAuth: []
+ *       - in: query
+ *         name: status
+ *         schema: { type: string }
+ *       - in: query
+ *         name: userId
+ *         schema: { type: string }
+ *       - in: query
+ *         name: serviceType
+ *         schema: { type: string }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 20 }
+ *       - in: query
+ *         name: cursor
+ *         schema: { type: string }
  *     responses:
  *       200: { description: List of user's orders }
+ *       400: { description: Validation error }
+ *       401: { description: Unauthorized }
  */
-router.get('/', requireAuth, getOrdersController);
+router.get('/', requireAuth, validate({ query: orderQuerySchema }), getOrdersController);
 
 /**
  * @swagger

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import { languageEnum } from '../../shared/language.js';
 
 extendZodWithOpenApi(z);
 
@@ -12,7 +13,7 @@ export const registerSchema = z.object({
   password: z.string().min(8).max(128),
   phone: z.string().min(7).max(20).optional(),
   region: z.string().min(1).max(10).optional(),
-  language: z.enum(['az', 'en', 'ru']).optional().default('en'),
+  language: languageEnum.optional().default('en'),
 }).openapi('RegisterInput');
 
 /**

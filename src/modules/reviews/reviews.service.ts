@@ -1,6 +1,7 @@
 import { db } from '../../config/firebase.js';
 import { AppError } from '../../errors/AppError.js';
 import type { CreateReviewInput, ReviewQuery, UpdateReviewInput } from './reviews.schema.js';
+import { paginateQuery } from '../../shared/pagination.js';
 import { COLLECTIONS } from '../../config/collections.js';
 
 const reviewsCollection = db.collection(COLLECTIONS.REVIEWS);
@@ -94,8 +95,12 @@ export async function getReviews(filters: ReviewQuery, role?: string) {
     throw new AppError(400, 'VALIDATION_ERROR', 'targetType and targetId are required');
   }
 
-  const snapshot = await query.orderBy('createdAt', 'desc').get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return paginateQuery(
+    reviewsCollection,
+    query.orderBy('createdAt', 'desc'),
+    filters,
+    (doc) => ({ id: doc.id, ...doc.data() })
+  );
 }
 
 async function canReview(userId: string, targetType: string, targetId: string): Promise<boolean> {

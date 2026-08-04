@@ -23,7 +23,15 @@ export async function seedTravel(ctx: SeedContext, createdIncludedServiceIds: Re
     const profileUrl = await ctx.uploadImageFile(companyImages[i % companyImages.length]!, 'travelCompanies');
     const bannerUrl = await ctx.uploadImageFile(companyImages[(i + 1) % companyImages.length]!, 'travelCompanies');
 
-    const res = await fetch(`${ctx.baseUrl}/api/services/travel/companies`, {
+    const sectionOrders = [
+      ['ABOUT', 'GALLERY', 'ITEMS'],
+      ['ITEMS', 'ABOUT'],
+      ['GALLERY'],
+      ['ABOUT', 'ITEMS']
+    ];
+    const sectionOrder = sectionOrders[i % sectionOrders.length];
+
+    const res = await fetch(`${ctx.baseUrl}/api/companies`, {
       method: 'POST',
       headers: { ...ctx.headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -32,6 +40,7 @@ export async function seedTravel(ctx: SeedContext, createdIncludedServiceIds: Re
         profileImage: profileUrl,
         bannerImage: bannerUrl,
         status: 'ACTIVE',
+        sectionOrder,
       }),
     });
     const result = await res.json();

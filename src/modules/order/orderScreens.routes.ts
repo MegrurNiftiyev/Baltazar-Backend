@@ -6,7 +6,7 @@ import { ORDER_SCREENS } from '../../config/orderScreens.js';
 const router = Router();
 
 const serviceTypeParamsSchema = z.object({
-  serviceType: z.enum(['RENT_A_CAR', 'TRAVEL', 'HOTEL_ROOM', 'FOOD']),
+  serviceType: z.enum(['RENT_A_CAR', 'TRAVEL', 'HOTEL', 'FOOD']),
 });
 
 /**
@@ -20,7 +20,7 @@ const serviceTypeParamsSchema = z.object({
  *       - in: path
  *         name: serviceType
  *         required: true
- *         schema: { type: string, enum: [RENT_A_CAR, TRAVEL, HOTEL_ROOM, FOOD] }
+ *         schema: { type: string, enum: [RENT_A_CAR, TRAVEL, HOTEL, FOOD] }
  *     responses:
  *       200: { description: Ordered list of screen keys for this service type }
  */

@@ -1,19 +1,22 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import { paginationQuerySchema } from '../../shared/pagination.js';
 
 extendZodWithOpenApi(z);
 
+export const reviewTargetTypeEnum = z.enum(['RENT_A_CAR', 'TRAVEL', 'HOTEL', 'FOOD', 'COMPANY']);
+
 export const createReviewSchema = z.object({
-  targetType: z.enum(['RENT_A_CAR', 'TRAVEL', 'HOTEL', 'FOOD', 'COMPANY']),
+  targetType: reviewTargetTypeEnum,
   targetId: z.string().min(1),
   rating: z.number().int().min(1).max(5),
   comment: z.string().min(1).max(2000).optional(),
 }).openapi('CreateReviewInput');
 
 export const reviewQuerySchema = z.object({
-  targetType: z.enum(['RENT_A_CAR', 'TRAVEL', 'HOTEL', 'FOOD', 'COMPANY']).optional(),
+  targetType: reviewTargetTypeEnum.optional(),
   targetId: z.string().min(1).optional(),
-}).openapi('ReviewQuery');
+}).merge(paginationQuerySchema).openapi('ReviewQuery');
 
 export const updateReviewSchema = z.object({
   rating: z.number().int().min(1).max(5).optional(),

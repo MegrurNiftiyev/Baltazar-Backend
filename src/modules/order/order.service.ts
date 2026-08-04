@@ -2,7 +2,8 @@ import { db } from '../../config/firebase.js';
 import { AppError } from '../../errors/AppError.js';
 import { COLLECTIONS } from '../../config/collections.js';
 import { ORDER_SCREENS } from '../../config/orderScreens.js';
-import type { AdvanceStepInput, CreateOrderInput, OrderScreenKey } from './order.schema.js';
+import { paginateQuery } from '../../shared/pagination.js';
+import type { AdvanceStepInput, CreateOrderInput, OrderScreenKey, OrderQuery } from './order.schema.js';
 
 const ordersCollection = db.collection(COLLECTIONS.ORDERS);
 const transactionsCollection = db.collection(COLLECTIONS.TRANSACTIONS);
@@ -13,7 +14,7 @@ async function verifyServiceExists(serviceType: string, serviceId: string) {
   const collectionMap: Record<string, string> = {
     RENT_A_CAR: COLLECTIONS.CARS,
     TRAVEL: COLLECTIONS.TRAVELS,
-    HOTEL_ROOM: COLLECTIONS.ROOMS,
+    HOTEL: COLLECTIONS.ROOMS,
     FOOD: COLLECTIONS.FOOD_ITEMS,
   };
 
@@ -34,7 +35,7 @@ async function computeOrderPrice(serviceType: string, serviceId: string, details
   const collectionMap: Record<string, string> = {
     RENT_A_CAR: COLLECTIONS.CARS,
     TRAVEL: COLLECTIONS.TRAVELS,
-    HOTEL_ROOM: COLLECTIONS.ROOMS,
+    HOTEL: COLLECTIONS.ROOMS,
     FOOD: COLLECTIONS.FOOD_ITEMS,
   };
   const doc = await db.collection(collectionMap[serviceType]!).doc(serviceId).get();
@@ -46,7 +47,7 @@ async function computeOrderPrice(serviceType: string, serviceId: string, details
       const days = Number(details.dates?.days ?? 1);
       return round2(data.price * Math.max(1, days));
     }
-    case 'HOTEL_ROOM': {
+    case 'HOTEL': {
       const nights = Number(details.dates?.nights ?? 1);
       const roomId = details.room?.roomId;
       const roomDoc = roomId ? await db.collection(COLLECTIONS.ROOMS).doc(roomId).get() : null;
@@ -203,7 +204,7 @@ export async function getOrderById(orderId: string, userId: string, role?: strin
   return { id: doc.id, ...order };
 }
 
-export async function getOrders(userId: string, role?: string, filters?: { status?: string; userId?: string; serviceType?: string }) {
+export async function getOrders(userId: string, role?: string, filters?: OrderQuery) {
   let query: FirebaseFirestore.Query = ordersCollection;
 
   if (role === 'ADMIN') {
@@ -214,9 +215,12 @@ export async function getOrders(userId: string, role?: string, filters?: { statu
     query = query.where('userId', '==', userId);
   }
 
-  const snapshot = await query.orderBy('createdAt', 'desc').get();
-
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return paginateQuery(
+    ordersCollection,
+    query.orderBy('createdAt', 'desc'),
+    filters || { limit: 20 },
+    (doc) => ({ id: doc.id, ...doc.data() })
+  );
 }
 
 export async function getPaymentSummary(orderId: string, userId: string) {

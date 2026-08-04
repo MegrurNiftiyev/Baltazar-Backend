@@ -10,8 +10,16 @@ export const createOrderController = catchAsync(async (req: Request, res: Respon
 
 export const getOrdersController = catchAsync(async (req: Request, res: Response) => {
   const role = req.user!.role;
-  const orders = await orderService.getOrders(req.user!.userId, role, req.query);
-  res.status(200).json({ success: true, data: localize(orders, req.lang!) });
+  const result = await orderService.getOrders(req.user!.userId, role, req.validatedQuery as any);
+  res.status(200).json({
+    success: true,
+    data: localize(result.items, req.lang!),
+    pagination: {
+      nextCursor: result.nextCursor,
+      hasMore: result.hasMore,
+      limit: Number(req.query.limit || 20),
+    },
+  });
 });
 
 export const getOrderByIdController = catchAsync(async (req: Request, res: Response) => {

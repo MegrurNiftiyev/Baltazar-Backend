@@ -4,13 +4,13 @@ import { COLLECTIONS } from '../../config/collections.js';
 import { getReviewEligibility } from '../reviews/reviews.service.js';
 import type {
   CarsQuery,
-  CreateCompanyInput,
-  UpdateCompanyInput,
   CreateCarInput,
   UpdateCarInput,
 } from './rentacar.schema.js';
+import { paginateQuery } from '../../shared/pagination.js';
 
-const companiesCollection = db.collection(COLLECTIONS.COMPANIES);
+
+
 const carsCollection = db.collection(COLLECTIONS.CARS);
 const ordersCollection = db.collection(COLLECTIONS.ORDERS);
 const activeStatuses = ['PENDING', 'AWAITING_PAYMENT', 'PROCESSING', 'CONFIRMED'];
@@ -36,59 +36,11 @@ async function deleteSnapshotInBatches(snapshot: FirebaseFirestore.QuerySnapshot
   }
 }
 
-// ── Companies ──────────────────────────────────────────────────────────
-
-export async function getCompanies() {
-  const snapshot = await companiesCollection
-    .where('serviceType', '==', 'RENT_A_CAR')
-    .where('status', '==', 'ACTIVE')
-    .get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-}
-
-export async function getCompanyById(id: string, userId?: string) {
-  const doc = await companiesCollection.doc(id).get();
-  if (!doc.exists) {
-    throw new AppError(404, 'NOT_FOUND');
-  }
-  const { ratingSum, ...data } = doc.data()!;
-  const reviewEligibility = await getReviewEligibility(userId, 'COMPANY', id);
-  return { id: doc.id, ...data, reviewEligibility };
-}
-
-export async function createCompany(input: CreateCompanyInput) {
-  const docRef = await companiesCollection.add({
-    ...input,
-    serviceType: 'RENT_A_CAR',
-    rating: 5,
-    reviewCount: 0,
-    ratingSum: 0,
-    createdAt: new Date().toISOString(),
-  });
-  return { id: docRef.id, ...input, rating: 5, reviewCount: 0 };
-}
-
-export async function updateCompany(id: string, input: UpdateCompanyInput) {
-  const doc = await companiesCollection.doc(id).get();
-  if (!doc.exists) {
-    throw new AppError(404, 'NOT_FOUND');
-  }
-  await companiesCollection.doc(id).update(input);
-  // Note: reviewEligibility in this response reflects no particular user (userId defaults to undefined)
-  // because this is an admin PUT response, not a customer-facing product page.
-  return getCompanyById(id);
-}
-
-export async function deleteCompany(id: string) {
-  const doc = await companiesCollection.doc(id).get();
-  if (!doc.exists) {
-    throw new AppError(404, 'NOT_FOUND');
-  }
-  const childSnapshot = await carsCollection.where('companyId', '==', id).get();
+export async function deleteCarsForCompany(companyId: string): Promise<{ deletedCount: number }> {
+  const childSnapshot = await carsCollection.where('companyId', '==', companyId).get();
   await assertNoActiveOrdersForServiceIds(childSnapshot.docs.map((child) => child.id));
   await deleteSnapshotInBatches(childSnapshot);
-  await companiesCollection.doc(id).delete();
-  return { id, deleted: true, deletedCars: childSnapshot.size };
+  return { deletedCount: childSnapshot.size };
 }
 
 // ── Cars ───────────────────────────────────────────────────────────────
@@ -122,30 +74,35 @@ export async function getCars(filters: CarsQuery) {
   }
 
   // Range filters — only one inequality filter field per Firestore query
+  const result = await paginateQuery(
+    carsCollection,
+    query.orderBy('createdAt', 'desc'),
+    filters,
+    (doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        brand: data.brand,
+        model: data.model,
+        price: data.price,
+        image: data.images?.[0] || null,
+        rating: data.rating || 0,
+        category: data.category,
+        transmission: data.transmission,
+        fuelType: data.fuelType,
+      };
+    }
+  );
+
+  let filteredItems = result.items;
   if (filters.minPrice !== undefined) {
-    query = query.where('price', '>=', filters.minPrice);
+    filteredItems = filteredItems.filter((c) => c.price >= filters.minPrice!);
   }
   if (filters.maxPrice !== undefined) {
-    query = query.where('price', '<=', filters.maxPrice);
+    filteredItems = filteredItems.filter((c) => c.price <= filters.maxPrice!);
   }
 
-  const snapshot = await query.get();
-
-  // Map to list DTO — only essential fields for listing
-  return snapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      brand: data.brand,
-      model: data.model,
-      price: data.price,
-      image: data.images?.[0] || null,
-      rating: data.rating || 0,
-      category: data.category,
-      transmission: data.transmission,
-      fuelType: data.fuelType,
-    };
-  });
+  return { ...result, items: filteredItems };
 }
 
 /**
