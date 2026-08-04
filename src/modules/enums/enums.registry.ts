@@ -20,13 +20,8 @@ export const ENUM_REGISTRY: Record<string, readonly string[]> = {
   'regions': regionEnum.options,
   'currencies': currencyEnum.options,
   'company-sections': companyDetailSectionEnum.options,
-};
-
-export const NAMESPACED_ENUM_REGISTRY: Record<string, Record<string, readonly string[]>> = {
-  orders: {
-    statuses: orderStatusEnum.options,
-    screens: orderScreenKeyEnum.options,
-  },
+  'order-statuses': orderStatusEnum.options,
+  'order-screens': orderScreenKeyEnum.options,
 };
 
 export type EnumKey = keyof typeof ENUM_REGISTRY;
