@@ -6,8 +6,11 @@ node_modules/
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
 serviceAccountKey.json
 *.pem
+implemetation.plan.md
 
 # Logs
 logs
@@ -27,6 +30,14 @@ pids
 # Directory for production builds
 dist/
 build/
+
+#seed images
+
+testimages/
+
+# Admin Panel
+admin/
+
 
 # IDE / OS files
 .vscode/

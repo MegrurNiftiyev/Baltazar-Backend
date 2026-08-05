@@ -1,0 +1,198 @@
+{
+  "companies": [
+    {
+      "name": { "az": "Baku Auto Rental", "en": "Baku Auto Rental", "ru": "Baku Auto Rental" },
+      "about": { "az": "Bakıda lüks və ekonomsinif avtomobil icarəsi.", "en": "Luxury and economy car rentals in Baku.", "ru": "Аренда авто класса люкс и эконом в Баку." },
+      "sectionsOrder": ["fleet", "pricing", "terms"]
+    },
+    {
+      "name": { "az": "Caspian Car Hire", "en": "Caspian Car Hire", "ru": "Caspian Car Hire" },
+      "about": { "az": "Sərfəli qiymətlərlə etibarlı icarə xidməti.", "en": "Reliable rental service with affordable rates.", "ru": "Надежный сервис аренды по доступным ценам." },
+      "sectionsOrder": ["cars", "reviews"]
+    },
+    {
+      "name": { "az": "VIP Express Car Rental", "en": "VIP Express Car Rental", "ru": "VIP Express Car Rental" },
+      "about": { "az": "VİP avtomobillər və şəxsi sürücü xidməti.", "en": "VIP vehicles and personal chauffeur services.", "ru": "ВИП автомобили и услуги личного водителя." },
+      "sectionsOrder": ["vip-fleet", "services"]
+    },
+    {
+      "name": { "az": "Azerbaijan Luxury Drive", "en": "Azerbaijan Luxury Drive", "ru": "Azerbaijan Luxury Drive" },
+      "about": { "az": "Sport və premium klass avtomobillərin icarəsi.", "en": "Sports and premium class car rental.", "ru": "Аренда спортивных и премиум автомобилей." },
+      "sectionsOrder": ["premium-cars", "booking"]
+    }
+  ],
+  "cars": [
+    {
+      "companyIndex": 0,
+      "brand": "Toyota",
+      "model": "Camry Hybrid",
+      "year": 2023,
+      "category": "Sedan",
+      "transmission": "AUTOMATIC",
+      "fuelType": "HYBRID",
+      "seats": 5,
+      "price": 85.00,
+      "features": ["Leather Seats", "Apple CarPlay", "Climate Control", "Rear Camera"],
+      "imageFiles": ["toyota_blue.png", "toyota_alt.png"]
+    },
+    {
+      "companyIndex": 0,
+      "brand": "Toyota",
+      "model": "GR Supra",
+      "year": 2024,
+      "category": "İdman Avtomobili",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 2,
+      "price": 280.00,
+      "features": ["3.0L Turbo", "JBL Audio", "Sport Mode", "Adaptive Suspension"],
+      "imageFiles": ["toyota_supra_style.png", "toyota_alt.png"]
+    },
+    {
+      "companyIndex": 0,
+      "brand": "Mercedes-Benz",
+      "model": "S-Class S500",
+      "year": 2024,
+      "category": "Lüks",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 5,
+      "price": 380.00,
+      "features": ["Massage Seats", "Burmester 3D Sound", "Panoramic Roof", "Soft Close Doors"],
+      "imageFiles": ["mercedes_sedan.png", "mercedes_luxury.png"]
+    },
+    {
+      "companyIndex": 0,
+      "brand": "Mercedes-AMG",
+      "model": "GT Coupe",
+      "year": 2024,
+      "category": "İdman Avtomobili",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 2,
+      "price": 550.00,
+      "features": ["V8 Biturbo 585hp", "AMG Performance Exhaust", "Carbon Interior"],
+      "imageFiles": ["mercedes_amg.png", "mercedes_luxury.png"]
+    },
+
+    {
+      "companyIndex": 1,
+      "brand": "Honda",
+      "model": "Civic Type R",
+      "year": 2023,
+      "category": "Hetçbek",
+      "transmission": "MANUAL",
+      "fuelType": "PETROL",
+      "seats": 4,
+      "price": 140.00,
+      "features": ["2.0L VTEC Turbo", "Brembo Brakes", "Bespoke Bucket Seats"],
+      "imageFiles": ["honda_civic_type_r.png", "honda_alt.png"]
+    },
+    {
+      "companyIndex": 1,
+      "brand": "Ford",
+      "model": "Mustang GT 5.0",
+      "year": 2023,
+      "category": "İdman Avtomobili",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 4,
+      "price": 220.00,
+      "features": ["5.0L V8 Engine", "Brembo Brakes", "Active Exhaust", "Digital Cockpit"],
+      "imageFiles": ["ford_mustang.png", "ford_mustang_alt.png"]
+    },
+    {
+      "companyIndex": 1,
+      "brand": "Nissan",
+      "model": "GT-R Nismo",
+      "year": 2023,
+      "category": "İdman Avtomobili",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 4,
+      "price": 500.00,
+      "features": ["Twin-Turbo V6", "ATTESA E-TS AWD", "Carbon Fibre Bodykit"],
+      "imageFiles": ["nissan_gtr_style.png", "honda_alt.png"]
+    },
+
+    {
+      "companyIndex": 2,
+      "brand": "Ferrari",
+      "model": "488 Spider Red",
+      "year": 2023,
+      "category": "Lüks",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 2,
+      "price": 850.00,
+      "features": ["3.9L Twin-Turbo V670hp", "Hardtop Convertible", "JBL Sound"],
+      "imageFiles": ["ferrari_488.png", "ferrari_red.png"]
+    },
+    {
+      "companyIndex": 2,
+      "brand": "Ferrari",
+      "model": "F8 Tributo Black",
+      "year": 2024,
+      "category": "Lüks",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 2,
+      "price": 950.00,
+      "features": ["720hp V8 Engine", "Carbon Racing Seats", "Telemetry System"],
+      "imageFiles": ["ferrari_black.png", "ferrari_alt.png"]
+    },
+    {
+      "companyIndex": 2,
+      "brand": "Lamborghini",
+      "model": "Aventador S White",
+      "year": 2023,
+      "category": "Lüks",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 2,
+      "price": 1100.00,
+      "features": ["V12 Naturally Aspirated", "Scissor Doors", "4WD", "Lifting System"],
+      "imageFiles": ["lamborghini_aventador.png", "lamborghini_white.png"]
+    },
+    {
+      "companyIndex": 2,
+      "brand": "Lamborghini",
+      "model": "Huracan EVO Red",
+      "year": 2024,
+      "category": "Lüks",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 2,
+      "price": 1000.00,
+      "features": ["V10 640hp Engine", "LDVI Dynamics", "Carbon Skin Interior"],
+      "imageFiles": ["lamborghini_huracan.png", "lamborghini_red.png"]
+    },
+
+    {
+      "companyIndex": 3,
+      "brand": "Porsche",
+      "model": "911 Carrera S",
+      "year": 2024,
+      "category": "Lüks",
+      "transmission": "AUTOMATIC",
+      "fuelType": "PETROL",
+      "seats": 4,
+      "price": 600.00,
+      "features": ["Twin-Turbo Flat-Six", "PDK Transmission", "Sport Chrono Package"],
+      "imageFiles": ["porsche_911.png", "porsche_911_alt.png", "porsche_clean.png"]
+    },
+    {
+      "companyIndex": 3,
+      "brand": "Tesla",
+      "model": "Model S Plaid",
+      "year": 2024,
+      "category": "Elektrikli",
+      "transmission": "AUTOMATIC",
+      "fuelType": "ELECTRIC",
+      "seats": 5,
+      "price": 400.00,
+      "features": ["Tri-Motor AWD 1020hp", "Autopilot", "Yoke Steering", "17 inch Screen"],
+      "imageFiles": ["tesla_model_s.png", "toyota_alt.png"]
+    }
+  ]
+}

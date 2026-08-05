@@ -1,0 +1,47 @@
+[
+  {
+    "dateOfBirth": "1992-03-14",
+    "address": "Baku, Nizami st. 10",
+    "idNumber": "AZE1000001",
+    "driverLicenseNumber": "DL-100001",
+    "driverLicenseExpiry": "2030-01-01",
+    "passportNumber": "AA1000001",
+    "passportExpiry": "2031-01-01"
+  },
+  {
+    "dateOfBirth": "1988-11-02",
+    "address": "Baku, Xetai r., Babek ave. 45",
+    "idNumber": "AZE1000002",
+    "driverLicenseNumber": "DL-100002",
+    "driverLicenseExpiry": "2029-06-15",
+    "passportNumber": "AA1000002",
+    "passportExpiry": "2030-06-15"
+  },
+  {
+    "dateOfBirth": "1995-07-23",
+    "address": "Baku, Yasamal r., Zerife Aliyeva st. 12",
+    "idNumber": "AZE1000003",
+    "driverLicenseNumber": "DL-100003",
+    "driverLicenseExpiry": "2031-02-20",
+    "passportNumber": "AA1000003",
+    "passportExpiry": "2032-02-20"
+  },
+  {
+    "dateOfBirth": "1990-01-09",
+    "address": "Baku, Narimanov r., Ataturk ave. 78",
+    "idNumber": "AZE1000004",
+    "driverLicenseNumber": "DL-100004",
+    "driverLicenseExpiry": "2030-09-30",
+    "passportNumber": "AA1000004",
+    "passportExpiry": "2031-09-30"
+  },
+  {
+    "dateOfBirth": "1993-05-17",
+    "address": "Baku, Sabail r., Neftchilar ave. 5",
+    "idNumber": "AZE1000005",
+    "driverLicenseNumber": "DL-100005",
+    "driverLicenseExpiry": "2029-12-01",
+    "passportNumber": "AA1000005",
+    "passportExpiry": "2030-12-01"
+  }
+]
