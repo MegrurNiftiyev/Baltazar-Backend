@@ -49,13 +49,28 @@ export async function seedRentACar(ctx: SeedContext) {
     }
   }
 
+  const createdServices: Array<{ serviceType: string; id: string; companyId?: string }> = [];
+
   for (let i = 0; i < carData.cars.length; i++) {
     const car = carData.cars[i];
     const compId = createdCompanyIds[car.companyIndex];
     if (!compId) continue;
 
-    const img1 = await ctx.uploadImageFile(carImages[i % carImages.length]!, 'rentacarCars');
-    const img2 = await ctx.uploadImageFile(carImages[(i + 1) % carImages.length]!, 'rentacarCars');
+    const carImageFileNames: string[] = car.imageFiles || [];
+    const imagesToUpload = carImageFileNames.length > 0
+      ? carImageFileNames.map((fn: string) => path.join(carDir, fn))
+      : [carImages[i % carImages.length]!, carImages[(i + 1) % carImages.length]!];
+
+    const uploadedUrls: string[] = [];
+    for (const imgPath of imagesToUpload) {
+      if (fs.existsSync(imgPath)) {
+        const url = await ctx.uploadImageFile(imgPath, 'rentacarCars');
+        uploadedUrls.push(url);
+      }
+    }
+    if (uploadedUrls.length === 0) {
+      uploadedUrls.push(await ctx.uploadImageFile(carImages[i % carImages.length]!, 'rentacarCars'));
+    }
 
     const res = await fetch(`${ctx.baseUrl}/api/services/rentacar/cars`, {
       method: 'POST',
@@ -71,15 +86,18 @@ export async function seedRentACar(ctx: SeedContext) {
         seats: car.seats,
         price: car.price,
         features: car.features,
-        images: [img1, img2],
+        images: uploadedUrls,
         status: 'AVAILABLE',
       }),
     });
     const result = await res.json();
     if (res.ok) {
       console.log(`  🚘 Created Car: ${car.brand} ${car.model}`);
+      createdServices.push({ serviceType: 'RENT_A_CAR', id: result.data.id, companyId: compId });
     } else {
       console.error('  ❌ Car error:', result);
     }
   }
+
+  return createdServices;
 }

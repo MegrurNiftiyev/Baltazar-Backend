@@ -55,6 +55,8 @@ export async function seedTravel(ctx: SeedContext, createdIncludedServiceIds: Re
   // Get included service IDs array
   const incServiceIds = Object.values(createdIncludedServiceIds);
 
+  const createdServices: Array<{ serviceType: string; id: string; companyId?: string }> = [];
+
   for (let i = 0; i < travelData.tours.length; i++) {
     const tour = travelData.tours[i];
     const compId = createdCompanyIds[tour.companyIndex];
@@ -83,8 +85,11 @@ export async function seedTravel(ctx: SeedContext, createdIncludedServiceIds: Re
     const result = await res.json();
     if (res.ok) {
       console.log(`  🗺️ Created Tour: ${tour.title.en}`);
+      createdServices.push({ serviceType: 'TRAVEL', id: result.data.id, companyId: compId });
     } else {
       console.error('  ❌ Tour error:', result);
     }
   }
+
+  return createdServices;
 }

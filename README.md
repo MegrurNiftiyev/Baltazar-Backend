@@ -2,11 +2,39 @@
 
 Production-grade TypeScript + Express backend for the Baltazar multi-service platform.
 
-The API covers authentication, user profiles (personal info, driver license, passport), admin tools, hotels, rent-a-car, travel, food, step-based order booking, tokenized payments, verified reviews, wishlist, home banners, explore personalization, and mobile app version config.
+The API covers authentication, user profiles, admin tools, multi-domain companies (hotel, rent-a-car, travel, food), step-based order booking, tokenized payments, verified reviews, wishlist, home banners, explore personalization, dynamic enums, and mobile app version config.
 
----
+- 📱 **Mobile App (Kotlin / Android)**: [Baltazar-Mobile](https://github.com/MegrurNiftiyev/Baltazar-Mobile)
+- 💳 **Payment Simulator Gateway**: [Baltazar-Payment-Backend](https://github.com/MegrurNiftiyev/Baltazar-Payment-Backend)
 
 ## Tech Stack
+
+<p>
+  <img alt="Node.js" src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
+  <img alt="Express.js" src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white">
+  <img alt="Firebase" src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black">
+</p>
+
+## Packages
+
+<p>
+  <a href="https://www.npmjs.com/package/express"><img alt="express" src="https://img.shields.io/badge/express-v5.1.0-000000?style=for-the-badge&logo=express&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/firebase-admin"><img alt="firebase-admin" src="https://img.shields.io/badge/firebase--admin-v13.4.0-FFCA28?style=for-the-badge&logo=firebase&logoColor=black"></a>
+  <a href="https://www.npmjs.com/package/jsonwebtoken"><img alt="jsonwebtoken" src="https://img.shields.io/badge/jsonwebtoken-v9.0.2-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/google-auth-library"><img alt="google-auth-library" src="https://img.shields.io/badge/google--auth--library-v9.15.1-4285F4?style=for-the-badge&logo=google&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/zod"><img alt="zod" src="https://img.shields.io/badge/zod-v3.24.4-3068B7?style=for-the-badge&logo=npm&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/multer"><img alt="multer" src="https://img.shields.io/badge/multer-v2.2.0-000000?style=for-the-badge&logo=npm&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/helmet"><img alt="helmet" src="https://img.shields.io/badge/helmet-v8.1.0-000000?style=for-the-badge&logo=npm&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/cors"><img alt="cors" src="https://img.shields.io/badge/cors-v2.8.5-000000?style=for-the-badge&logo=npm&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/hpp"><img alt="hpp" src="https://img.shields.io/badge/hpp-v0.2.3-000000?style=for-the-badge&logo=npm&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/express-rate-limit"><img alt="express-rate-limit" src="https://img.shields.io/badge/express--rate--limit-v7.5.0-000000?style=for-the-badge&logo=npm&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/pino"><img alt="pino" src="https://img.shields.io/badge/pino-v9.6.0-000000?style=for-the-badge&logo=npm&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/swagger-jsdoc"><img alt="swagger-jsdoc" src="https://img.shields.io/badge/swagger--jsdoc-v6.2.8-85EA2D?style=for-the-badge&logo=swagger&logoColor=black"></a>
+  <a href="https://www.npmjs.com/package/swagger-ui-express"><img alt="swagger-ui-express" src="https://img.shields.io/badge/swagger--ui--express-v5.0.1-85EA2D?style=for-the-badge&logo=swagger&logoColor=black"></a>
+  <a href="https://www.npmjs.com/package/node-cron"><img alt="node-cron" src="https://img.shields.io/badge/node--cron-v4.6.0-000000?style=for-the-badge&logo=npm&logoColor=white"></a>
+  <a href="https://www.npmjs.com/package/dotenv-flow"><img alt="dotenv-flow" src="https://img.shields.io/badge/dotenv--flow-v4.1.0-ECD53F?style=for-the-badge&logo=dotenv&logoColor=black"></a>
+</p>
 
 | Category | Technology |
 |---|---|
@@ -21,8 +49,9 @@ The API covers authentication, user profiles (personal info, driver license, pas
 | Security | Helmet, CORS, HPP, express-rate-limit |
 | Logging | Pino, pino-http |
 | API Docs | Swagger UI, swagger-jsdoc |
-| Background Jobs | node-cron (exchange-rate refresh) |
+| Background Jobs | node-cron (cleanup expired uploads) |
 | Config | dotenv-flow |
+
 
 ---
 
@@ -31,219 +60,160 @@ The API covers authentication, user profiles (personal info, driver license, pas
 ```text
 src/server.ts             Server entry point, cron scheduling, graceful shutdown
 src/app.ts                Express app, middleware, route mounting
-src/config/               Env, Firebase (Firestore + Storage), logger, Swagger, locales, order screens
+src/config/               Env, Firebase (Firestore + Storage), collections, locales, order screens
 src/errors/               AppError
-src/jobs/                 Cron jobs (exchange-rate refresh)
+src/jobs/                 Cron jobs (cleanup expired uploads)
 src/middlewares/          Auth, roles, validation, rate limits, uploads, errors
 src/modules/              Domain modules (schema -> service -> controller -> routes)
-src/openapi/              OpenAPI assembly
+src/openapi/              OpenAPI registry
+src/shared/               Shared enums and domain types (serviceType, language)
 src/types/                Express type augmentation
-src/utils/                Tokens, passwords, localization, currency, image upload, async wrapper
+src/utils/                Tokens, passwords, image upload, async wrapper
 scripts/generateSwagger.ts  Static OpenAPI JSON build (npm run docs:build)
 ```
 
-Most modules follow this pattern:
+---
 
-```text
-schema.ts -> service.ts -> controller.ts -> routes.ts
-```
-
-### Firestore Data Model
+## Firestore Data Model
 
 | Collection | Key fields |
 |---|---|
-| `users` | name, email, passwordHash, role (`USER`/`ADMIN`), phone, region, language, wishlist, personalInfo, driverLicense, passport, profileCompleteness |
-| `companies` | Shared by rent-a-car / travel / food companies, distinguished by `serviceType`; name, about, profileImage, bannerImage, images, sectionsOrder, rating, reviewCount, status |
+| `users` | name, email, passwordHash, role (USER/ADMIN), phone, region, language, wishlist, personalInfo, driverLicense, passport, profileCompleteness |
+| `companies` | Shared by all service types. serviceType, name, about, profileImage, bannerImage, images, sectionOrder, rating, reviewCount, status |
 | `cars` | companyId, brand, model, year, category, transmission, fuelType, seats, price, images, features, rating, reviewCount, status |
 | `travels` | Tours: companyId, categories, title, roadmap, images, duration, startDate, endDate, includedServices, price, rating, reviewCount, status |
-| `hotels` | name, about, city, address, starRating, amenities, images, logo, sectionsOrder, price, rating, reviewCount, status |
+| `hotels` | companyId, starRating, amenities, price, status |
 | `rooms` | hotelId, roomType, name, description, price, capacity, amenities, images, status |
 | `foodItems` | companyId, name, description, category, price, images, ingredients, status, calories, protein, fat, carb |
-| `includedServices` | name, icon, serviceType (`TRAVEL`/`HOTEL`) |
-| `orders` | userId, serviceType, serviceId, status, currentStep, details, createdAt, expiresAt |
-| `paymentMethods` | userId, paymentMethodId, brand, last4, cardholderName |
-| `transactions` | orderId, userId, amount, status (`SUCCESS`/`FAILED`/`PENDING`) |
-| `reviews` | userId, targetType, targetId, rating, comment, createdAt |
+| `includedServices` | name, icon, serviceType |
+| `orders` | userId, serviceType, serviceId, companyId, status, currentStep, details, serverComputedPrice, createdAt, expiresAt |
+| `paymentMethods` | userId, paymentMethodId, brand, last4, expiryMonth, expiryYear |
+| `transactions` | orderId, userId, amount, currency, status (SUCCESS/FAILED/PENDING) |
+| `reviews` | userId, targetType, targetId, serviceId, companyId, rating, comment, createdAt |
 | `banners` | image, link, order, isActive |
 | `appConfig` | latestVersion, minSupportedVersion, updateNotes |
-| `exchangeRates` | currency, rateToUsd, updatedAt (refreshed by cron) |
-| `userInterests` | Per-user explore personalization counters |
+| `uploads` | userId, filename, url, purpose, expiresAt, confirmed |
+| `categories` | serviceType, name |
 
 ---
 
-## Response Format
+## Conventions
 
-All successful controller responses currently use this envelope:
-
-```json
-{
-  "success": true,
-  "data": {}
-}
-```
-
-Operational errors use this envelope:
-
-```json
-{
-  "success": false,
-  "errorCode": "VALIDATION_ERROR",
-  "message": "Something went wrong"
-}
-```
-
-Localized fields are stored as `{ az, en, ru }` maps but API responses always
-return one resolved string. Authenticated requests use the language stored on
-the user profile. Public requests use a valid `?lang=az|en|ru` query parameter,
-then `Accept-Language`, then English. Error `message` values follow the same
-resolution order; `errorCode` remains stable for client-side handling.
-
-Prices are stored in USD and converted for display by region using cached
-exchange rates (`exchangeRates` collection, refreshed every 6 hours by cron).
-Region `AZ` displays AZN; all other regions display USD.
-
-The health endpoint is the only route that does not use the `success/data` envelope.
+- **Response Envelope**: All successful controller responses return `{ "success": true, "data": { ... } }`.
+- **Error Envelope**: Operational errors return `{ "success": false, "errorCode": "...", "message": "..." }`.
+- **Localization**: Localized fields are stored as `{ az, en, ru }`. The API resolves strings using the `resolveLocale` utility, prioritizing the authenticated user's language, then the `?lang` query parameter, then `Accept-Language`, falling back to English.
+- **Enums**: Module-specific enums reside in their respective `.schema.ts`, while cross-cutting enums (e.g., regions, currencies, service types) are in `src/shared/`. Valid enum options are exposed via `/api/enums/:key`.
 
 ---
 
-## Auth
+## Order Execution Architecture & Data-Driven Step Engine
 
-Login and register endpoints are rate-limited (`authLimiter`).
+The order booking flow in Baltazar is **100% data-driven** and dynamic across all 4 service types (`RENT_A_CAR`, `TRAVEL`, `HOTEL`, `FOOD`).
 
-### `POST /api/auth/register`
+### 1. Screen Sequences (`src/config/orderScreens.ts`)
+Every domain defines an ordered list of screens required to complete a booking:
 
-Access: public
+```ts
+export const ORDER_SCREENS = {
+  RENT_A_CAR: ['PERSONAL_INFO_SCREEN', 'DRIVER_LICENSE_SCREEN', 'ADDRESS_SCREEN', 'PAYMENT_SCREEN', 'CONFIRM_SCREEN'],
+  TRAVEL:     ['PERSONAL_INFO_SCREEN', 'PASSPORT_INFO_SCREEN', 'PAYMENT_SCREEN', 'CONFIRM_SCREEN'],
+  HOTEL:      ['PERSONAL_INFO_SCREEN', 'PAYMENT_SCREEN', 'CONFIRM_SCREEN'],
+  FOOD:       ['PERSONAL_INFO_SCREEN', 'DELIVERY_ADDRESS_SCREEN', 'PAYMENT_SCREEN', 'CONFIRM_SCREEN'],
+};
+```
 
-Status: `201 Created`
+### 2. Intelligent Screen Skipping (Profile Completeness)
+When a user calls `PUT /api/orders/:id/step`, the server executes `resolveNextStep(order, user)`.
+If the user's profile already has completed data (verified via `user.profileCompleteness` flags), the backend **automatically skips** redundant input screens:
+- `PERSONAL_INFO_SCREEN` is skipped if `user.profileCompleteness.personalInfo === true`
+- `DRIVER_LICENSE_SCREEN` is skipped if `user.profileCompleteness.driverLicense === true`
+- `PASSPORT_INFO_SCREEN` is skipped if `user.profileCompleteness.passport === true`
 
-Request body:
+The API response directly instructs the mobile client which screen to render next:
+```json
+{
+  "orderId": "ord_123",
+  "status": "PENDING",
+  "nextStep": { "screen": "ADDRESS_SCREEN" }
+}
+```
 
+### 3. Step Accumulation & Server-Side Price Calculation
+As the user completes steps, payload data from each screen is accumulated into the order's `details` object (`details[screen] = inputData`).
+
+When the sequence completes and reaches `DONE` (after `CONFIRM_SCREEN`):
+1. The engine triggers `computeOrderPrice(serviceType, serviceId, details)`.
+2. The server dynamically looks up base prices, multipliers (rental days, hotel nights, selected rooms), and calculates taxes and fees.
+3. The resulting `serverComputedPrice` (`basePrice`, `tax`, `serviceFee`, `totalAmount`, `currency`) is securely stored on the order document.
+
+### 4. Payment Execution & State Transition
+1. Client calls `POST /api/payment/pay/:orderId` passing a saved `paymentMethodId`.
+2. Backend charges the exact `serverComputedPrice.totalAmount` via the Payment Gateway.
+3. Upon payment authorization success, order status transitions from `PENDING` -> `CONFIRMED`.
+
+---
+
+## Modules
+
+### Auth
+
+Core functionality for Auth.
+
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| POST | /api/auth/register | Public | Register a new user | Status confirmation / entity payload |
+| POST | /api/auth/login | Public | Login with email and password | Status confirmation / entity payload |
+| POST | /api/auth/refresh | Public | Refresh access token using a refresh token | Status confirmation / entity payload |
+| POST | /api/auth/google | Public | Login or register with Google OAuth | Status confirmation / entity payload |
+
+#### User Action Payload Examples
+**POST /api/auth/register**
 ```json
 {
   "name": "Aydin Aliyev",
   "email": "aydin@example.com",
-  "password": "secure-password",
+  "password": "securepassword123",
   "phone": "+994501112233",
   "region": "AZ",
   "language": "en"
 }
 ```
 
-Rules:
+**POST /api/auth/login**
+```json
+{
+  "email": "aydin@example.com",
+  "password": "securepassword123"
+}
+```
 
-- `name`: string, 2-100 chars
-- `email`: valid email
-- `password`: string, 8-128 chars
-- `phone`: optional string, 7-20 chars
-- `region`: optional string, 1-10 chars
-- `language`: optional `az`, `en`, or `ru`, defaults to `en`
-- `role` is never accepted — every registration is hardcoded to `USER`
-
-Response data:
-
+#### Response Payload Example (Login / Register / Refresh / Google)
 ```json
 {
   "user": {
-    "id": "user_id",
+    "id": "usr_987654321",
     "name": "Aydin Aliyev",
     "email": "aydin@example.com",
     "role": "USER"
   },
-  "accessToken": "jwt",
-  "refreshToken": "jwt"
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
-### `POST /api/auth/login`
+### Users
 
-Access: public
+Core functionality for Users.
 
-Status: `200 OK`
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/users/me | Authenticated | Get current user profile | `UserProfile` object |
+| PUT | /api/users/me | Authenticated | Update current user profile | Status confirmation / entity payload |
+| PUT | /api/users/me/avatar | Authenticated | Upload/replace the current user's avatar image | Status confirmation / entity payload |
+| PUT | /api/users/{id}/disable | Admin | Revoke all sessions for a user (disable/ban action) | Status confirmation / entity payload |
 
-Request body:
-
-```json
-{
-  "email": "aydin@example.com",
-  "password": "secure-password"
-}
-```
-
-Response data: same shape as register.
-
-### `POST /api/auth/refresh`
-
-Access: public
-
-Status: `200 OK`
-
-Request body:
-
-```json
-{
-  "refreshToken": "jwt"
-}
-```
-
-Response data: same shape as register.
-
-### `POST /api/auth/google`
-
-Access: public
-
-Status: `200 OK`
-
-Request body:
-
-```json
-{
-  "idToken": "google-id-token"
-}
-```
-
-Response data: same shape as register.
-
----
-
-## Users
-
-### `GET /api/users/me`
-
-Access: authenticated
-
-Status: `200 OK`
-
-Request body: none
-
-Response data:
-
-```json
-{
-  "id": "user_id",
-  "name": "Aydin Aliyev",
-  "email": "aydin@example.com",
-  "role": "USER",
-  "phone": "+994501112233",
-  "region": "AZ",
-  "language": "en",
-  "wishlist": [],
-  "profileCompleteness": {
-    "personalInfo": true,
-    "driverLicense": false,
-    "passport": false
-  },
-  "createdAt": "2026-07-01T00:00:00.000Z"
-}
-```
-
-### `PUT /api/users/me`
-
-Access: authenticated
-
-Status: `200 OK`
-
-Request body:
-
+#### User Action Payload Examples
+**PUT /api/users/me**
 ```json
 {
   "name": "Aydin Aliyev",
@@ -266,1484 +236,529 @@ Request body:
 }
 ```
 
-Rules: all fields are optional. `personalInfo`, `driverLicense`, and `passport`
-are used by the booking flow and automatically update the matching
-`profileCompleteness` flags (`personalInfo` requires all three sub-fields).
-Returns `400 NO_FIELDS_TO_UPDATE` when the body is empty.
-
-Response data: updated user profile (same shape as `GET /api/users/me`).
-
-### `PUT /api/users/:id/disable`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body: none
-
-Revokes all sessions for a user (disable/ban). The refresh token is revoked
-immediately; any still-valid access token (up to 15 min) keeps working until
-natural expiry.
-
----
-
-## Wishlist
-
-### `GET /api/user/wishlist`
-
-Access: authenticated
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: localized wishlist array with full service details.
-
-### `POST /api/user/wishlist`
-
-Access: authenticated
-
-Status: `201 Created`
-
-Request body:
-
+#### GET Response Payload Example (`GET /api/users/me`)
 ```json
 {
-  "serviceId": "service_id",
-  "serviceType": "TRAVEL"
+  "id": "usr_987654321",
+  "name": "Aydin Aliyev",
+  "email": "aydin@example.com",
+  "role": "USER",
+  "phone": "+994501112233",
+  "region": "AZ",
+  "language": "en",
+  "wishlist": ["RENT_A_CAR_car_123"],
+  "personalInfo": {
+    "dateOfBirth": "1995-04-12",
+    "address": "Baku, Azerbaijan",
+    "idNumber": "AZE12345678"
+  },
+  "driverLicense": {
+    "licenseNumber": "B-123456",
+    "expiryDate": "2030-01-01"
+  },
+  "passport": {
+    "passportNumber": "C1234567",
+    "expiryDate": "2032-01-01"
+  },
+  "profileCompleteness": {
+    "personalInfo": true,
+    "driverLicense": true,
+    "passport": true
+  },
+  "createdAt": "2026-08-01T00:00:00.000Z"
 }
 ```
 
-Rules:
+### Wishlist
 
-- `serviceType`: `RENT_A_CAR`, `TRAVEL`, `HOTEL`, or `FOOD`
-- Adding the same service twice returns `409`
+Core functionality for Wishlist.
 
-Response data: wishlist add result.
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/user/wishlist | Authenticated | Get the authenticated user's wishlist | `WishlistItem[]` array with populated entity |
+| POST | /api/user/wishlist | Authenticated | Add a service to wishlist | Status confirmation / entity payload |
+| DELETE | /api/user/wishlist/{id} | Admin | Remove a service from wishlist | Status confirmation / entity payload |
 
-### `DELETE /api/user/wishlist/:id`
-
-Access: authenticated
-
-Status: `200 OK`
-
-Path params:
-
-- `id`: wishlist item ID in the format `serviceType_serviceId`
-
-Request body: none
-
-Response data:
-
+#### User Action Payload Example (`POST /api/user/wishlist`)
 ```json
 {
-  "itemId": "wishlist_item_id",
-  "removed": true
+  "serviceId": "car_123",
+  "serviceType": "RENT_A_CAR"
 }
 ```
 
----
-
-## Home
-
-### `GET /api/home/banner`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: active banner slides, ordered by `order`.
-
-### `POST /api/home/banner`
-
-Access: admin
-
-Status: `201 Created`
-
-Content-Type: `multipart/form-data`
-
-Form fields:
-
-- `image`: image file (max 5 MB, uploaded to Firebase Storage `banners/` folder)
-- `link`: string, required
-- `order`: number, required
-- `isActive`: optional boolean, defaults to `true`
-
-Response data: created banner object with the public Storage URL.
-
-### `PUT /api/home/banner/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Content-Type: `multipart/form-data`
-
-Form fields: same as create. A new `image` file replaces the stored image;
-otherwise the existing URL is kept.
-
-Response data: updated banner object.
-
-### `DELETE /api/home/banner/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: banner deleted confirmation.
-
-### `GET /api/home/explore`
-
-Access: public (optionally authenticated for personalization)
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: personalized explore rows. Authenticated views are tracked in
-`userInterests` and influence future personalization.
-
----
-
-## App Config
-
-### `GET /api/app/config`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: current mobile app version configuration.
-
-### `PUT /api/app/config`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body:
-
+#### GET Response Payload Example (`GET /api/user/wishlist`)
 ```json
-{
-  "latestVersion": "1.4.0",
-  "minSupportedVersion": "1.2.0",
-  "updateNotes": {
-    "az": "Yeniliklər",
-    "en": "What's new",
-    "ru": "Что нового"
+[
+  {
+    "id": "RENT_A_CAR_car_123",
+    "serviceId": "car_123",
+    "serviceType": "RENT_A_CAR",
+    "addedAt": "2026-08-05T09:00:00.000Z",
+    "item": {
+      "id": "car_123",
+      "brand": "Toyota",
+      "model": "Camry",
+      "price": 90,
+      "rating": 4.8,
+      "image": "https://storage.googleapis.com/baltazar-bucket/cars/camry.jpg"
+    }
   }
+]
+```
+
+### Companies
+
+Core functionality for Companies.
+
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/companies | Public | Get a list of companies | `Company[]` array |
+| POST | /api/companies | Admin | Create a new company | Status confirmation / entity payload |
+| GET | /api/companies/{id} | Public | Get a company by ID | `Company` detail (with `fullSectionOrder`) |
+| PUT | /api/companies/{id} | Admin | Update an existing company | Status confirmation / entity payload |
+| DELETE | /api/companies/{id} | Admin | Delete a company and its items | Status confirmation / entity payload |
+
+#### GET Response Payload Example (`GET /api/companies/:id`)
+```json
+{
+  "id": "comp_123456",
+  "serviceType": "RENT_A_CAR",
+  "name": "Baku Premium Cars",
+  "about": "Top luxury car rentals in Baku",
+  "profileImage": "https://storage.googleapis.com/baltazar-bucket/companies/profile.jpg",
+  "bannerImage": "https://storage.googleapis.com/baltazar-bucket/companies/banner.jpg",
+  "images": ["https://storage.googleapis.com/baltazar-bucket/companies/1.jpg"],
+  "sectionOrder": ["ABOUT", "ITEMS", "GALLERY"],
+  "fullSectionOrder": ["HEADER", "ABOUT", "ITEMS", "GALLERY", "REVIEWS"],
+  "rating": 4.9,
+  "reviewCount": 15,
+  "status": "ACTIVE"
 }
 ```
 
-Rules:
+### Hotel
 
-- `latestVersion`, `minSupportedVersion`: required non-empty strings
-- `updateNotes`: optional `{ az, en, ru }` map
+Core functionality for Hotel.
 
-Response data: updated app configuration.
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/services/hotel | Public | List hotels with filters | `HotelDTO[]` array |
+| POST | /api/services/hotel | Admin | Create hotel (admin) | Status confirmation / entity payload |
+| GET | /api/services/hotel/{id} | Public | Get hotel details by ID | `HotelDetail` object |
+| PUT | /api/services/hotel/{id} | Admin | Update hotel (admin) | Status confirmation / entity payload |
+| DELETE | /api/services/hotel/{id} | Admin | Delete hotel | Status confirmation / entity payload |
+| GET | /api/services/hotel/{id}/rooms | Public | List rooms for a hotel | `Room[]` array |
+| POST | /api/services/hotel/rooms | Admin | Create room (admin) | Status confirmation / entity payload |
+| PUT | /api/services/hotel/rooms/{id} | Admin | Update room (admin) | Status confirmation / entity payload |
+| DELETE | /api/services/hotel/rooms/{id} | Admin | Delete room | Status confirmation / entity payload |
 
----
-
-## Hotel
-
-### `GET /api/services/hotel`
-
-Access: public
-
-Status: `200 OK`
-
-Query params:
-
-- `minPrice`: optional number
-- `maxPrice`: optional number
-- `starRating`: optional integer 1-5
-- `city`: optional string
-- `minRating`: optional number 0-5
-- `name`: optional string
-
-Request body: none
-
-Response data: localized hotel array.
-
-### `GET /api/services/hotel/:id`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: localized hotel object.
-
-### `GET /api/services/hotel/:id/rooms`
-
-Access: public
-
-Status: `200 OK`
-
-Query params:
-
-- `roomType`: optional string
-
-Request body: none
-
-Response data: localized room array.
-
-### `POST /api/services/hotel`
-
-Access: admin
-
-Status: `201 Created`
-
-Request body:
-
+#### GET Response Payload Example (`GET /api/services/hotel/:id`)
 ```json
 {
-  "name": { "az": "Hotel", "en": "Hotel", "ru": "Hotel" },
-  "about": { "az": "About hotel", "en": "About hotel", "ru": "About hotel" },
+  "id": "hotel_123",
+  "companyId": "comp_456",
+  "name": "Four Seasons Baku",
+  "about": "Luxury hotel on the Caspian Boulevard",
   "city": "Baku",
-  "address": "Center street",
+  "address": "1 Neftchilar Avenue",
   "starRating": 5,
-  "amenities": ["wifi", "pool"],
-  "images": ["https://example.com/hotel.jpg"],
-  "logo": "https://example.com/logo.jpg",
-  "sectionsOrder": ["about", "rooms", "reviews"],
-  "price": 120,
+  "amenities": ["WiFi", "Pool", "Spa", "Fitness Center"],
+  "images": ["https://storage.googleapis.com/baltazar-bucket/hotels/fs1.jpg"],
+  "logo": "https://storage.googleapis.com/baltazar-bucket/hotels/logo.jpg",
+  "price": 250,
+  "rating": 4.9,
+  "reviewCount": 42,
   "status": "ACTIVE"
 }
 ```
 
-Rules:
+### RentACar
 
-- Required fields: `name`, `city`, `starRating`, `price`
-- `starRating`: integer 1-5
-- `price`: number 0-50000 (USD base)
-- `status`: `ACTIVE` or `INACTIVE`, defaults to `ACTIVE`
-- `rating` and `reviewCount` default to `0`
+Core functionality for RentACar.
 
-Response data: created hotel object.
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/services/rentacar/cars | Public | List cars with filters | `CarDTO[]` array |
+| POST | /api/services/rentacar/cars | Admin | Create car (admin) | Status confirmation / entity payload |
+| GET | /api/services/rentacar/cars/{id} | Public | Get full car details by ID | `CarDetail` object |
+| PUT | /api/services/rentacar/cars/{id} | Admin | Update car (admin) | Status confirmation / entity payload |
+| DELETE | /api/services/rentacar/cars/{id} | Admin | Delete car | Status confirmation / entity payload |
 
-### `PUT /api/services/hotel/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body: partial `POST /api/services/hotel` body.
-
-Response data: updated hotel object.
-
-### `DELETE /api/services/hotel/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Returns `409` when the hotel has active bookings.
-
-Response data:
-
+#### GET Response Payload Example (`GET /api/services/rentacar/cars/:id`)
 ```json
 {
-  "id": "hotel_id",
-  "deleted": true
-}
-```
-
-### `POST /api/services/hotel/rooms`
-
-Access: admin
-
-Status: `201 Created`
-
-Request body:
-
-```json
-{
-  "hotelId": "hotel_id",
-  "roomType": "DELUXE",
-  "name": { "az": "Room", "en": "Room", "ru": "Room" },
-  "description": { "az": "Room description", "en": "Room description", "ru": "Room description" },
-  "price": 150,
-  "capacity": 2,
-  "amenities": ["wifi"],
-  "images": ["https://example.com/room.jpg"],
-  "status": "AVAILABLE"
-}
-```
-
-Rules:
-
-- Required fields: `hotelId`, `roomType`, `name`, `price`, `capacity`
-- `capacity`: integer, minimum 1
-- `status`: `AVAILABLE` or `UNAVAILABLE`, defaults to `AVAILABLE`
-
-Response data: created room object.
-
-### `PUT /api/services/hotel/rooms/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body: partial `POST /api/services/hotel/rooms` body.
-
-Response data: updated room object.
-
-### `DELETE /api/services/hotel/rooms/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Returns `409` when the room has active bookings.
-
-Response data:
-
-```json
-{
-  "id": "room_id",
-  "deleted": true
-}
-```
-
----
-
-## Rent A Car
-
-### `GET /api/services/rentacar/companies`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: localized rent-a-car company array.
-
-### `GET /api/services/rentacar/companies/:id`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: localized rent-a-car company object.
-
-### `GET /api/services/rentacar/cars`
-
-Access: public
-
-Status: `200 OK`
-
-Query params:
-
-- `companyId`: optional string
-- `minPrice`: optional number
-- `maxPrice`: optional number
-- `brand`: optional string
-- `model`: optional string
-- `category`: optional string
-- `transmission`: optional `AUTOMATIC` or `MANUAL`
-- `fuelType`: optional `PETROL`, `DIESEL`, `ELECTRIC`, or `HYBRID`
-
-Request body: none
-
-Response data: car DTO array (id, brand, model, price, image, rating).
-
-### `GET /api/services/rentacar/cars/:id`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: full localized car object.
-
-### `POST /api/services/rentacar/companies`
-
-Access: admin
-
-Status: `201 Created`
-
-Request body:
-
-```json
-{
-  "name": { "az": "Company", "en": "Company", "ru": "Company" },
-  "about": { "az": "About company", "en": "About company", "ru": "About company" },
-  "profileImage": "https://example.com/profile.jpg",
-  "bannerImage": "https://example.com/banner.jpg",
-  "images": ["https://example.com/company.jpg"],
-  "sectionsOrder": ["about", "cars", "reviews"],
-  "status": "ACTIVE"
-}
-```
-
-Rules:
-
-- Required fields: `name`
-- `profileImage`, `bannerImage`: optional URL strings
-- `serviceType` is fixed to `RENT_A_CAR`
-- `status`: `ACTIVE` or `INACTIVE`, defaults to `ACTIVE`
-
-Response data: created company object.
-
-### `PUT /api/services/rentacar/companies/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body: partial `POST /api/services/rentacar/companies` body.
-
-Response data: updated company object.
-
-### `DELETE /api/services/rentacar/companies/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Returns `409` when the company has active bookings.
-
-Response data:
-
-```json
-{
-  "id": "company_id",
-  "deleted": true
-}
-```
-
-### `POST /api/services/rentacar/cars`
-
-Access: admin
-
-Status: `201 Created`
-
-Request body:
-
-```json
-{
-  "companyId": "company_id",
-  "brand": "Toyota",
-  "model": "Camry",
+  "id": "car_123",
+  "companyId": "comp_123",
+  "brand": "Mercedes-Benz",
+  "model": "E-Class",
   "year": 2024,
   "category": "Sedan",
   "transmission": "AUTOMATIC",
   "fuelType": "HYBRID",
   "seats": 5,
-  "price": 90,
-  "images": ["https://example.com/car.jpg"],
-  "features": ["bluetooth"],
+  "price": 120,
+  "images": ["https://storage.googleapis.com/baltazar-bucket/cars/eclass.jpg"],
+  "features": ["GPS", "Bluetooth", "Leather Seats"],
+  "rating": 4.8,
+  "reviewCount": 20,
   "status": "AVAILABLE"
 }
 ```
 
-Rules:
+### Food
 
-- Required fields: `companyId`, `brand`, `model`, `year`, `category`, `transmission`, `fuelType`, `seats`, `price`, `images`
-- `year`: integer, 1990 to current year + 1
-- `seats`: integer 1-50
-- `images`: at least one image URL
-- `status`: `AVAILABLE` or `UNAVAILABLE`, defaults to `AVAILABLE`
+Core functionality for Food.
 
-Response data: created car object.
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/services/food/items | Public | List food items with filters | `FoodItemDTO[]` array |
+| POST | /api/services/food/items | Admin | Create food item (admin) | Status confirmation / entity payload |
+| GET | /api/services/food/items/{id} | Public | Get food item details by ID | `FoodItemDetail` object |
+| PUT | /api/services/food/items/{id} | Admin | Update food item (admin) | Status confirmation / entity payload |
+| DELETE | /api/services/food/items/{id} | Admin | Delete food item | Status confirmation / entity payload |
 
-### `PUT /api/services/rentacar/cars/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body: partial `POST /api/services/rentacar/cars` body.
-
-Response data: updated car object.
-
-### `DELETE /api/services/rentacar/cars/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Returns `409` when the car has active bookings.
-
-Response data:
-
+#### GET Response Payload Example (`GET /api/services/food/items/:id`)
 ```json
 {
-  "id": "car_id",
-  "deleted": true
+  "id": "food_123",
+  "companyId": "comp_789",
+  "name": "Special Doner Kabab",
+  "description": "Fresh meat with homemade garlic sauce",
+  "category": "Fast Food",
+  "price": 10,
+  "images": ["https://storage.googleapis.com/baltazar-bucket/food/doner.jpg"],
+  "ingredients": ["Beef", "Garlic Sauce", "Bread", "Tomato"],
+  "calories": 520,
+  "protein": 35,
+  "fat": 20,
+  "carb": 45,
+  "rating": 4.7,
+  "reviewCount": 30,
+  "status": "AVAILABLE"
 }
 ```
 
----
+### Travel
 
-## Food
+Core functionality for Travel.
 
-### `GET /api/services/food/companies`
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/services/travel/tours | Public | List tours with filters | `TourDTO[]` array |
+| POST | /api/services/travel/tours | Admin | Create tour (admin) | Status confirmation / entity payload |
+| GET | /api/services/travel/tours/{id} | Public | Get full tour details | `TourDetail` object |
+| PUT | /api/services/travel/tours/{id} | Admin | Update tour (admin) | Status confirmation / entity payload |
+| DELETE | /api/services/travel/tours/{id} | Admin | Delete tour | Status confirmation / entity payload |
 
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: localized food company array.
-
-### `GET /api/services/food/companies/:id`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: localized food company object.
-
-### `GET /api/services/food/items`
-
-Access: public
-
-Status: `200 OK`
-
-Query params:
-
-- `companyId`: optional string
-- `category`: optional string
-- `minPrice`: optional number
-- `maxPrice`: optional number
-- `name`: optional string
-
-Request body: none
-
-Response data: localized food item array.
-
-### `GET /api/services/food/items/:id`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: localized food item object.
-
-### `POST /api/services/food/companies`
-
-Access: admin
-
-Status: `201 Created`
-
-Request body:
-
+#### GET Response Payload Example (`GET /api/services/travel/tours/:id`)
 ```json
 {
-  "name": { "az": "Restaurant", "en": "Restaurant", "ru": "Restaurant" },
-  "about": { "az": "About restaurant", "en": "About restaurant", "ru": "About restaurant" },
-  "logo": "https://example.com/logo.jpg",
-  "images": ["https://example.com/restaurant.jpg"],
-  "cuisineTypes": ["local"],
-  "address": "Center street",
-  "status": "ACTIVE"
+  "id": "tour_123",
+  "companyId": "comp_999",
+  "categories": ["Mountain", "Adventure"],
+  "title": "Shahdag Winter & Summer Tour",
+  "roadmap": "Day 1: Departure -> Day 2: Mountain Activities",
+  "images": ["https://storage.googleapis.com/baltazar-bucket/tours/shahdag.jpg"],
+  "duration": "2 Days",
+  "startDate": "2026-09-01T08:00:00.000Z",
+  "endDate": "2026-09-02T20:00:00.000Z",
+  "includedServices": ["Transfer", "Guide", "Hotel"],
+  "price": 150,
+  "rating": 4.9,
+  "reviewCount": 12,
+  "status": "AVAILABLE"
 }
 ```
 
-Rules:
+### IncludedServices
 
-- Required fields: `name`
-- `serviceType` is fixed to `FOOD`
-- `status`: `ACTIVE` or `INACTIVE`, defaults to `ACTIVE`
+Core functionality for IncludedServices.
 
-Response data: created company object.
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/services/included-services/{serviceType} | Public | Get included services by service type | `IncludedService[]` array |
+| POST | /api/services/included-services/{serviceType} | Admin | Create included service | Status confirmation / entity payload |
+| PUT | /api/services/included-services/{id} | Admin | Update included service | Status confirmation / entity payload |
+| DELETE | /api/services/included-services/{id} | Admin | Delete included service | Status confirmation / entity payload |
 
-### `PUT /api/services/food/companies/:id`
+### Order
 
-Access: admin
+Core functionality for Order.
 
-Status: `200 OK`
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/order-screens/{serviceType} | Public | Get the hardcoded screen sequence for a service type | `string[]` screen key array |
+| POST | /api/orders | Authenticated | Create a new Order (start a booking flow) | Status confirmation / entity payload |
+| GET | /api/orders | Authenticated | Get all orders for the authenticated user | `OrderDTO[]` array |
+| GET | /api/orders/{id} | Authenticated | Get a specific order by ID | `OrderDetail` object |
+| PUT | /api/orders/{id}/step | Authenticated | Advance order to next step | Status confirmation / entity payload |
+| PUT | /api/orders/{id}/cancel | Authenticated | Cancel an order | Status confirmation / entity payload |
+| GET | /api/orders/{id}/payment-summary | Authenticated | Get payment summary for an order | `PaymentSummary` breakdown |
+| PUT | /api/orders/{id}/status | Admin | Update order status (Admin only) | Status confirmation / entity payload |
 
-Request body: partial `POST /api/services/food/companies` body.
-
-Response data: updated company object.
-
-### `DELETE /api/services/food/companies/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Returns `409` when the company has active bookings.
-
-Response data:
-
+#### User Action Payload Examples
+**POST /api/orders** (Create initial order)
 ```json
 {
-  "id": "company_id",
-  "deleted": true
+  "serviceType": "RENT_A_CAR",
+  "serviceId": "car_123"
 }
 ```
 
-### `POST /api/services/food/items`
-
-Access: admin
-
-Status: `201 Created`
-
-Request body:
-
+**PUT /api/orders/:id/step** (Advance step submission)
 ```json
 {
-  "companyId": "company_id",
-  "name": { "az": "Burger", "en": "Burger", "ru": "Burger" },
-  "description": { "az": "Food description", "en": "Food description", "ru": "Food description" },
-  "category": "Main",
-  "price": 12,
-  "images": ["https://example.com/food.jpg"],
-  "ingredients": ["bread"],
-  "status": "AVAILABLE",
-  "calories": 650,
-  "protein": 30,
-  "fat": 25,
-  "carb": 70
-}
-```
-
-Rules:
-
-- Required fields: `companyId`, `name`, `category`, `price`
-- `status`: `AVAILABLE` or `OUT_OF_STOCK`, defaults to `AVAILABLE`
-- `calories`, `protein`, `fat`, `carb`: optional nutrition numbers
-
-Response data: created food item object.
-
-### `PUT /api/services/food/items/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body: partial `POST /api/services/food/items` body.
-
-Response data: updated food item object.
-
-### `DELETE /api/services/food/items/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Returns `409` when the item has active bookings.
-
-Response data:
-
-```json
-{
-  "id": "item_id",
-  "deleted": true
-}
-```
-
----
-
-## Travel
-
-### `GET /api/services/travel/companies`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: localized travel company array.
-
-### `GET /api/services/travel/companies/:id`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: localized travel company object.
-
-### `GET /api/services/travel/tours`
-
-Access: public
-
-Status: `200 OK`
-
-Query params:
-
-- `companyId`: optional string
-- `category`: optional string
-- `minRating`: optional number
-- `startDate`: optional string
-- `endDate`: optional string
-- `name`: optional string
-
-Request body: none
-
-Response data: localized tour array.
-
-### `GET /api/services/travel/tours/:id`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: localized tour object.
-
-### `POST /api/services/travel/companies`
-
-Access: admin
-
-Status: `201 Created`
-
-Request body:
-
-```json
-{
-  "name": { "az": "Travel company", "en": "Travel company", "ru": "Travel company" },
-  "about": { "az": "About company", "en": "About company", "ru": "About company" },
-  "profileImage": "https://example.com/profile.jpg",
-  "bannerImage": "https://example.com/banner.jpg",
-  "images": ["https://example.com/company.jpg"],
-  "sectionsOrder": ["about", "tours", "reviews"],
-  "status": "ACTIVE"
-}
-```
-
-Rules:
-
-- Required fields: `name`
-- `profileImage`, `bannerImage`: optional URL strings
-- `serviceType` is fixed to `TRAVEL`
-- `status`: `ACTIVE` or `INACTIVE`, defaults to `ACTIVE`
-
-Response data: created company object.
-
-### `PUT /api/services/travel/companies/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body: partial `POST /api/services/travel/companies` body.
-
-Response data: updated company object.
-
-### `DELETE /api/services/travel/companies/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Returns `409` when the company has active bookings.
-
-Response data:
-
-```json
-{
-  "id": "company_id",
-  "deleted": true
-}
-```
-
-### `POST /api/services/travel/tours`
-
-Access: admin
-
-Status: `201 Created`
-
-Request body:
-
-```json
-{
-  "companyId": "company_id",
-  "categories": ["Adventure"],
-  "title": { "az": "Tour", "en": "Tour", "ru": "Tour" },
-  "roadmap": [
-    {
-      "lat": 40.4093,
-      "long": 49.8671,
-      "order": 1
-    }
-  ],
-  "images": ["https://example.com/tour.jpg"],
-  "duration": "3 days",
-  "startDate": "2026-08-01",
-  "endDate": "2026-08-04",
-  "includedServices": ["service_id"],
-  "price": 250,
-  "status": "ACTIVE"
-}
-```
-
-Rules:
-
-- Required fields: `companyId`, `categories`, `title`, `images`, `duration`, `startDate`, `endDate`, `price`
-- `categories` and `images`: at least one entry each
-- `status`: `ACTIVE`, `INACTIVE`, or `SOLD_OUT`, defaults to `ACTIVE`
-
-Response data: created tour object.
-
-### `PUT /api/services/travel/tours/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body: partial `POST /api/services/travel/tours` body.
-
-Response data: updated tour object.
-
-### `DELETE /api/services/travel/tours/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Returns `409` when the tour has active bookings.
-
-Response data:
-
-```json
-{
-  "id": "tour_id",
-  "deleted": true
-}
-```
-
----
-
-## Included Services
-
-### `GET /api/services/included-services/:serviceType`
-
-Access: public
-
-Status: `200 OK`
-
-Path params:
-
-- `serviceType`: `TRAVEL` or `HOTEL`
-
-Request body: none
-
-Response data: localized included service array.
-
-### `POST /api/services/included-services/:serviceType`
-
-Access: admin
-
-Status: `201 Created`
-
-Path params:
-
-- `serviceType`: `TRAVEL` or `HOTEL`
-
-Request body:
-
-```json
-{
-  "name": { "az": "Breakfast", "en": "Breakfast", "ru": "Breakfast" },
-  "icon": "coffee",
-  "serviceType": "HOTEL"
-}
-```
-
-Required fields: `name`, `serviceType`.
-
-Response data: created included service object.
-
-### `PUT /api/services/included-services/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body: partial `POST /api/services/included-services/:serviceType` body.
-
-Rules: `name` remains a full `{ az, en, ru }` map when supplied.
-
-Response data: updated included service object with localized fields resolved
-to one string.
-
-### `DELETE /api/services/included-services/:id`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body: none
-
-Response data:
-
-```json
-{
-  "id": "included_service_id",
-  "deleted": true
-}
-```
-
----
-
-## Order
-
-Orders are step-based booking flows. Each service type has a hardcoded screen
-sequence; screens already satisfied by the user's `profileCompleteness`
-(personal info, driver license, passport) are skipped automatically. Unpaid
-orders expire after 24 hours (`expiresAt`) and become `EXPIRED` when touched.
-
-Screen sequences (`src/config/orderScreens.ts`):
-
-| Service type | Screens |
-|---|---|
-| `RENT_A_CAR` | PERSONAL_INFO → DRIVER_LICENSE → ADDRESS → PAYMENT → CONFIRM |
-| `TRAVEL` | PERSONAL_INFO → PASSPORT_INFO → PAYMENT → CONFIRM |
-| `HOTEL_ROOM` | PERSONAL_INFO → PAYMENT → CONFIRM |
-| `FOOD` | PERSONAL_INFO → DELIVERY_ADDRESS → PAYMENT → CONFIRM |
-
-### `POST /api/orders`
-
-Access: authenticated
-
-Status: `201 Created`
-
-Request body:
-
-```json
-{
-  "serviceType": "TRAVEL",
-  "serviceId": "service_id"
-}
-```
-
-Rules:
-
-- `serviceType`: `RENT_A_CAR`, `TRAVEL`, `HOTEL_ROOM`, or `FOOD`
-- `HOTEL_ROOM` targets a room document; other types target their own collections
-- For `RENT_A_CAR` and `TRAVEL`, the service's `companyId` is copied into `details`
-
-Response data: created order with `status: "PENDING"`, `currentStep: 0`,
-`expiresAt` (24 hours), and the first required screen.
-
-### `GET /api/orders`
-
-Access: authenticated
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: order array for the authenticated user.
-
-### `GET /api/orders/:id`
-
-Access: authenticated
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: order object.
-
-### `PUT /api/orders/:id/step`
-
-Access: authenticated
-
-Status: `200 OK`
-
-Request body:
-
-```json
-{
-  "screen": "PERSONAL_INFO_SCREEN",
+  "screen": "ADDRESS_SCREEN",
   "data": {
-    "dateOfBirth": "1995-04-12"
+    "pickupAddress": "Baku Airport Terminal 1",
+    "dropoffAddress": "Baku City Center"
   }
 }
 ```
 
-Rules:
-
-- `screen`: one of the `OrderScreenKey` values for the order's service type
-- `data`: free-form object stored under the screen key in `details`
-- Expired orders return `400 ORDER_EXPIRED`
-
-Response data:
-
+#### GET Response Payload Example (`GET /api/orders/:id`)
 ```json
 {
-  "orderId": "order_id",
+  "id": "ord_123456",
+  "userId": "usr_987654321",
+  "serviceType": "RENT_A_CAR",
+  "serviceId": "car_123",
+  "companyId": "comp_123",
   "status": "PENDING",
-  "nextStep": { "screen": "PAYMENT_SCREEN" }
+  "currentStep": 2,
+  "details": {
+    "PERSONAL_INFO_SCREEN": { "dateOfBirth": "1995-04-12", "address": "Baku", "idNumber": "AZE12345678" }
+  },
+  "serverComputedPrice": {
+    "basePrice": 120,
+    "tax": 10,
+    "serviceFee": 5,
+    "totalAmount": 135,
+    "currency": "AZN"
+  },
+  "createdAt": "2026-08-05T10:00:00.000Z",
+  "expiresAt": "2026-08-05T10:30:00.000Z"
 }
 ```
 
-`nextStep` is `"DONE"` when the flow is complete.
+### Payment
 
-### `PUT /api/orders/:id/cancel`
+Core functionality for Payment.
 
-Access: authenticated
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/payment/all-cards | Authenticated | Get all saved payment methods | `PaymentMethod[]` array |
+| POST | /api/payment/add-card | Authenticated | Add a payment card (tokenized via external gateway) | Status confirmation / entity payload |
+| POST | /api/payment/pay/{orderId} | Authenticated | Process payment for an order | Status confirmation / entity payload |
 
-Status: `200 OK`
-
-Request body: none
-
-Response data:
-
+#### User Action Payload Examples
+**POST /api/payment/add-card**
 ```json
 {
-  "id": "order_id",
-  "status": "CANCELLED"
-}
-```
-
-### `GET /api/orders/:id/payment-summary`
-
-Access: authenticated
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: payment summary for the order, including transaction history.
-
-### `PUT /api/orders/:id/status`
-
-Access: admin
-
-Status: `200 OK`
-
-Request body:
-
-```json
-{
-  "status": "CONFIRMED"
-}
-```
-
-Rules:
-
-- `status`: `PENDING`, `AWAITING_PAYMENT`, `PROCESSING`, `CONFIRMED`, `CANCELLED`, or `EXPIRED`
-
-Response data:
-
-```json
-{
-  "id": "order_id",
-  "status": "CONFIRMED"
-}
-```
-
-### `GET /api/order-screens/:serviceType`
-
-Access: public
-
-Status: `200 OK`
-
-Path params:
-
-- `serviceType`: `RENT_A_CAR`, `TRAVEL`, `HOTEL_ROOM`, or `FOOD`
-
-Request body: none
-
-Response data:
-
-```json
-{
-  "screens": ["PERSONAL_INFO_SCREEN", "PASSPORT_INFO_SCREEN", "PAYMENT_SCREEN", "CONFIRM_SCREEN"]
-}
-```
-
----
-
-## Payment
-
-Cards are tokenized through an external payment gateway simulator — only
-`paymentMethodId`, `brand`, and `last4` are stored. Card and pay endpoints are
-rate-limited (`paymentLimiter`).
-
-### `GET /api/payment/all-cards`
-
-Access: authenticated
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: saved payment methods for the authenticated user (last4 and
-brand only).
-
-### `POST /api/payment/add-card`
-
-Access: authenticated
-
-Status: `201 Created`
-
-Request body:
-
-```json
-{
-  "cardNumber": "4539974024498311",
-  "expiryMonth": 11,
-  "expiryYear": 2028,
-  "cvv": "123",
-  "cardholderName": "Aydin Aliyev"
-}
-```
-
-Rules:
-
-- `cardNumber`: string, 13-19 chars
-- `expiryMonth`: integer 1-12
-- `expiryYear`: integer, minimum 2024
-- `cvv`: string, 3-4 chars
-- `cardholderName`: non-empty string
-
-Response data:
-
-```json
-{
-  "id": "doc_id",
-  "paymentMethodId": "gateway_payment_method_id",
+  "paymentMethodId": "pm_card_visa_123",
   "brand": "VISA",
-  "last4": "8311"
+  "last4": "4242",
+  "expiryMonth": 12,
+  "expiryYear": 2028
 }
 ```
 
-### `POST /api/payment/pay/:orderId`
-
-Access: authenticated
-
-Status: `200 OK`
-
-Path params:
-
-- `orderId`: order to pay for
-
-Request body:
-
+**POST /api/payment/pay/:orderId**
 ```json
 {
-  "paymentMethodId": "payment_method_id"
+  "paymentMethodId": "pm_card_visa_123"
 }
 ```
 
-Rules:
+#### GET Response Payload Example (`GET /api/payment/all-cards`)
+```json
+[
+  {
+    "id": "pm_doc_123",
+    "paymentMethodId": "pm_card_visa_123",
+    "brand": "VISA",
+    "last4": "4242",
+    "expiryMonth": 12,
+    "expiryYear": 2028
+  }
+]
+```
 
-- The order must belong to the authenticated user
-- Returns `409 PAYMENT_IN_PROGRESS` when the order is already `PROCESSING`
-- Returns `400 ORDER_ALREADY_PAID` when the order is `CONFIRMED`
-- `CANCELLED` and `EXPIRED` orders cannot be paid
-- The order is atomically set to `PROCESSING` before the gateway charge, then
-  to `CONFIRMED` on success
+### Reviews
 
-Response data: payment result with the recorded transaction.
+Core functionality for Reviews.
+
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/reviews | Authenticated | Get reviews for a target (public) | `{ items: Review[], averageRating, totalCount }` |
+| POST | /api/reviews | Authenticated | Create a review (requires a confirmed order) | Status confirmation / entity payload |
+| GET | /api/reviews/{id} | Authenticated | Get a review by ID | Object payload |
+| PUT | /api/reviews/{id} | Authenticated | Update the authenticated user's review | Status confirmation / entity payload |
+| DELETE | /api/reviews/{id} | Authenticated | Delete the authenticated user's review | Status confirmation / entity payload |
+
+#### User Action Payload Example (`POST /api/reviews`)
+```json
+{
+  "targetType": "SERVICE",
+  "targetId": "car_123",
+  "rating": 5,
+  "comment": "Great experience, smooth ride!"
+}
+```
+
+#### GET Response Payload Example (`GET /api/reviews?targetType=SERVICE&targetId=car_123`)
+```json
+{
+  "items": [
+    {
+      "id": "rev_123",
+      "userId": "usr_987654321",
+      "userName": "Aydin A.",
+      "targetType": "SERVICE",
+      "targetId": "car_123",
+      "serviceId": "car_123",
+      "companyId": "comp_123",
+      "rating": 5,
+      "comment": "Great experience, smooth ride!",
+      "createdAt": "2026-08-04T12:00:00.000Z"
+    }
+  ],
+  "averageRating": 5,
+  "totalCount": 1
+}
+```
+
+### Home
+
+Core functionality for Home.
+
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/home/banner | Public | Get home banner slides | `Banner[]` array |
+| POST | /api/home/banner | Admin | Create a banner slide (admin) | Status confirmation / entity payload |
+| PUT | /api/home/banner/{id} | Admin | Update a banner slide (admin) | Status confirmation / entity payload |
+| DELETE | /api/home/banner/{id} | Admin | Delete a banner slide | Status confirmation / entity payload |
+| GET | /api/home/explore | Public | Get personalized explore rows | `ExploreRow[]` array |
+
+#### GET Response Payload Example (`GET /api/home/banner`)
+```json
+[
+  {
+    "id": "ban_123",
+    "image": "https://storage.googleapis.com/baltazar-bucket/banners/summer.jpg",
+    "link": "/services/rentacar",
+    "order": 1,
+    "isActive": true
+  }
+]
+```
+
+### AppConfig
+
+Core functionality for AppConfig.
+
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/app/config | Public | Get mobile app version configuration | `AppConfig` object |
+| PUT | /api/app/config | Admin | Update mobile app version configuration | Status confirmation / entity payload |
+
+#### GET Response Payload Example (`GET /api/app/config`)
+```json
+{
+  "latestVersion": "1.4.0",
+  "minSupportedVersion": "1.2.0",
+  "updateNotes": {
+    "az": "Yeniliklər əlavə edildi",
+    "en": "Bug fixes and performance improvements",
+    "ru": "Исправления ошибок"
+  }
+}
+```
+
+### Enums
+
+Core functionality for Enums.
+
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| GET | /api/enums/roles | Public | Get valid user roles | `string[]` enum options array |
+| GET | /api/enums/service-types | Public | Get valid service types | `string[]` enum options array |
+| GET | /api/enums/company-statuses | Public | Get valid company statuses | `string[]` enum options array |
+| GET | /api/enums/food-item-statuses | Public | Get valid food item statuses | `string[]` enum options array |
+| GET | /api/enums/car-statuses | Public | Get valid car statuses | `string[]` enum options array |
+| GET | /api/enums/transmissions | Public | Get valid transmission types | `string[]` enum options array |
+| GET | /api/enums/fuel-types | Public | Get valid fuel types | `string[]` enum options array |
+| GET | /api/enums/review-target-types | Public | Get valid review target types | `string[]` enum options array |
+| GET | /api/enums/languages | Public | Get supported languages | `string[]` enum options array |
+| GET | /api/enums/regions | Public | Get valid regions | `string[]` enum options array |
+| GET | /api/enums/currencies | Public | Get valid currencies | `string[]` enum options array |
+| GET | /api/enums/company-sections | Public | Get valid company detail sections | `string[]` enum options array |
+| GET | /api/enums/order-statuses | Public | Get valid order statuses | `string[]` enum options array |
+| GET | /api/enums/order-screens | Public | Get valid order screen keys | `string[]` enum options array |
+
+#### GET Response Payload Example (`GET /api/enums/service-types`)
+```json
+[
+  "RENT_A_CAR",
+  "HOTEL",
+  "TRAVEL",
+  "FOOD"
+]
+```
+
+### Uploads
+
+Core functionality for Uploads.
+
+| Method | Path | Access | Description | Response Data Format |
+|---|---|---|---|---|
+| POST | /api/uploads/image | Authenticated | Upload a single image | Status confirmation / entity payload |
+| POST | /api/uploads/images | Authenticated | Upload multiple images (max 10) | Status confirmation / entity payload |
+| GET | /api/uploads/images | Admin | List every uploaded image in the database (admin only) | `Upload[]` array |
+
+#### User Action Payload Example (`POST /api/uploads/image`)
+*Form Data*: `image` file (Max 5MB, JPEG/PNG/WebP)
+
+#### Response Payload Example (`POST /api/uploads/image`)
+```json
+{
+  "url": "https://storage.googleapis.com/baltazar-bucket/uploads/abc-123.jpg",
+  "filename": "abc-123.jpg",
+  "expiresAt": "2026-08-05T12:00:00.000Z"
+}
+```
 
 ---
 
-## Reviews
+## Background Jobs & Setup
 
-Reviews are verified: creating one requires at least one `CONFIRMED` order for
-the target. For `COMPANY` targets the order must reference the company through
-`details.companyId`; for all other targets the order's `serviceId` must match
-`targetId`. Ineligible attempts return `403 REVIEW_NOT_ELIGIBLE`.
+- **Cleanup Expired Uploads**: A `node-cron` job runs periodically to clear `pending` uploads from Firebase Storage that were never confirmed by an entity creation/update, preventing storage leaks.
 
-### `GET /api/reviews`
+### Environment Variables (`src/config/env.ts`)
 
-Access: public (admin may fetch all)
-
-Status: `200 OK`
-
-Query params:
-
-- `targetType`: optional `RENT_A_CAR`, `TRAVEL`, `HOTEL`, `FOOD`, or `COMPANY`
-- `targetId`: optional string
-
-Rules: non-admin requests must supply both `targetType` and `targetId`;
-admins may omit both to list every review.
-
-Request body: none
-
-Response data: review array, newest first.
-
-### `POST /api/reviews`
-
-Access: authenticated
-
-Status: `201 Created`
-
-Request body:
-
-```json
-{
-  "targetType": "HOTEL",
-  "targetId": "hotel_id",
-  "rating": 5,
-  "comment": "Excellent stay"
-}
-```
-
-Rules:
-
-- `targetType`: `RENT_A_CAR`, `TRAVEL`, `HOTEL`, `FOOD`, or `COMPANY`
-- `rating`: integer 1-5
-- `comment`: string, 1-2000 chars
-- Requires a confirmed order for the target (see above)
-
-Response data: created review object.
-
-### `GET /api/reviews/:id`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response data: review object.
-
-### `PUT /api/reviews/:id`
-
-Access: authenticated (review owner)
-
-Status: `200 OK`
-
-Request body:
-
-```json
-{
-  "rating": 4,
-  "comment": "Updated comment"
-}
-```
-
-Rules: both fields optional, but at least one must be present. Only the review
-owner can update.
-
-Response data: updated review object.
-
-### `DELETE /api/reviews/:id`
-
-Access: authenticated (review owner or admin)
-
-Status: `200 OK`
-
-Request body: none
-
-Response data:
-
-```json
-{
-  "id": "review_id",
-  "deleted": true
-}
+```text
+NODE_ENV=development | production
+PORT=3000
+LOG_LEVEL=info
+JWT_ACCESS_SECRET=...
+JWT_REFRESH_SECRET=...
+FIREBASE_PROJECT_ID=...
+FIREBASE_CLIENT_EMAIL=...
+FIREBASE_PRIVATE_KEY=...
+FIREBASE_STORAGE_BUCKET=...
+CORS_ORIGIN=http://localhost:3000
+GOOGLE_CLIENT_ID=...
+PAYMENT_GATEWAY_URL=http://localhost:4000
 ```
 
 ---
 
 ## Admin
 
-All admin routes require authentication and `ADMIN` role.
+Admin functionality is restricted to users with the `ADMIN` role.
 
-### `POST /api/admin/users/add-admin`
-
-Status: `200 OK`
-
-Request body:
-
-```json
-{
-  "userId": "user_id"
-}
-```
-
-Response data:
-
-```json
-{
-  "userId": "user_id",
-  "role": "ADMIN"
-}
-```
-
-### `GET /api/admin/transactions`
-
-Status: `200 OK`
-
-Query params:
-
-- `status`: optional `SUCCESS`, `FAILED`, or `PENDING`
-- `userId`: optional string
-
-Request body: none
-
-Response data: transaction array.
-
-Admin capabilities exposed on other routers:
-
-- `PUT /api/orders/:id/status` — update any order's status
-- `PUT /api/users/:id/disable` — revoke all sessions for a user
-- `GET /api/reviews` without filters — list every review (admin role)
-- `DELETE /api/reviews/:id` — delete any review (admin role)
-- Banner, app config, and service CRUD endpoints documented above
-
----
-
-## Health
-
-### `GET /health`
-
-Access: public
-
-Status: `200 OK`
-
-Request body: none
-
-Response:
-
-```json
-{
-  "status": "ok",
-  "timestamp": "2026-07-28T00:00:00.000Z"
-}
-```
-
----
-
-## Image Uploads
-
-Multipart uploads are handled by Multer in memory with a 5 MB per-file limit.
-Files are written to Firebase Storage under a folder per domain (for example
-`banners/`), with UUID-prefixed sanitized filenames, and served as public URLs:
-
-```text
-https://storage.googleapis.com/<FIREBASE_STORAGE_BUCKET>/banners/<uuid>-<filename>
-```
-
-Currently banner create/update endpoints accept file uploads. Other image
-fields across the API accept plain URL strings.
-
----
-
-## Background Jobs
-
-| Job | Schedule | Purpose |
-|---|---|---|
-| `refreshExchangeRates` | Every 6 hours (`0 */6 * * *`) | Fetches the latest USD→AZN rate and stores it in `exchangeRates` for region-based price display |
-
----
-
-## API Docs
-
-When the server is running:
-
-- Swagger UI: `http://localhost:3000/api-docs`
-- Raw JSON spec: `http://localhost:3000/api-docs.json`
-
-Swagger is generated from route annotations in `src/modules/**/*.routes.ts`
-combined with Zod schemas via `@asteasolutions/zod-to-openapi`. To emit a
-static spec (used in production from `dist/openapi.json`):
-
-```bash
-npm run docs:build
-```
-
----
-
-## Environment Variables
-
-Copy `.env.example` to `.env.development` or your local `.env` file and fill in the values.
-
-| Variable | Description |
-|---|---|
-| `NODE_ENV` | `development` or `production` |
-| `PORT` | HTTP port, default `3000` (do not set in production — the platform injects it) |
-| `LOG_LEVEL` | Pino log level |
-| `JWT_ACCESS_SECRET` | Secret for access tokens, minimum 32 chars |
-| `JWT_REFRESH_SECRET` | Secret for refresh tokens, minimum 32 chars |
-| `FIREBASE_PROJECT_ID` | Firebase project ID |
-| `FIREBASE_CLIENT_EMAIL` | Firebase service account email |
-| `FIREBASE_PRIVATE_KEY` | Firebase service account private key |
-| `FIREBASE_STORAGE_BUCKET` | Firebase Storage bucket for image uploads |
-| `CORS_ORIGIN` | Comma-separated allowed origins |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
-| `PAYMENT_GATEWAY_URL` | Payment gateway simulator URL |
-
----
-
-## Setup
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Create an env file:
-
-```bash
-cp .env.example .env.development
-```
-
-Run in development:
-
-```bash
-npm run dev
-```
-
-Run tests:
-
-```bash
-npm test
-```
-
-Build:
-
-```bash
-npm run build
-```
-
-Start production build:
-
-```bash
-npm start
-```
-
----
-
-## Deployment
-
-For Render or similar platforms:
-
-```bash
-Build Command: npm install && npm run build
-Start Command: npm start
-```
-
-The intended compiled entry point is `dist/server.js`.
-
----
-
-## Notes
-
-- `dist/` is ignored by Git and should be generated during deployment.
-- Runtime response envelopes were checked against the current controllers.
-- Request body and query models were checked against the current Zod schemas.
-- Rent-a-car, travel, and food companies share the `companies` Firestore
-  collection and are distinguished by their `serviceType` field.
+- `GET /api/admin/metrics` - Retrieve system-wide metrics (total users, active orders, revenue). Response: `{ totalUsers, activeOrders, totalRevenue, totalCompanies }`.
+- `POST /api/admin/reset-database` - DANGER: Wipes all collections except the calling admin's own user record. Response: `{ reset: true }`.
+- `GET /api/admin/transactions` - View all cross-domain financial transactions. Response: `Transaction[]` array.
+- `PUT /api/users/:id/disable` - Ban/disable a user account and revoke their sessions. Response: `{ disabled: true }`.

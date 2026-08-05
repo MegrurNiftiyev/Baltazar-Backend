@@ -10,7 +10,9 @@ import { seedHotels } from './seeders/seedHotels.js';
 import { seedRentACar } from './seeders/seedRentACar.js';
 import { seedTravel } from './seeders/seedTravel.js';
 import { seedHome } from './seeders/seedHome.js';
-
+import { seedUserProfilesAndCards } from './seeders/seedUserProfilesAndCards.js';
+import { seedOrdersPaymentsReviews } from './seeders/seedOrdersPaymentsReviews.js';
+import { seedTestUsers } from './seeders/seedTestUsers.js';
 const PORT = 3099;
 const BASE_URL = `http://localhost:${PORT}`;
 
@@ -72,16 +74,37 @@ async function main() {
         uploadImageFile: (filePath: string, folder: string) => uploadImageFileHelper(BASE_URL, token, filePath, folder),
       };
 
+      console.log('🗑️  Resetting database...');
+      const resetRes = await fetch(`${BASE_URL}/api/admin/reset-database`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!resetRes.ok) {
+        console.error('❌ Database reset failed:', await resetRes.json());
+        process.exit(1);
+      }
+      console.log('✅ Database reset complete.\n');
+
       // 2. Seed Categories & Included Services first
       await seedCategories(ctx);
       const createdIncServices = await seedIncludedServices(ctx);
 
       // 3. Execute domain seeders
-      await seedFood(ctx);
-      await seedHotels(ctx);
-      await seedRentACar(ctx);
-      await seedTravel(ctx, createdIncServices);
+      const allCreatedServices: Array<{ serviceType: string; id: string; companyId?: string }> = [];
+      const foodServices = await seedFood(ctx);
+      allCreatedServices.push(...foodServices);
+      const hotelServices = await seedHotels(ctx);
+      allCreatedServices.push(...hotelServices);
+      const rentACarServices = await seedRentACar(ctx);
+      allCreatedServices.push(...rentACarServices);
+      const travelServices = await seedTravel(ctx, createdIncServices);
+      allCreatedServices.push(...travelServices);
+
       await seedHome(ctx);
+
+      const testUsers = await seedTestUsers(ctx);
+      const usersWithCards = await seedUserProfilesAndCards(ctx, testUsers);
+      await seedOrdersPaymentsReviews(ctx, usersWithCards, allCreatedServices);
 
       console.log('\n🎉 ALL DOMAIN SEEDERS EXECUTED SUCCESSFULLY!');
     } catch (err) {

@@ -49,12 +49,15 @@ export async function seedFood(ctx: SeedContext) {
     }
   }
 
+  const createdServices: Array<{ serviceType: string; id: string; companyId?: string }> = [];
+
   for (let i = 0; i < foodData.items.length; i++) {
     const item = foodData.items[i];
     const compId = createdCompanyIds[item.companyIndex];
     if (!compId) continue;
 
-    const imgUrl = await ctx.uploadImageFile(itemImages[i % itemImages.length]!, 'foodItems');
+    const imageFileName = item.imageFile ? path.join(itemDir, item.imageFile) : itemImages[i % itemImages.length]!;
+    const imgUrl = await ctx.uploadImageFile(imageFileName, 'foodItems');
 
     const res = await fetch(`${ctx.baseUrl}/api/services/food/items`, {
       method: 'POST',
@@ -77,8 +80,11 @@ export async function seedFood(ctx: SeedContext) {
     const result = await res.json();
     if (res.ok) {
       console.log(`  🍔 Created Food Item: ${item.name.en}`);
+      createdServices.push({ serviceType: 'FOOD', id: result.data.id, companyId: compId });
     } else {
       console.error('  ❌ Food item error:', result);
     }
   }
+
+  return createdServices;
 }

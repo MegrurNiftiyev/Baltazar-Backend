@@ -15,6 +15,8 @@ export async function seedHotels(ctx: SeedContext) {
     ? fs.readdirSync(roomImagesDir).map((f) => path.join(roomImagesDir, f))
     : hotelImages;
 
+  const createdServices: Array<{ serviceType: string; id: string; companyId?: string }> = [];
+
   for (let i = 0; i < hotelData.hotels.length; i++) {
     const hotel = hotelData.hotels[i];
     const logoUrl = await ctx.uploadImageFile(hotelImages[i % hotelImages.length]!, 'hotels');
@@ -69,9 +71,12 @@ export async function seedHotels(ctx: SeedContext) {
       const roomResult = await roomRes.json();
       if (roomRes.ok) {
         console.log(`  🛏️ Created Room: ${room.name.en} (with ${2} images)`);
+        createdServices.push({ serviceType: 'HOTEL', id: roomResult.data.id });
       } else {
         console.error('  ❌ Room error:', roomResult);
       }
     }
   }
+
+  return createdServices;
 }

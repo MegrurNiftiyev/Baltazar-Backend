@@ -78,14 +78,14 @@ export async function register(input: RegisterInput) {
     passwordHash,
     role: 'USER', // ← hardcoded, non-negotiable
     phone: input.phone || null,
-    region: input.region || null,
-    language: input.language || 'en',
+    region: input.region || 'AZ',
+    language: input.language || 'az',
     wishlist: [],
     profileCompleteness: { personalInfo: false, driverLicense: false, passport: false },
     createdAt: new Date().toISOString(),
   });
 
-  const tokens = await issueTokens(docRef.id, 'USER', input.language || 'en');
+  const tokens = await issueTokens(docRef.id, 'USER', input.language || 'az');
 
   return {
     user: {
@@ -117,7 +117,7 @@ export async function login(input: LoginInput) {
     throw new AppError(401, 'INVALID_CREDENTIALS');
   }
 
-  const tokens = await issueTokens(user.id, user.role, (user.language as 'az' | 'en' | 'ru') || 'en');
+  const tokens = await issueTokens(user.id, user.role, (user.language as 'az' | 'en' | 'ru') || 'az');
 
   return {
     user: {
@@ -170,7 +170,7 @@ export async function refresh(refreshToken: string) {
   const tokens = await issueTokens(
     payload.userId,
     userData.role as 'USER' | 'ADMIN',
-    (userData.language as 'az' | 'en' | 'ru') || 'en',
+    (userData.language as 'az' | 'en' | 'ru') || 'az',
   );
 
   return {
@@ -210,8 +210,8 @@ export async function googleLogin(input: GoogleLoginInput) {
       passwordHash: '', // no password for Google-only accounts
       role: 'USER',
       phone: null,
-      region: null,
-      language: 'en',
+      region: 'AZ',
+      language: 'az',
       wishlist: [],
       profileCompleteness: { personalInfo: false, driverLicense: false, passport: false },
       createdAt: new Date().toISOString(),
@@ -223,13 +223,14 @@ export async function googleLogin(input: GoogleLoginInput) {
       email: googlePayload.email,
       passwordHash: '',
       role: 'USER' as const,
-      language: 'en',
+      region: 'AZ',
+      language: 'az',
       wishlist: [],
       createdAt: new Date().toISOString(),
     };
   }
 
-  const tokens = await issueTokens(user.id, user.role, (user.language as 'az' | 'en' | 'ru') || 'en');
+  const tokens = await issueTokens(user.id, user.role, (user.language as 'az' | 'en' | 'ru') || 'az');
 
   return {
     user: {
