@@ -1,0 +1,109 @@
+{
+  "hotels": [
+    {
+      "name": { "az": "Grand Hotel Europe Baku", "en": "Grand Hotel Europe Baku", "ru": "Grand Hotel Europe Baku" },
+      "about": { "az": "Xəzər dənizinə möhtəşəm mənzərəsi olan 5 ulduzlu lüks otel.", "en": "5-star luxury hotel offering panoramic Caspian Sea views.", "ru": "5-звездочный отель с видом на море." },
+      "city": "Baku",
+      "address": "Neftchilar Avenue 34, Baku",
+      "starRating": 5,
+      "price": 180.00,
+      "amenities": ["Free WiFi", "Swimming Pool", "Spa & Wellness", "Airport Shuttle"],
+      "rooms": [
+        {
+          "roomType": "Deluxe King Room",
+          "name": { "az": "Dəniz Mənzərəli Deluxe King Otağı", "en": "Deluxe King Room with Sea View", "ru": "Номер Делюкс с видом на море" },
+          "description": { "az": "Böyük çarpayılı və mərmər hamamlı geniş otaq.", "en": "Spacious room with king bed and marble bathroom.", "ru": "Просторный номер с большой кроватью." },
+          "price": 160.00,
+          "capacity": 2,
+          "amenities": ["Sea View", "King Bed", "Coffee Machine"]
+        },
+        {
+          "roomType": "Executive Suite",
+          "name": { "az": "Lounge Girişli Executive Suite", "en": "Executive Suite with Lounge Access", "ru": "Номер Представительский Люкс" },
+          "description": { "az": "Ayrıca qonaq otağı olan yüksək mərtəbəli lyuks otaq.", "en": "High-floor suite with separate living room.", "ru": "Люкс на высоком этаже с гостиной." },
+          "price": 350.00,
+          "capacity": 4,
+          "amenities": ["Jacuzzi", "Lounge Access", "Balcony"]
+        },
+        {
+          "roomType": "Standard Twin Room",
+          "name": { "az": "Standart İkiçarpayılı Otaq", "en": "Standard Twin Room", "ru": "Стандартный двухместный номер" },
+          "description": { "az": "İki tək çarpayılı rahat və işıqlı otaq.", "en": "Comfortable room with two single beds.", "ru": "Уютный номер с двумя односпальными кроватями." },
+          "price": 120.00,
+          "capacity": 2,
+          "amenities": ["Twin Beds", "Free WiFi", "Air Conditioning"]
+        },
+        {
+          "roomType": "Superior Family Suite",
+          "name": { "az": "Ailəvi Suite Otağı", "en": "Superior Family Suite", "ru": "Семейный Люкс" },
+          "description": { "az": "Böyük ailələr üçün 2 yataq otaqlı geniş suite.", "en": "2-bedroom suite ideal for families.", "ru": "2-комнатный люкс для семейного отдыха." },
+          "price": 280.00,
+          "capacity": 5,
+          "amenities": ["2 Bedrooms", "Kitchenette", "Balcony"]
+        }
+      ]
+    },
+    {
+      "name": { "az": "Hilton Baku Executive", "en": "Hilton Baku Executive", "ru": "Hilton Baku Executive" },
+      "about": { "az": "Dama çıxan fırlanan barı və lüks lyuks otaqları ilə müasir otel.", "en": "Contemporary elegance featuring rooftop revolving bar.", "ru": "Современный отель с вращающимся баром на крыше." },
+      "city": "Baku",
+      "address": "Azadliq Avenue 1, Baku",
+      "starRating": 5,
+      "price": 240.00,
+      "amenities": ["Rooftop Bar", "Executive Lounge", "Fitness Center"],
+      "rooms": [
+        {
+          "roomType": "King Guest Room",
+          "name": { "az": "King Qonaq Otağı", "en": "King Guest Room", "ru": "Стандартный номер King" },
+          "description": { "az": "Müasir dizaynlı rahat qonaq otağı.", "en": "Modern room featuring signature Hilton Serenity bed.", "ru": "Современный номер с фирменной кроватью." },
+          "price": 210.00,
+          "capacity": 2,
+          "amenities": ["King Bed", "Work Desk", "Smart TV"]
+        },
+        {
+          "roomType": "Executive King Suite",
+          "name": { "az": "Ekzekutiv King Suite", "en": "Executive King Suite", "ru": "Представительский Люкс King" },
+          "description": { "az": "Şəhər mənzərəsi və eksklüziv lounge hüququ.", "en": "Spacious suite with executive lounge privileges.", "ru": "Просторный люкс с доступом в представительский лаунж." },
+          "price": 390.00,
+          "capacity": 3,
+          "amenities": ["Executive Lounge", "Espresso Machine", "Panoramic Window"]
+        },
+        {
+          "roomType": "Presidential Suite",
+          "name": { "az": "Prezident Lyuksu", "en": "Presidential Suite", "ru": "Президентский люкс" },
+          "description": { "az": "Şəhərin panoramik mənzərəsi olan eksklüziv lyuks.", "en": "Exclusive suite featuring 360 panoramic views.", "ru": "Эксклюзивный люкс с панорамным видом." },
+          "price": 650.00,
+          "capacity": 4,
+          "amenities": ["360 View", "Private Butler", "Sauna"]
+        }
+      ]
+    },
+    {
+      "name": { "az": "Fairmont Flame Towers", "en": "Fairmont Flame Towers", "ru": "Fairmont Flame Towers" },
+      "about": { "az": "Məşhur Alov Qüllələrində yerləşən ikonik lüks otel.", "en": "Iconic luxury hotel located inside Flame Towers.", "ru": "Роскошный отель в Пламенных Башнях." },
+      "city": "Baku",
+      "address": "Mehdi Huseyn Street 1A, Baku",
+      "starRating": 5,
+      "price": 310.00,
+      "amenities": ["City View", "Jazz Club", "Indoor Pool", "Sauna"],
+      "rooms": [
+        {
+          "roomType": "Deluxe City View Room",
+          "name": { "az": "Şəhər Mənzərəli Deluxe Otaq", "en": "Deluxe City View Room", "ru": "Номер Делюкс с видом на город" },
+          "description": { "az": "Alov Qüllələrindən Bakının möhtəşəm panoraması.", "en": "Stunning city panorama from Flame Towers.", "ru": "Потрясающая панорама города из Пламенных Башен." },
+          "price": 270.00,
+          "capacity": 2,
+          "amenities": ["City Panorama", "Rain Shower", "Mini Bar"]
+        },
+        {
+          "roomType": "Flame Towers Grand Suite",
+          "name": { "az": "Flame Towers Qrand Suite", "en": "Flame Towers Grand Suite", "ru": "Гранд Люкс Пламенные Башни" },
+          "description": { "az": "Xüsusi dizaynlı vanna və panoramik mənzərə.", "en": "Luxurious suite with bathtub overlooking Caspian Sea.", "ru": "Роскошный люкс с ванной и панорамным видом." },
+          "price": 480.00,
+          "capacity": 3,
+          "amenities": ["Caspian View", "Freestanding Tub", "Walk-in Closet"]
+        }
+      ]
+    }
+  ]
+}
