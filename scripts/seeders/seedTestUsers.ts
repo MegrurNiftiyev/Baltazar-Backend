@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import type { SeedContext } from './utils.js';
+import { uploadImageFileHelper, type SeedContext } from './utils.js';
 
 const TEST_USER_COUNT = 5;
 
@@ -46,9 +46,9 @@ export async function seedTestUsers(ctx: SeedContext) {
     const userId = regJson.data.user.id;
     const token = regJson.data.accessToken;
 
-    // Avatar — upload the image, then reference its URL on the profile
+    // Avatar — upload the image with the user's token so validateImageReferences ownership check passes
     const avatarPath = avatarFiles[i % avatarFiles.length]!;
-    const avatarUrl = await ctx.uploadImageFile(avatarPath, 'avatars');
+    const avatarUrl = await uploadImageFileHelper(ctx.baseUrl, token, avatarPath, 'avatars');
 
     const avatarRes = await fetch(`${ctx.baseUrl}/api/users/me/avatar`, {
       method: 'PUT',
