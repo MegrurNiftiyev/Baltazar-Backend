@@ -3,14 +3,15 @@ import { catchAsync } from '../../utils/catchAsync.js';
 import * as companiesService from './companies.service.js';
 
 export const getCompaniesController = catchAsync(async (req: Request, res: Response) => {
-  const result = await companiesService.getCompanies(req.query as any);
+  const query = (req.validatedQuery || req.query) as any;
+  const result = await companiesService.getCompanies(query);
   res.status(200).json({
     success: true,
     data: result.items,
     pagination: {
       nextCursor: result.nextCursor,
       hasMore: result.hasMore,
-      limit: Number(req.query.limit || 20),
+      limit: Number(query.limit || 20),
     },
   });
 });

@@ -40,11 +40,34 @@ export async function paginateQuery<T>(
     // fetched it), just ignore it and return the first page rather than erroring out.
   }
 
-  const snapshot = await query.get();
+  let snapshot: FirebaseFirestore.QuerySnapshot;
+  try {
+    snapshot = await query.get();
+  } catch (err: any) {
+    if (err.code === 9 || (err.message && err.message.toLowerCase().includes('index'))) {
+      const allDocsSnap = await collectionRef.limit(100).get();
+      let docs = allDocsSnap.docs.filter((doc) => doc.data().status === 'ACTIVE');
+      docs = docs.sort((a, b) => {
+        const aTime = a.data().createdAt || '';
+        const bTime = b.data().createdAt || '';
+        return bTime.localeCompare(aTime);
+      });
+      const hasMore = docs.length > limit;
+      const pageDocs = hasMore ? docs.slice(0, limit) : docs;
+      const nextCursor = hasMore ? pageDocs[pageDocs.length - 1]!.id : null;
+      return {
+        items: pageDocs.map(mapDoc as any),
+        nextCursor,
+        hasMore,
+      };
+    }
+    throw err;
+  }
+
   const hasMore = snapshot.docs.length > limit;
   const pageDocs = hasMore ? snapshot.docs.slice(0, limit) : snapshot.docs;
 
-  const nextCursor = hasMore ? pageDocs[pageDocs.length - 1].id : null;
+  const nextCursor = hasMore ? pageDocs[pageDocs.length - 1]!.id : null;
 
   return {
     items: pageDocs.map(mapDoc as any),
