@@ -46,7 +46,10 @@ export async function paginateQuery<T>(
   } catch (err: any) {
     if (err.code === 9 || (err.message && err.message.toLowerCase().includes('index'))) {
       const allDocsSnap = await collectionRef.limit(100).get();
-      let docs = allDocsSnap.docs.filter((doc) => doc.data().status === 'ACTIVE');
+      let docs = allDocsSnap.docs.filter((doc) => {
+        const s = doc.data().status;
+        return !s || s === 'ACTIVE' || s === 'AVAILABLE';
+      });
       docs = docs.sort((a, b) => {
         const aTime = a.data().createdAt || '';
         const bTime = b.data().createdAt || '';
