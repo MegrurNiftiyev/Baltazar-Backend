@@ -14,8 +14,8 @@ export async function seedOrdersPaymentsReviews(
 ) {
   console.log('\n🧾 Seeding Orders → Payments → Reviews...');
 
-  const addressesSeedPath = path.join(process.cwd(), 'scripts', 'seed-data', 'addresses.seed.json');
-  const reviewCommentsSeedPath = path.join(process.cwd(), 'scripts', 'seed-data', 'review-comments.seed.json');
+  const addressesSeedPath = path.join(process.cwd(), 'scripts', 'data', 'addresses.seed.json');
+  const reviewCommentsSeedPath = path.join(process.cwd(), 'scripts', 'data', 'review-comments.seed.json');
   const addressesSeed = JSON.parse(fs.readFileSync(addressesSeedPath, 'utf8'));
   const reviewCommentsSeed = JSON.parse(fs.readFileSync(reviewCommentsSeedPath, 'utf8'));
 
