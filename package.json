@@ -16,6 +16,7 @@
     "seed:audit:fix": "tsx scripts/auditSeedData.ts --fix",
     "seed:normalize-images": "tsx scripts/normalizeTestImages.ts",
     "seed": "npm run seed:audit && npm run seed:normalize-images && tsx scripts/seedAll.ts",
+    "seed:home": "tsx scripts/seedHomeOnly.ts",
     "docs:build": "tsx scripts/generateSwagger.ts"
   },
   "dependencies": {
