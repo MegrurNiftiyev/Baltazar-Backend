@@ -5,7 +5,7 @@ import { addCardSchema } from '../src/modules/payment/payment.schema.js';
 import { updateProfileSchema } from '../src/modules/users/users.schema.js';
 import { ENUM_REGISTRY } from '../src/modules/enums/enums.registry.js';
 
-const SEED_DATA_DIR = path.join(process.cwd(), 'scripts', 'seed-data');
+const SEED_DATA_DIR = path.join(process.cwd(), 'scripts', 'data');
 const SEEDERS_DIR = path.join(process.cwd(), 'scripts', 'seeders');
 
 function findSeedDataImports(): Map<string, string[]> {

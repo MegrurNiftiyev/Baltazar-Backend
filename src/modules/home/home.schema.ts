@@ -6,6 +6,8 @@ extendZodWithOpenApi(z);
 
 export const createBannerSchema = z.object({
   serviceType: serviceTypeEnum,
+  title: z.object({ az: z.string(), en: z.string(), ru: z.string() }),
+  desc: z.object({ az: z.string(), en: z.string(), ru: z.string() }),
   order: z.number().optional().default(1),
   isActive: z.boolean().optional().default(true),
   image: z.string().url(),

@@ -10,8 +10,8 @@ export async function seedUserProfilesAndCards(
   console.log('\n👤 Seeding User Profiles and Payment Cards...');
   const result = [];
 
-  const cardsSeedPath = path.join(process.cwd(), 'scripts', 'seed-data', 'cards.seed.json');
-  const userProfilesSeedPath = path.join(process.cwd(), 'scripts', 'seed-data', 'user-profiles.seed.json');
+  const cardsSeedPath = path.join(process.cwd(), 'scripts', 'data', 'cards.seed.json');
+  const userProfilesSeedPath = path.join(process.cwd(), 'scripts', 'data', 'user-profiles.seed.json');
   const cardsSeed = JSON.parse(fs.readFileSync(cardsSeedPath, 'utf8'));
   const userProfilesSeed = JSON.parse(fs.readFileSync(userProfilesSeedPath, 'utf8'));
 

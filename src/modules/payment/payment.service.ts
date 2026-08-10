@@ -9,7 +9,8 @@ const transactionsCollection = db.collection(COLLECTIONS.TRANSACTIONS);
 const ordersCollection = db.collection(COLLECTIONS.ORDERS);
 
 async function gatewayRequest(path: string, body: Record<string, unknown>) {
-  const response = await fetch(`${env.PAYMENT_GATEWAY_URL}${path}`, {
+  const baseUrl = env.PAYMENT_GATEWAY_URL.replace(/\/+$/, '');
+  const response = await fetch(`${baseUrl}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -77,7 +78,7 @@ export async function processPayment(userId: string, orderId: string, input: Pay
 
   const order = orderDoc.data()!;
 
-  let chargeResponse: { chargeId: string; status: string };
+  let chargeResponse: { chargeId?: string; transactionId?: string; status: string };
   let amount: number;
   try {
     const methodSnapshot = await paymentMethodsCollection
@@ -96,14 +97,16 @@ export async function processPayment(userId: string, orderId: string, input: Pay
       amount,
       currency: 'AZN',
       description: `Order ${orderId}`,
-    })) as { chargeId: string; status: string };
+    })) as { chargeId?: string; transactionId?: string; status: string };
   } catch (err) {
     await ordersCollection.doc(orderId).update({ status: 'PENDING' });
     throw err;
   }
 
+  const providerEventId = chargeResponse.transactionId || chargeResponse.chargeId || `txn_${Date.now()}`;
+
   const existingTx = await transactionsCollection
-    .where('providerEventId', '==', chargeResponse.chargeId)
+    .where('providerEventId', '==', providerEventId)
     .limit(1)
     .get();
 
@@ -111,19 +114,22 @@ export async function processPayment(userId: string, orderId: string, input: Pay
     return { id: existingTx.docs[0]!.id, ...existingTx.docs[0]!.data() };
   }
 
-  const status = chargeResponse.status === 'succeeded' ? 'SUCCESS' : 'FAILED';
+  const status =
+    chargeResponse.status === 'succeeded' || chargeResponse.status === 'SUCCESS' || chargeResponse.status === 'success'
+      ? 'SUCCESS'
+      : 'FAILED';
   const txRef = await transactionsCollection.add({
     userId,
     orderId,
     paymentMethodId: input.paymentMethodId,
     amount,
     currency: 'AZN',
-    providerEventId: chargeResponse.chargeId,
+    providerEventId,
     status,
     createdAt: new Date().toISOString(),
   });
 
-  if (chargeResponse.status === 'succeeded') {
+  if (status === 'SUCCESS') {
     await ordersCollection.doc(orderId).update({
       status: 'CONFIRMED',
       paidAt: new Date().toISOString(),

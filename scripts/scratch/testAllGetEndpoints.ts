@@ -1,5 +1,4 @@
 import 'dotenv-flow/config';
-import fetch from 'node-fetch';
 import { app } from '../../src/app.js';
 import type { Server } from 'http';
 
