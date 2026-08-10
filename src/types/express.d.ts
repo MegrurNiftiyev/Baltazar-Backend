@@ -1,4 +1,5 @@
 import type { SupportedLang } from '../config/locales.js';
+import type { Region } from '../shared/enums.js';
 
 declare global {
   namespace Express {
@@ -11,6 +12,8 @@ declare global {
       };
       /** Populated by resolveLocale middleware. */
       lang?: SupportedLang;
+      /** Populated by resolveLocale middleware. */
+      region?: Region;
       /** Populated by validate middleware for Express 5 compatibility. */
       validatedQuery?: unknown;
     }
