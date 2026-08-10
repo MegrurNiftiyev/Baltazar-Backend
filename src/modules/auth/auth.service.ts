@@ -190,10 +190,15 @@ export async function refresh(refreshToken: string) {
  * then issues JWT tokens.
  */
 export async function googleLogin(input: GoogleLoginInput) {
-  const ticket = await googleClient.verifyIdToken({
-    idToken: input.idToken,
-    audience: env.GOOGLE_CLIENT_ID,
-  });
+  let ticket;
+  try {
+    ticket = await googleClient.verifyIdToken({
+      idToken: input.idToken,
+      audience: env.GOOGLE_CLIENT_ID,
+    });
+  } catch {
+    throw new AppError(401, 'INVALID_CREDENTIALS');
+  }
 
   const googlePayload = ticket.getPayload();
   if (!googlePayload || !googlePayload.email) {
