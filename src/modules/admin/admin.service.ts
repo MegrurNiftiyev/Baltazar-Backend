@@ -92,3 +92,28 @@ export async function resetDatabase(adminId: string) {
     }
   }
 }
+
+export async function reorderExploreSections(items: Array<{ serviceType: string; order: number }>) {
+  const sectionsCol = db.collection(COLLECTIONS.HOME_SECTIONS);
+  const snapshot = await sectionsCol.get();
+  const batch = db.batch();
+
+  for (const item of items) {
+    const existingDoc = snapshot.docs.find((d) => d.data().serviceType === item.serviceType);
+    if (existingDoc) {
+      batch.update(existingDoc.ref, { order: item.order });
+    } else {
+      const newRef = sectionsCol.doc(`sec-${item.serviceType.toLowerCase()}`);
+      batch.set(newRef, {
+        id: `sec-${item.serviceType.toLowerCase()}`,
+        key: item.serviceType,
+        serviceType: item.serviceType,
+        order: item.order,
+        isActive: true,
+      });
+    }
+  }
+
+  await batch.commit();
+  return { success: true, updatedCount: items.length };
+}

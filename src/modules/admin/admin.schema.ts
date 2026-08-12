@@ -19,6 +19,17 @@ export const listUsersQuerySchema = z.object({
   role: roleEnum.optional(),
 }).merge(paginationQuerySchema).openapi('ListUsersQuery');
 
+export const reorderSectionsSchema = z
+  .array(
+    z.object({
+      serviceType: z.enum(['RENT_A_CAR', 'HOTEL', 'TRAVEL', 'FOOD']),
+      order: z.number().int().min(0),
+    }),
+  )
+  .min(1)
+  .openapi('ReorderSectionsInput');
+
 export type AddAdminInput = z.infer<typeof addAdminSchema>;
 export type AdminTransactionQuery = z.infer<typeof adminTransactionQuerySchema>;
 export type ListUsersQuery = z.infer<typeof listUsersQuerySchema>;
+export type ReorderSectionsInput = z.infer<typeof reorderSectionsSchema>;

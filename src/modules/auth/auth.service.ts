@@ -30,14 +30,11 @@ async function findUserByEmail(email: string) {
     phone?: string;
     region?: string;
     language?: string;
-    profileCompleteness?: {
-      personalInfo: boolean;
-      driverLicense: boolean;
-      passport: boolean;
-    };
+    personalInfo?: boolean;
+    driverLicense?: boolean;
+    passport?: boolean;
     refreshToken?: string;
     refreshTokenExpiresAt?: Date;
-    wishlist?: Array<{ serviceId: string; serviceType: string }>;
     createdAt: string;
   };
 }
@@ -80,8 +77,9 @@ export async function register(input: RegisterInput) {
     phone: input.phone || null,
     region: input.region || 'AZ',
     language: input.language || 'az',
-    wishlist: [],
-    profileCompleteness: { personalInfo: false, driverLicense: false, passport: false },
+    personalInfo: false,
+    driverLicense: false,
+    passport: false,
     createdAt: new Date().toISOString(),
   });
 
@@ -217,8 +215,9 @@ export async function googleLogin(input: GoogleLoginInput) {
       phone: null,
       region: 'AZ',
       language: 'az',
-      wishlist: [],
-      profileCompleteness: { personalInfo: false, driverLicense: false, passport: false },
+      personalInfo: false,
+      driverLicense: false,
+      passport: false,
       createdAt: new Date().toISOString(),
     });
 
@@ -230,7 +229,9 @@ export async function googleLogin(input: GoogleLoginInput) {
       role: 'USER' as const,
       region: 'AZ',
       language: 'az',
-      wishlist: [],
+      personalInfo: false,
+      driverLicense: false,
+      passport: false,
       createdAt: new Date().toISOString(),
     };
   }

@@ -28,12 +28,10 @@ export async function seedHotels(ctx: SeedContext) {
       headers: { ...ctx.headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: hotel.name,
-        about: hotel.about,
+        description: hotel.about,
         city: hotel.city,
         address: hotel.address,
         starRating: hotel.starRating,
-        price: hotel.price,
-        amenities: hotel.amenities,
         serviceType: 'HOTEL',
         logo: logoUrl,
         images: [img1, img2],
@@ -47,11 +45,10 @@ export async function seedHotels(ctx: SeedContext) {
     const hotelId = hotelResult.data.id;
     console.log(`✨ Created Hotel: ${hotel.name.en} (${hotelId})`);
 
-    // Add Rooms with multiple room images uploaded from testimages/hotlerooms/
+    // Add Rooms with single room image uploaded from testimages/hotlerooms/
     for (let r = 0; r < hotel.rooms.length; r++) {
       const room = hotel.rooms[r];
-      const roomImg1 = await ctx.uploadImageFile(roomImages[(i + r) % roomImages.length]!, 'hotels');
-      const roomImg2 = await ctx.uploadImageFile(roomImages[(i + r + 1) % roomImages.length]!, 'hotels');
+      const roomImg = await ctx.uploadImageFile(roomImages[(i + r) % roomImages.length]!, 'hotels');
 
       const roomRes = await fetch(`${ctx.baseUrl}/api/services/hotel/rooms`, {
         method: 'POST',
@@ -60,17 +57,16 @@ export async function seedHotels(ctx: SeedContext) {
           hotelId,
           roomType: room.roomType,
           name: room.name,
-          description: room.description,
           price: room.price,
           capacity: room.capacity,
           amenities: room.amenities,
-          images: [roomImg1, roomImg2],
+          image: roomImg,
           status: 'AVAILABLE',
         }),
       });
       const roomResult = await roomRes.json();
       if (roomRes.ok) {
-        console.log(`  🛏️ Created Room: ${room.name.en} (with ${2} images)`);
+        console.log(`  🛏️ Created Room: ${room.name.en}`);
         createdServices.push({ serviceType: 'HOTEL', id: roomResult.data.id });
       } else {
         console.error('  ❌ Room error:', roomResult);

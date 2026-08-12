@@ -17,6 +17,13 @@
     "seed:normalize-images": "tsx scripts/normalizeTestImages.ts",
     "seed": "npm run seed:audit && npm run seed:normalize-images && tsx scripts/seedAll.ts",
     "seed:home": "tsx scripts/seedHomeOnly.ts",
+    "migrate:order": "tsx scripts/migrations/addOrderField.ts",
+    "migrate:explore": "tsx scripts/migrations/backfillExploreFields.ts",
+    "migrate:remove-order": "tsx scripts/migrations/removeItemOrderField.ts",
+    "migrate:setup-sections": "tsx scripts/migrations/setupExploreSections.ts",
+    "migrate:restructure-hotels": "tsx scripts/migrations/restructureHotelsAndRooms.ts",
+    "migrate:user-wishlist": "tsx scripts/migrations/migrateUserAndWishlist.ts",
+    "migrate:all": "tsx scripts/migrations/removeItemOrderField.ts && tsx scripts/migrations/setupExploreSections.ts && tsx scripts/migrations/restructureHotelsAndRooms.ts && tsx scripts/migrations/migrateUserAndWishlist.ts",
     "docs:build": "tsx scripts/generateSwagger.ts"
   },
   "dependencies": {

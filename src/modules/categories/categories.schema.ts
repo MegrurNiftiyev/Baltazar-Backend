@@ -17,9 +17,11 @@ export const categoriesQuerySchema = z.object({
 export const createCategorySchema = z.object({
   name: localizedMapSchema,
   serviceType: serviceTypeEnum,
+  order: z.number().int().min(0).optional().default(0),
 }).openapi('CreateCategoryInput');
 
 export const updateCategorySchema = createCategorySchema.partial().openapi('UpdateCategoryInput');
+
 
 export type CategoriesQuery = z.infer<typeof categoriesQuerySchema>;
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;

@@ -50,8 +50,8 @@
 - `src/modules/reviews/`: Generic multi-domain review system featuring verified buyer eligibility and automatic rating aggregation. `targetType` includes `COMPANY` alongside the four service types.
 - `src/modules/travel/`: Travel domain managing tour packages only (company CRUD moved to `companies` module). Owns the tours collection and exports `deleteToursForCompany(companyId)` for the companies module to call on cascade delete.
 - `src/modules/uploads/`: Generic 2-step image upload endpoints (`POST /api/uploads/image`, `POST /api/uploads/images`), storage lifecycle tracking (`pending` -> `confirmed`), and image reference validation.
-- `src/modules/users/`: User profile management, avatar updates, and account status handling. (Region/currency are NOT yet attached to the user profile — the `regionEnum`/`currencyEnum`/`REGION_CURRENCY_MAP` exist and are exposed via the enums module, but wiring a user's region into pricing/display is a separate, not-yet-scheduled task. Don't assume it's live.)
-- `src/modules/wishlist/`: User bookmarking and wishlist management for multi-domain entities.
+- `src/modules/users/`: User profile management, avatar updates, and account status handling. Returns top-level boolean completeness flags (`personalInfo`, `driverLicense`, `passport`). `wishlist` array is NOT embedded in `User` documents.
+- `src/modules/wishlist/`: User bookmarking and wishlist management storing entries in dedicated Firestore `wishlist` collection (`COLLECTIONS.WISHLIST`). Returns `ExploreCardDTO[]` populated cards. `DELETE /api/user/wishlist/:id` takes item ID in URL path.
 
 # Middlewares (`src/middlewares/`)
 - `src/middlewares/requireAuth.ts`: JWT authentication guard injecting `req.user` context.

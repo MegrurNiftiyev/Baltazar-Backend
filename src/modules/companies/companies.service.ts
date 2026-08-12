@@ -18,13 +18,20 @@ export async function getCompanies(query: CompaniesQuery) {
     ref = ref.where('serviceType', '==', query.serviceType);
   }
   
-  return paginateQuery(
+  const result = await paginateQuery(
     companiesCollection,
     ref.orderBy('createdAt', 'desc'),
     query,
     (doc) => ({ id: doc.id, ...doc.data() })
   );
+
+  const sortedItems = [...result.items].sort(
+    (a: any, b: any) => (a.order ?? 0) - (b.order ?? 0)
+  );
+
+  return { ...result, items: sortedItems };
 }
+
 
 export async function getCompanyById(id: string, userId?: string) {
   const doc = await companiesCollection.doc(id).get();

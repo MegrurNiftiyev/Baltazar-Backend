@@ -10,6 +10,35 @@ import type {
   UpdateIncludedServiceInput,
 } from './travel.schema.js';
 import { paginateQuery } from '../../shared/pagination.js';
+import type { ExploreCardDTO } from '../../shared/dto/explore-card.dto.js';
+import { getLocalizedPriceSuffix } from '../../shared/priceSuffix.js';
+import type { SupportedLang } from '../../config/locales.js';
+
+export function toTourExploreCard(doc: any, lang: SupportedLang = 'en'): ExploreCardDTO {
+  const ratingAvg =
+    typeof doc.rating === 'number'
+      ? doc.rating
+      : typeof doc.rating?.average === 'number'
+      ? doc.rating.average
+      : 0;
+
+  const countVal = doc.reviewCount ?? doc.rating?.count ?? 0;
+  const firstCategory = doc.categories?.[0] || doc.category;
+
+  return {
+    id: doc.id,
+    serviceType: 'TRAVEL',
+    serviceId: doc.id,
+    title: doc.title || doc.name || '',
+    image: doc.images?.[0] || doc.image || '',
+    price: typeof doc.price === 'number' ? doc.price : typeof doc.packagePrice === 'number' ? doc.packagePrice : 0,
+    priceSuffix: getLocalizedPriceSuffix('TRAVEL', lang),
+    currency: doc.currency || 'AZN',
+    rating: ratingAvg,
+    ratingCount: countVal,
+    category: firstCategory || undefined,
+  };
+}
 
 
 
@@ -83,6 +112,7 @@ export async function getTours(filters: ToursQuery) {
         startDate: data.startDate,
         endDate: data.endDate,
         status: data.status,
+        order: data.order ?? 0,
       };
     }
   );

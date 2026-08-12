@@ -70,26 +70,24 @@ async function resolveNextStep(
   user: Record<string, unknown>,
 ): Promise<OrderScreenKey | 'DONE'> {
   const screens = ORDER_SCREENS[order.serviceType as keyof typeof ORDER_SCREENS];
-  const completeness = (user.profileCompleteness ?? {}) as {
-    personalInfo?: boolean;
-    driverLicense?: boolean;
-    passport?: boolean;
-  };
+  const hasPersonalInfo = Boolean(user.personalInfo ?? (user.profileCompleteness as any)?.personalInfo);
+  const hasDriverLicense = Boolean(user.driverLicense ?? (user.profileCompleteness as any)?.driverLicense);
+  const hasPassport = Boolean(user.passport ?? (user.profileCompleteness as any)?.passport);
 
   let idx = (order.currentStep as number) ?? 0;
 
   while (idx < screens.length) {
     const screen = screens[idx]!;
 
-    if (screen === 'PERSONAL_INFO_SCREEN' && completeness.personalInfo) {
+    if (screen === 'PERSONAL_INFO_SCREEN' && hasPersonalInfo) {
       idx++;
       continue;
     }
-    if (screen === 'DRIVER_LICENSE_SCREEN' && completeness.driverLicense) {
+    if (screen === 'DRIVER_LICENSE_SCREEN' && hasDriverLicense) {
       idx++;
       continue;
     }
-    if (screen === 'PASSPORT_INFO_SCREEN' && completeness.passport) {
+    if (screen === 'PASSPORT_INFO_SCREEN' && hasPassport) {
       idx++;
       continue;
     }

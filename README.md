@@ -66,7 +66,7 @@ src/jobs/                 Cron jobs (cleanup expired uploads)
 src/middlewares/          Auth, roles, validation, rate limits, uploads, errors
 src/modules/              Domain modules (schema -> service -> controller -> routes)
 src/openapi/              OpenAPI registry
-src/shared/               Shared enums and domain types (serviceType, language)
+src/shared/               Shared enums, DTOs, and domain types (serviceType, language, priceSuffix)
 src/types/                Express type augmentation
 src/utils/                Tokens, passwords, image upload, async wrapper
 scripts/generateSwagger.ts  Static OpenAPI JSON build (npm run docs:build)
@@ -78,19 +78,21 @@ scripts/generateSwagger.ts  Static OpenAPI JSON build (npm run docs:build)
 
 | Collection | Key fields |
 |---|---|
-| `users` | name, email, passwordHash, role (USER/ADMIN), phone, region, language, wishlist, personalInfo, driverLicense, passport, profileCompleteness |
-| `companies` | Shared by all service types. serviceType, name, about, profileImage, bannerImage, images, sectionOrder, rating, reviewCount, status |
-| `cars` | companyId, brand, model, year, category, transmission, fuelType, seats, price, images, features, rating, reviewCount, status |
-| `travels` | Tours: companyId, categories, title, roadmap, images, duration, startDate, endDate, includedServices, price, rating, reviewCount, status |
-| `hotels` | companyId, starRating, amenities, price, status |
-| `rooms` | hotelId, roomType, name, description, price, capacity, amenities, images, status |
-| `foodItems` | companyId, name, description, category, price, images, ingredients, status, calories, protein, fat, carb |
-| `includedServices` | name, icon, serviceType |
+| `users` | name, email, passwordHash, role (USER/ADMIN), phone, region, language, personalInfo (boolean), driverLicense (boolean), passport (boolean), avatarUrl, createdAt |
+| `wishlist` | userId, serviceId, serviceType, createdAt |
+| `companies` | Shared by all service types. serviceType, name, about, profileImage, bannerImage, logo, images, sectionOrder, rating, reviewCount, status |
+| `cars` | companyId, brand, model, title, description, year, category, transmission, fuelType, seats, price, images, features, rating, reviewCount, status |
+| `travels` | Tours: companyId, categories, title, description, roadmap, images, duration, startDate, endDate, includedServices, price, rating, reviewCount, status |
+| `hotels` | title, name, description, city, address, starRating, amenities, priceRange {min, max}, currency, images, rating, reviewCount, status |
+| `rooms` | hotelId, roomType, name, price, capacity, amenities, image, status |
+| `foodItems` | companyId, title, name, description, category, price, images, ingredients, status, calories, protein, fat, carb |
+| `includedServices` | name, serviceType |
 | `orders` | userId, serviceType, serviceId, companyId, status, currentStep, details, serverComputedPrice, createdAt, expiresAt |
 | `paymentMethods` | userId, paymentMethodId, brand, last4, expiryMonth, expiryYear |
 | `transactions` | orderId, userId, amount, currency, status (SUCCESS/FAILED/PENDING) |
 | `reviews` | userId, targetType, targetId, serviceId, companyId, rating, comment, createdAt |
 | `banners` | image, link, order, isActive |
+| `homeSections` | serviceType, title, order |
 | `appConfig` | latestVersion, minSupportedVersion, updateNotes |
 | `uploads` | userId, filename, url, purpose, expiresAt, confirmed |
 | `categories` | serviceType, name |
@@ -101,8 +103,9 @@ scripts/generateSwagger.ts  Static OpenAPI JSON build (npm run docs:build)
 
 - **Response Envelope**: All successful controller responses return `{ "success": true, "data": { ... } }`.
 - **Error Envelope**: Operational errors return `{ "success": false, "errorCode": "...", "message": "..." }`.
-- **Localization**: Localized fields are stored as `{ az, en, ru }`. The API resolves strings using the `resolveLocale` utility, prioritizing the authenticated user's language, then the `?lang` query parameter, then `Accept-Language`, falling back to English.
+- **Localization**: Localized fields are stored as `{ az, en, ru }`. The API resolves strings using the `resolveLocale` middleware and `getLocalizedPriceSuffix` helpers, prioritizing the authenticated user's language, then `Accept-Language`, falling back to English.
 - **Enums**: Module-specific enums reside in their respective `.schema.ts`, while cross-cutting enums (e.g., regions, currencies, service types) are in `src/shared/`. Valid enum options are exposed via `/api/enums/:key`.
+- **Explore Ordering**: Section order is managed at the section level (`homeSections`), while items inside sections are sorted dynamically by `rating` (desc) -> `reviewCount` (desc) -> `createdAt` (desc).
 
 ---
 
@@ -124,10 +127,10 @@ export const ORDER_SCREENS = {
 
 ### 2. Intelligent Screen Skipping (Profile Completeness)
 When a user calls `PUT /api/orders/:id/step`, the server executes `resolveNextStep(order, user)`.
-If the user's profile already has completed data (verified via `user.profileCompleteness` flags), the backend **automatically skips** redundant input screens:
-- `PERSONAL_INFO_SCREEN` is skipped if `user.profileCompleteness.personalInfo === true`
-- `DRIVER_LICENSE_SCREEN` is skipped if `user.profileCompleteness.driverLicense === true`
-- `PASSPORT_INFO_SCREEN` is skipped if `user.profileCompleteness.passport === true`
+If the user's profile already has completed data (verified via top-level boolean flags `user.personalInfo`, `user.driverLicense`, `user.passport`), the backend **automatically skips** redundant input screens:
+- `PERSONAL_INFO_SCREEN` is skipped if `user.personalInfo === true`
+- `DRIVER_LICENSE_SCREEN` is skipped if `user.driverLicense === true`
+- `PASSPORT_INFO_SCREEN` is skipped if `user.passport === true`
 
 The API response directly instructs the mobile client which screen to render next:
 ```json
@@ -246,25 +249,10 @@ Core functionality for Users.
   "phone": "+994501112233",
   "region": "AZ",
   "language": "en",
-  "wishlist": ["RENT_A_CAR_car_123"],
-  "personalInfo": {
-    "dateOfBirth": "1995-04-12",
-    "address": "Baku, Azerbaijan",
-    "idNumber": "AZE12345678"
-  },
-  "driverLicense": {
-    "licenseNumber": "B-123456",
-    "expiryDate": "2030-01-01"
-  },
-  "passport": {
-    "passportNumber": "C1234567",
-    "expiryDate": "2032-01-01"
-  },
-  "profileCompleteness": {
-    "personalInfo": true,
-    "driverLicense": true,
-    "passport": true
-  },
+  "avatarUrl": null,
+  "personalInfo": true,
+  "driverLicense": true,
+  "passport": true,
   "createdAt": "2026-08-01T00:00:00.000Z"
 }
 ```
@@ -275,9 +263,9 @@ Core functionality for Wishlist.
 
 | Method | Path | Access | Description | Response Data Format |
 |---|---|---|---|---|
-| GET | /api/user/wishlist | Authenticated | Get the authenticated user's wishlist | `WishlistItem[]` array with populated entity |
+| GET | /api/user/wishlist | Authenticated | Get the authenticated user's wishlist | `{ items: ExploreCardDTO[], hasMore, nextCursor }` |
 | POST | /api/user/wishlist | Authenticated | Add a service to wishlist | Status confirmation / entity payload |
-| DELETE | /api/user/wishlist/{id} | Admin | Remove a service from wishlist | Status confirmation / entity payload |
+| DELETE | /api/user/wishlist/{id} | Authenticated | Remove a service from wishlist | `{ itemId, removed: true }` |
 
 #### User Action Payload Example (`POST /api/user/wishlist`)
 ```json
@@ -289,22 +277,25 @@ Core functionality for Wishlist.
 
 #### GET Response Payload Example (`GET /api/user/wishlist`)
 ```json
-[
-  {
-    "id": "RENT_A_CAR_car_123",
-    "serviceId": "car_123",
-    "serviceType": "RENT_A_CAR",
-    "addedAt": "2026-08-05T09:00:00.000Z",
-    "item": {
-      "id": "car_123",
-      "brand": "Toyota",
-      "model": "Camry",
-      "price": 90,
-      "rating": 4.8,
-      "image": "https://storage.googleapis.com/baltazar-bucket/cars/camry.jpg"
+{
+  "items": [
+    {
+      "wishlistItemId": "RENT_A_CAR_car_123",
+      "serviceType": "RENT_A_CAR",
+      "serviceId": "car_123",
+      "title": "Tesla Model S Plaid",
+      "image": "https://storage.googleapis.com/baltazar-bucket/cars/tesla.jpg",
+      "price": 400,
+      "priceSuffix": "/ day",
+      "currency": "AZN",
+      "rating": 5,
+      "ratingCount": 12,
+      "category": "Elektrikli"
     }
-  }
-]
+  ],
+  "hasMore": false,
+  "nextCursor": null
+}
 ```
 
 ### Companies
@@ -357,18 +348,18 @@ Core functionality for Hotel.
 ```json
 {
   "id": "hotel_123",
-  "companyId": "comp_456",
-  "name": "Four Seasons Baku",
-  "about": "Luxury hotel on the Caspian Boulevard",
+  "title": "Fairmont Flame Towers",
+  "name": "Fairmont Flame Towers",
+  "description": "Iconic luxury hotel located inside Flame Towers",
   "city": "Baku",
-  "address": "1 Neftchilar Avenue",
+  "address": "1 Mehdi Huseyn Street",
   "starRating": 5,
-  "amenities": ["WiFi", "Pool", "Spa", "Fitness Center"],
+  "amenities": ["Spa", "Pool", "Gym"],
   "images": ["https://storage.googleapis.com/baltazar-bucket/hotels/fs1.jpg"],
-  "logo": "https://storage.googleapis.com/baltazar-bucket/hotels/logo.jpg",
-  "price": 250,
-  "rating": 4.9,
-  "reviewCount": 42,
+  "priceRange": { "min": 270, "max": 480 },
+  "priceSuffix": "/ gecə",
+  "rating": 5,
+  "reviewCount": 0,
   "status": "ACTIVE"
 }
 ```
@@ -398,6 +389,7 @@ Core functionality for RentACar.
   "fuelType": "HYBRID",
   "seats": 5,
   "price": 120,
+  "priceSuffix": "/ gün",
   "images": ["https://storage.googleapis.com/baltazar-bucket/cars/eclass.jpg"],
   "features": ["GPS", "Bluetooth", "Leather Seats"],
   "rating": 4.8,
@@ -639,7 +631,7 @@ Core functionality for Home.
 | POST | /api/home/banner | Admin | Create a banner slide (admin) | Status confirmation / entity payload |
 | PUT | /api/home/banner/{id} | Admin | Update a banner slide (admin) | Status confirmation / entity payload |
 | DELETE | /api/home/banner/{id} | Admin | Delete a banner slide | Status confirmation / entity payload |
-| GET | /api/home/explore | Public | Get personalized explore rows | `ExploreRow[]` array |
+| GET | /api/home/explore | Public | Get personalized explore rows | `ExploreSectionDTO[]` array |
 
 #### GET Response Payload Example (`GET /api/home/banner`)
 ```json
@@ -762,3 +754,4 @@ Admin functionality is restricted to users with the `ADMIN` role.
 - `POST /api/admin/reset-database` - DANGER: Wipes all collections except the calling admin's own user record. Response: `{ reset: true }`.
 - `GET /api/admin/transactions` - View all cross-domain financial transactions. Response: `Transaction[]` array.
 - `PUT /api/users/:id/disable` - Ban/disable a user account and revoke their sessions. Response: `{ disabled: true }`.
+- `PATCH /api/admin/explore-sections/reorder` - Bulk update section ordering for explore page (`homeSections`).

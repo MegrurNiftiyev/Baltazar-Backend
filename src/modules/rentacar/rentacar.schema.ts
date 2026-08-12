@@ -27,8 +27,17 @@ export const carsQuerySchema = z.object({
 
 
 
+const localizedMapSchema = z.object({
+  az: z.string(),
+  en: z.string(),
+  ru: z.string(),
+});
+
 export const createCarSchema = z.object({
   companyId: z.string().min(1),
+  title: localizedMapSchema.optional(),
+  name: localizedMapSchema.optional(),
+  description: localizedMapSchema.optional(),
   brand: z.string().min(1),
   model: z.string().min(1),
   year: z.number().int().min(1990).max(new Date().getFullYear() + 1),
@@ -41,6 +50,7 @@ export const createCarSchema = z.object({
   features: z.array(z.string()).optional(),
   status: carStatusEnum.default('AVAILABLE'),
 }).openapi('CreateCarInput');
+
 
 export const updateCarSchema = createCarSchema.partial().openapi('UpdateCarInput');
 

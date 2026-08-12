@@ -8,6 +8,34 @@ import type {
   UpdateFoodItemInput,
 } from './food.schema.js';
 import { paginateQuery } from '../../shared/pagination.js';
+import type { ExploreCardDTO } from '../../shared/dto/explore-card.dto.js';
+import { getLocalizedPriceSuffix } from '../../shared/priceSuffix.js';
+import type { SupportedLang } from '../../config/locales.js';
+
+export function toFoodExploreCard(doc: any, lang: SupportedLang = 'en'): ExploreCardDTO {
+  const ratingAvg =
+    typeof doc.rating === 'number'
+      ? doc.rating
+      : typeof doc.rating?.average === 'number'
+      ? doc.rating.average
+      : 0;
+
+  const countVal = doc.reviewCount ?? doc.rating?.count ?? 0;
+
+  return {
+    id: doc.id,
+    serviceType: 'FOOD',
+    serviceId: doc.id,
+    title: doc.name || '',
+    image: doc.images?.[0] || doc.image || '',
+    price: typeof doc.price === 'number' ? doc.price : 0,
+    priceSuffix: getLocalizedPriceSuffix('FOOD', lang),
+    currency: doc.currency || 'AZN',
+    rating: ratingAvg,
+    ratingCount: countVal,
+    category: doc.category || undefined,
+  };
+}
 
 
 const companiesCollection = db.collection(COLLECTIONS.COMPANIES);
@@ -68,6 +96,7 @@ export async function getFoodItems(filters: FoodItemsQuery) {
         category: data.category,
         price: data.price,
         image: data.images?.[0] || null,
+        order: data.order ?? 0,
       };
     }
   );

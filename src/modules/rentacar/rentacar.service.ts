@@ -8,6 +8,40 @@ import type {
   UpdateCarInput,
 } from './rentacar.schema.js';
 import { paginateQuery } from '../../shared/pagination.js';
+import type { ExploreCardDTO } from '../../shared/dto/explore-card.dto.js';
+import { getLocalizedPriceSuffix } from '../../shared/priceSuffix.js';
+import type { SupportedLang } from '../../config/locales.js';
+
+export function toCarExploreCard(doc: any, lang: SupportedLang = 'en'): ExploreCardDTO {
+  const ratingAvg =
+    typeof doc.rating === 'number'
+      ? doc.rating
+      : typeof doc.rating?.average === 'number'
+      ? doc.rating.average
+      : 0;
+
+  const countVal = doc.reviewCount ?? doc.rating?.count ?? 0;
+
+  const carTitle =
+    doc.title ||
+    (doc.brand && doc.model
+      ? `${doc.brand} ${doc.model}`.trim()
+      : doc.name || doc.brand || doc.model || '');
+
+  return {
+    id: doc.id,
+    serviceType: 'RENT_A_CAR',
+    serviceId: doc.id,
+    title: carTitle,
+    image: doc.images?.[0] || doc.image || '',
+    price: typeof doc.price === 'number' ? doc.price : typeof doc.dailyPrice === 'number' ? doc.dailyPrice : 0,
+    priceSuffix: getLocalizedPriceSuffix('RENT_A_CAR', lang),
+    currency: doc.currency || 'AZN',
+    rating: ratingAvg,
+    ratingCount: countVal,
+    category: doc.category || undefined,
+  };
+}
 
 
 
@@ -90,6 +124,7 @@ export async function getCars(filters: CarsQuery) {
         category: data.category,
         transmission: data.transmission,
         fuelType: data.fuelType,
+        order: data.order ?? 0,
       };
     }
   );

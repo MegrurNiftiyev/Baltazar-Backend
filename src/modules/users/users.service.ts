@@ -7,6 +7,8 @@ const usersCollection = db.collection(COLLECTIONS.USERS);
 
 /**
  * Get user profile by ID — never includes passwordHash or refreshToken.
+ * Returns flattened top-level completeness booleans (personalInfo, driverLicense, passport).
+ * Wishlist is NOT included (stored in separate wishlist collection).
  */
 export async function getProfile(userId: string) {
   const doc = await usersCollection.doc(userId).get();
@@ -24,18 +26,15 @@ export async function getProfile(userId: string) {
     region: data.region || null,
     language: data.language || 'en',
     avatarUrl: data.avatarUrl || null,
-    wishlist: data.wishlist || [],
-    profileCompleteness: data.profileCompleteness || {
-      personalInfo: false,
-      driverLicense: false,
-      passport: false,
-    },
+    personalInfo: Boolean(data.personalInfo ?? data.profileCompleteness?.personalInfo ?? false),
+    driverLicense: Boolean(data.driverLicense ?? data.profileCompleteness?.driverLicense ?? false),
+    passport: Boolean(data.passport ?? data.profileCompleteness?.passport ?? false),
     createdAt: data.createdAt,
   };
 }
 
 /**
- * Update user profile — only the fields present in the input are updated.
+ * Update user avatar.
  */
 export async function updateAvatar(userId: string, avatarUrl: string) {
   const doc = await usersCollection.doc(userId).get();
@@ -44,11 +43,16 @@ export async function updateAvatar(userId: string, avatarUrl: string) {
   return getProfile(userId);
 }
 
+/**
+ * Update user profile — updates profile details and top-level completeness booleans.
+ */
 export async function updateProfile(userId: string, input: UpdateProfileInput) {
   const doc = await usersCollection.doc(userId).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
+
+  const pInfo = input.personalInfoDetails || input.personalInfo;
 
   // Build update object from non-undefined fields
   const updates: Record<string, unknown> = {};
@@ -56,19 +60,18 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
   if (input.phone !== undefined) updates.phone = input.phone;
   if (input.region !== undefined) updates.region = input.region;
   if (input.language !== undefined) updates.language = input.language;
-  if (input.personalInfo !== undefined) {
-    updates.personalInfo = input.personalInfo;
-    updates['profileCompleteness.personalInfo'] = Boolean(
-      input.personalInfo.dateOfBirth && input.personalInfo.address && input.personalInfo.idNumber,
-    );
+
+  if (pInfo !== undefined) {
+    updates.personalInfoDetails = pInfo;
+    updates.personalInfo = Boolean(pInfo.dateOfBirth && pInfo.address && pInfo.idNumber);
   }
   if (input.driverLicense !== undefined) {
-    updates.driverLicense = input.driverLicense;
-    updates['profileCompleteness.driverLicense'] = true;
+    updates.driverLicenseDetails = input.driverLicense;
+    updates.driverLicense = true;
   }
   if (input.passport !== undefined) {
-    updates.passport = input.passport;
-    updates['profileCompleteness.passport'] = true;
+    updates.passportDetails = input.passport;
+    updates.passport = true;
   }
 
   if (Object.keys(updates).length === 0) {

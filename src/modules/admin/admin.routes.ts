@@ -6,11 +6,13 @@ import {
   addAdminSchema,
   adminTransactionQuerySchema,
   listUsersQuerySchema,
+  reorderSectionsSchema,
 } from './admin.schema.js';
 import {
   addAdminController,
   getAllTransactionsController,
   getAllUsersController,
+  reorderExploreSectionsController,
   resetDatabaseController,
 } from './admin.controller.js';
 
@@ -111,5 +113,11 @@ router.get('/transactions', validate({ query: adminTransactionQuerySchema }), ge
  *       403: { description: Forbidden, admin only }
  */
 router.post('/reset-database', resetDatabaseController);
+
+router.patch(
+  '/explore-sections/reorder',
+  validate({ body: reorderSectionsSchema }),
+  reorderExploreSectionsController,
+);
 
 export default router;

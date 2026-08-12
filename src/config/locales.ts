@@ -160,6 +160,26 @@ const messages: Record<string, LocalizedMap> = {
     en: 'The uploaded file is invalid',
     ru: 'Загруженный файл недействителен',
   },
+  price_suffix_per_night: {
+    az: '/ gecə',
+    en: '/ night',
+    ru: '/ ночь',
+  },
+  price_suffix_per_day: {
+    az: '/ gün',
+    en: '/ day',
+    ru: '/ день',
+  },
+  price_suffix_per_item: {
+    az: '',
+    en: '',
+    ru: '',
+  },
+  price_suffix_per_person: {
+    az: 'adam başı',
+    en: '/ person',
+    ru: 'за человека',
+  },
 };
 
 /**

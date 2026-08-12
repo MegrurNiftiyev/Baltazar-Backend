@@ -29,7 +29,8 @@ export const foodItemStatusEnum = z.enum(['AVAILABLE', 'OUT_OF_STOCK']);
 
 export const createFoodItemSchema = z.object({
   companyId: z.string().min(1),
-  name: localizedMapSchema,
+  title: localizedMapSchema.optional(),
+  name: localizedMapSchema.optional(),
   description: localizedMapSchema.optional(),
   category: z.string().min(1),
   price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
@@ -41,6 +42,7 @@ export const createFoodItemSchema = z.object({
   fat: z.number().optional(),
   carb: z.number().optional(),
 }).openapi('CreateFoodItemInput');
+
 
 export const updateFoodItemSchema = createFoodItemSchema.partial().openapi('UpdateFoodItemInput');
 

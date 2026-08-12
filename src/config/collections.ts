@@ -17,4 +17,7 @@ export const COLLECTIONS = {
   BANNERS: 'banners',
   UPLOADS: 'uploads',
   CATEGORIES: 'categories',
+  HOME_SECTIONS: 'homeSections',
+  WISHLIST: 'wishlist',
 } as const;
+

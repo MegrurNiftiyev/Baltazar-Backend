@@ -1,9 +1,9 @@
 import { db } from '../../config/firebase.js';
 import { AppError } from '../../errors/AppError.js';
 import type { AddToWishlistInput } from './wishlist.schema.js';
-import { FieldValue } from 'firebase-admin/firestore';
 import { COLLECTIONS } from '../../config/collections.js';
 
+const wishlistCollection = db.collection(COLLECTIONS.WISHLIST);
 const usersCollection = db.collection(COLLECTIONS.USERS);
 
 /**
@@ -17,28 +17,30 @@ const collectionMap: Record<string, string> = {
 };
 
 /**
- * Get the user's wishlist — reads User.wishlist[], then batch-fetches
- * the referenced service documents via Firestore getAll().
+ * Get the user's wishlist — queries dedicated `wishlist` collection by `userId`.
  */
-export async function getWishlist(userId: string, query: { limit?: number, cursor?: string } = {}) {
+export async function getWishlist(userId: string, query: { limit?: number; cursor?: string } = {}) {
   const userDoc = await usersCollection.doc(userId).get();
   if (!userDoc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
 
-  const userData = userDoc.data()!;
-  const wishlist: Array<{ serviceId: string; serviceType: string }> = userData.wishlist || [];
+  const snap = await wishlistCollection
+    .where('userId', '==', userId)
+    .get();
 
-  if (wishlist.length === 0) {
+  if (snap.empty) {
     return { items: [], hasMore: false, nextCursor: undefined };
   }
 
-  // Reverse so newest additions appear first
-  const reversed = wishlist.slice().reverse();
+  // Sort by createdAt desc
+  const wishlistDocs = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as any));
+  wishlistDocs.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
   const limit = query.limit ? Number(query.limit) : 20;
-  const cursor = query.cursor ? parseInt(query.cursor) : 0;
-  const pageWishlist = reversed.slice(cursor, cursor + limit);
-  const hasMore = cursor + limit < reversed.length;
+  const cursor = query.cursor ? parseInt(query.cursor, 10) : 0;
+  const pageWishlist = wishlistDocs.slice(cursor, cursor + limit);
+  const hasMore = cursor + limit < wishlistDocs.length;
 
   if (pageWishlist.length === 0) {
     return { items: [], hasMore: false, nextCursor: undefined };
@@ -54,7 +56,7 @@ export async function getWishlist(userId: string, query: { limit?: number, curso
 
   // Batch-fetch all referenced documents
   const refs: FirebaseFirestore.DocumentReference[] = [];
-  const refMeta: Array<{ serviceType: string; serviceId: string }> = [];
+  const refMeta: Array<{ wishlistItemId: string; serviceType: string; serviceId: string }> = [];
 
   for (const [serviceType, ids] of grouped) {
     const collectionName = collectionMap[serviceType];
@@ -62,7 +64,11 @@ export async function getWishlist(userId: string, query: { limit?: number, curso
 
     for (const id of ids) {
       refs.push(db.collection(collectionName).doc(id));
-      refMeta.push({ serviceType, serviceId: id });
+      refMeta.push({
+        wishlistItemId: `${serviceType}_${id}`,
+        serviceType,
+        serviceId: id,
+      });
     }
   }
 
@@ -74,14 +80,14 @@ export async function getWishlist(userId: string, query: { limit?: number, curso
     .map((doc, index) => {
       if (!doc.exists) return null;
       return {
-        wishlistItemId: `${refMeta[index]!.serviceType}_${refMeta[index]!.serviceId}`,
+        wishlistItemId: refMeta[index]!.wishlistItemId,
         serviceType: refMeta[index]!.serviceType,
         serviceId: refMeta[index]!.serviceId,
         ...doc.data(),
       };
     })
     .filter(Boolean);
-    
+
   return {
     items,
     hasMore,
@@ -90,7 +96,7 @@ export async function getWishlist(userId: string, query: { limit?: number, curso
 }
 
 /**
- * Add a service to the user's wishlist.
+ * Add a service to the user's wishlist (dedicated `wishlist` collection).
  */
 export async function addToWishlist(userId: string, input: AddToWishlistInput) {
   // Verify the service exists
@@ -104,29 +110,21 @@ export async function addToWishlist(userId: string, input: AddToWishlistInput) {
     throw new AppError(404, 'NOT_FOUND');
   }
 
-  // Check for duplicate
-  const userDoc = await usersCollection.doc(userId).get();
-  if (!userDoc.exists) throw new AppError(404, 'NOT_FOUND');
-
-  const existing: Array<{ serviceId: string; serviceType: string }> =
-    userDoc.data()!.wishlist || [];
-
-  const alreadyExists = existing.some(
-    (w) => w.serviceId === input.serviceId && w.serviceType === input.serviceType,
-  );
-
-  if (alreadyExists) {
+  const docId = `${userId}_${input.serviceType}_${input.serviceId}`;
+  const existingDoc = await wishlistCollection.doc(docId).get();
+  if (existingDoc.exists) {
     throw new AppError(409, 'ALREADY_IN_WISHLIST');
   }
 
-  await usersCollection.doc(userId).update({
-    wishlist: FieldValue.arrayUnion({
-      serviceId: input.serviceId,
-      serviceType: input.serviceType,
-    }),
+  await wishlistCollection.doc(docId).set({
+    userId,
+    serviceId: input.serviceId,
+    serviceType: input.serviceType,
+    createdAt: new Date().toISOString(),
   });
 
   return {
+    wishlistItemId: `${input.serviceType}_${input.serviceId}`,
     serviceId: input.serviceId,
     serviceType: input.serviceType,
     added: true,
@@ -135,22 +133,35 @@ export async function addToWishlist(userId: string, input: AddToWishlistInput) {
 
 /**
  * Remove a service from the user's wishlist.
- * The `itemId` format is `serviceType_serviceId`.
+ * `itemId` can be `${serviceType}_${serviceId}` or exact docId `${userId}_${serviceType}_${serviceId}`.
  */
 export async function removeFromWishlist(userId: string, itemId: string) {
-  const [serviceType, ...serviceIdParts] = itemId.split('_');
-  const serviceId = serviceIdParts.join('_');
+  const fullDocId = `${userId}_${itemId}`;
+  const directDoc = await wishlistCollection.doc(fullDocId).get();
 
-  if (!serviceType || !serviceId) {
-    throw new AppError(400, 'INVALID_WISHLIST_ID');
+  if (directDoc.exists) {
+    await wishlistCollection.doc(fullDocId).delete();
+    return { itemId, removed: true };
   }
 
-  await usersCollection.doc(userId).update({
-    wishlist: FieldValue.arrayRemove({
-      serviceId,
-      serviceType,
-    }),
-  });
+  const exactDoc = await wishlistCollection.doc(itemId).get();
+  if (exactDoc.exists && exactDoc.data()?.userId === userId) {
+    await wishlistCollection.doc(itemId).delete();
+    return { itemId, removed: true };
+  }
+
+  // Parse itemId if format is serviceType_serviceId
+  const parts = itemId.split('_');
+  if (parts.length >= 2) {
+    const serviceType = parts[0];
+    const serviceId = parts.slice(1).join('_');
+    const constructedId = `${userId}_${serviceType}_${serviceId}`;
+    const snap = await wishlistCollection.doc(constructedId).get();
+    if (snap.exists) {
+      await wishlistCollection.doc(constructedId).delete();
+      return { itemId, removed: true };
+    }
+  }
 
   return { itemId, removed: true };
 }

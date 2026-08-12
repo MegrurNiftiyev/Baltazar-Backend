@@ -33,7 +33,9 @@ export const includedServicesParamsSchema = z.object({
 export const createTourSchema = z.object({
   companyId: z.string().min(1),
   categories: z.array(z.string()).min(1),
-  title: localizedMapSchema,
+  title: localizedMapSchema.optional(),
+  name: localizedMapSchema.optional(),
+  description: localizedMapSchema.optional(),
   roadmap: z
     .array(
       z.object({
@@ -51,6 +53,7 @@ export const createTourSchema = z.object({
   price: z.number().min(0).max(50000), // AZN - sanity cap, adjust per business rules
   status: z.enum(['ACTIVE', 'INACTIVE', 'SOLD_OUT']).default('ACTIVE'),
 }).openapi('CreateTourInput');
+
 
 export const updateTourSchema = createTourSchema.partial().openapi('UpdateTourInput');
 

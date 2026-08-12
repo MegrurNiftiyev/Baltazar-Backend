@@ -11,8 +11,10 @@ export async function getAllCategories(serviceType?: string) {
     query = query.where('serviceType', '==', serviceType);
   }
   const snapshot = await query.get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return docs.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0));
 }
+
 
 export async function getCategoryById(id: string) {
   const doc = await categoriesCollection.doc(id).get();
