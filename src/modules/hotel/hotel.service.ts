@@ -93,7 +93,7 @@ async function deleteSnapshotInBatches(snapshot: FirebaseFirestore.QuerySnapshot
 
 // ── Hotels ─────────────────────────────────────────────────────────────
 
-export async function getHotels(filters: HotelQuery) {
+export async function getHotels(filters: HotelQuery, lang: SupportedLang = 'en') {
   let query: FirebaseFirestore.Query = hotelsCollection.where('status', '==', 'ACTIVE');
 
   if (filters.starRating !== undefined) {
@@ -125,6 +125,7 @@ export async function getHotels(filters: HotelQuery) {
         rating: data.rating ?? 0,
         reviewCount: data.reviewCount ?? 0,
         priceRange: data.priceRange || { min: data.price || 0, max: data.price || 0 },
+        priceSuffix: getLocalizedPriceSuffix('HOTEL', lang),
         currency: data.currency || 'AZN',
         images,
         createdAt: data.createdAt,

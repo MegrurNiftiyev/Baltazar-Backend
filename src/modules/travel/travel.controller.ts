@@ -9,7 +9,7 @@ import { incrementUserInterest } from '../home/home.service.js';
 // ── Tours ──────────────────────────────────────────────────────────────
 
 export const getToursController = catchAsync(async (req: Request, res: Response) => {
-  const result = await travelService.getTours(req.validatedQuery as any);
+  const result = await travelService.getTours(req.validatedQuery as any, req.lang);
   res.status(200).json({
     success: true,
     data: localize(result.items, req.lang!),

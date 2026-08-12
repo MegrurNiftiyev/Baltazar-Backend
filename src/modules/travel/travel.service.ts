@@ -77,7 +77,7 @@ export async function deleteToursForCompany(companyId: string): Promise<{ delete
 
 // ── Tours ──────────────────────────────────────────────────────────────
 
-export async function getTours(filters: ToursQuery) {
+export async function getTours(filters: ToursQuery, lang: SupportedLang = 'en') {
   let query: FirebaseFirestore.Query = toursCollection;
 
   if (filters.companyId) {
@@ -105,6 +105,7 @@ export async function getTours(filters: ToursQuery) {
         title: data.title,
         categories: data.categories,
         price: data.price,
+        priceSuffix: getLocalizedPriceSuffix('TRAVEL', lang),
         image: data.images?.[0] || null,
         rating: data.rating || 0,
         reviewCount: data.reviewCount || 0,
@@ -112,7 +113,6 @@ export async function getTours(filters: ToursQuery) {
         startDate: data.startDate,
         endDate: data.endDate,
         status: data.status,
-        order: data.order ?? 0,
       };
     }
   );

@@ -9,7 +9,7 @@ import { incrementUserInterest } from '../home/home.service.js';
 // ── Food Items ─────────────────────────────────────────────────────────
 
 export const getFoodItemsController = catchAsync(async (req: Request, res: Response) => {
-  const result = await foodService.getFoodItems(req.validatedQuery as any);
+  const result = await foodService.getFoodItems(req.validatedQuery as any, req.lang);
   res.status(200).json({
     success: true,
     data: localize(result.items, req.lang!),

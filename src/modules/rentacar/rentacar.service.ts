@@ -84,8 +84,8 @@ export async function deleteCarsForCompany(companyId: string): Promise<{ deleted
  * Returns a list DTO: { id, brand, model, price, image, rating }
  * Full document is only returned by getCarById.
  */
-export async function getCars(filters: CarsQuery) {
-  let query: FirebaseFirestore.Query = carsCollection;
+export async function getCars(filters: CarsQuery, lang: SupportedLang = 'en') {
+  let query: FirebaseFirestore.Query = carsCollection.where('status', '==', 'AVAILABLE');
 
   // Equality filters (can be combined freely in Firestore)
   if (filters.companyId) {
@@ -119,12 +119,12 @@ export async function getCars(filters: CarsQuery) {
         brand: data.brand,
         model: data.model,
         price: data.price,
+        priceSuffix: getLocalizedPriceSuffix('RENT_A_CAR', lang),
         image: data.images?.[0] || null,
         rating: data.rating || 0,
         category: data.category,
         transmission: data.transmission,
         fuelType: data.fuelType,
-        order: data.order ?? 0,
       };
     }
   );

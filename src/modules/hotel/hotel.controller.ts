@@ -7,7 +7,7 @@ import { incrementUserInterest } from '../home/home.service.js';
 // ── Hotels ─────────────────────────────────────────────────────────────
 
 export const getHotelsController = catchAsync(async (req: Request, res: Response) => {
-  const result = await hotelService.getHotels(req.validatedQuery as any);
+  const result = await hotelService.getHotels(req.validatedQuery as any, req.lang);
   res.status(200).json({
     success: true,
     data: localize(result.items, req.lang!),

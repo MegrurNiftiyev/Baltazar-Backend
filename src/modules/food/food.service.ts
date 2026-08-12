@@ -73,7 +73,7 @@ export async function deleteFoodItemsForCompany(companyId: string): Promise<{ de
 
 // ── Food Items ─────────────────────────────────────────────────────────
 
-export async function getFoodItems(filters: FoodItemsQuery) {
+export async function getFoodItems(filters: FoodItemsQuery, lang: SupportedLang = 'en') {
   let query: FirebaseFirestore.Query = foodItemsCollection.where('status', '==', 'AVAILABLE');
 
   if (filters.companyId) {
@@ -92,11 +92,12 @@ export async function getFoodItems(filters: FoodItemsQuery) {
       return {
         id: doc.id,
         companyId: data.companyId,
-        name: data.name,
+        title: data.title || data.name,
+        name: data.name || data.title,
         category: data.category,
         price: data.price,
+        priceSuffix: getLocalizedPriceSuffix('FOOD', lang),
         image: data.images?.[0] || null,
-        order: data.order ?? 0,
       };
     }
   );
