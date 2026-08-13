@@ -89,7 +89,7 @@ export async function processPayment(userId: string, orderId: string, input: Pay
 
     if (methodSnapshot.empty) throw new AppError(404, 'NOT_FOUND', 'Payment method not found or not owned by user');
 
-    amount = order.details?.serverComputedPrice;
+    amount = order.totalPrice;
     if (typeof amount !== 'number' || amount <= 0) throw new AppError(400, 'PRICE_NOT_COMPUTED');
 
     chargeResponse = (await gatewayRequest('/api/payments/charges', {

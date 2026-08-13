@@ -187,8 +187,9 @@ const messages: Record<string, LocalizedMap> = {
  */
 export function t(code: string, lang: SupportedLang = 'en'): string {
   const entry = messages[code];
-  if (!entry) return messages.INTERNAL_ERROR[lang] || messages.INTERNAL_ERROR.en;
-  return entry[lang] || entry.en || messages.INTERNAL_ERROR.en;
+  if (!entry) return messages.INTERNAL_ERROR[lang] ?? messages.INTERNAL_ERROR.en;
+  const msg = entry[lang] ?? entry.en ?? entry.az;
+  return msg !== undefined ? msg : (messages.INTERNAL_ERROR[lang] ?? messages.INTERNAL_ERROR.en);
 }
 
 export default messages;

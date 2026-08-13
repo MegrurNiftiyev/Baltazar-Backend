@@ -30,6 +30,7 @@ export const createCompanySchema = z.object({
     .optional()
     .default(['ABOUT', 'GALLERY', 'ITEMS']),
   cuisineTypes: z.array(z.string()).optional(), // FOOD only
+  relatedItemIds: z.array(z.string()).max(10).optional().default([]),
   order: z.number().int().min(0).optional().default(0),
 }).openapi('CreateCompanyInput');
 

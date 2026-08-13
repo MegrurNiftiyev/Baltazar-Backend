@@ -30,7 +30,6 @@ export const roomQuerySchema = z
   .object({
     roomType: z.string().optional(),
   })
-  .merge(paginationQuerySchema)
   .openapi('RoomQuery');
 
 // ── Admin CRUD Schemas ─────────────────────────────────────────────────

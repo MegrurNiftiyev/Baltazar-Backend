@@ -45,15 +45,10 @@ export const deleteHotelController = catchAsync(async (req: Request, res: Respon
 // ── Rooms ──────────────────────────────────────────────────────────────
 
 export const getRoomsController = catchAsync(async (req: Request, res: Response) => {
-  const result = await hotelService.getRooms(req.params.id as string, req.validatedQuery as any);
+  const rooms = await hotelService.getRooms(req.params.id as string, req.validatedQuery as any);
   res.status(200).json({
     success: true,
-    data: localize(result.items, req.lang!),
-    pagination: {
-      nextCursor: result.nextCursor,
-      hasMore: result.hasMore,
-      limit: Number(req.query.limit || 20),
-    },
+    data: localize(rooms, req.lang!),
   });
 });
 

@@ -217,14 +217,8 @@ export async function getRooms(hotelId: string, filters: RoomQuery) {
     query = query.where('roomType', '==', filters.roomType);
   }
 
-  const result = await paginateQuery(
-    roomsCollection,
-    query.orderBy('createdAt', 'desc'),
-    filters,
-    (doc) => ({ id: doc.id, ...doc.data() }),
-  );
-
-  return result;
+  const snapshot = await query.get();
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
 export async function createRoom(input: CreateRoomInput) {

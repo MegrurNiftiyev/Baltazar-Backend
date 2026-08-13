@@ -23,7 +23,6 @@ const options: swaggerJSDoc.Options = {
       { name: 'RentACar' },
       { name: 'Food' },
       { name: 'Travel' },
-      { name: 'Enums' },
       { name: 'IncludedServices' },
       { name: 'Reviews' },
       { name: 'Order' },
@@ -32,6 +31,7 @@ const options: swaggerJSDoc.Options = {
       { name: 'AppConfig' },
       { name: 'Admin' },
       { name: 'Uploads' },
+      { name: 'Enums' },
     ],
     components: {
       securitySchemes: {

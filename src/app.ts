@@ -22,7 +22,6 @@ import travelRouter, { includedServicesRouter } from './modules/travel/travel.ro
 import hotelRouter from './modules/hotel/hotel.routes.js';
 import foodRouter from './modules/food/food.routes.js';
 import orderRouter from './modules/order/order.routes.js';
-import orderScreensRouter from './modules/order/orderScreens.routes.js';
 import paymentRouter from './modules/payment/payment.routes.js';
 import reviewsRouter from './modules/reviews/reviews.routes.js';
 import wishlistRouter from './modules/wishlist/wishlist.routes.js';
@@ -84,7 +83,6 @@ app.use('/api/services/travel', travelRouter);
 app.use('/api/services/included-services', includedServicesRouter);
 app.use('/api/reviews', reviewsRouter);
 app.use('/api/orders', orderRouter);
-app.use('/api/order-screens', orderScreensRouter);
 app.use('/api/payment', paymentRouter);
 app.use('/api/home', homeRouter);
 app.use('/api/categories', categoriesRouter);

@@ -99,5 +99,25 @@ export async function seedRentACar(ctx: SeedContext) {
     }
   }
 
+  const itemsByCompany: Record<string, string[]> = {};
+  for (const item of createdServices) {
+    if (item.companyId) {
+      itemsByCompany[item.companyId] = itemsByCompany[item.companyId] || [];
+      itemsByCompany[item.companyId]!.push(item.id);
+    }
+  }
+
+  for (const compId of createdCompanyIds) {
+    const relatedItemIds = (itemsByCompany[compId] || []).slice(0, 4);
+    if (relatedItemIds.length > 0) {
+      await fetch(`${ctx.baseUrl}/api/companies/${compId}`, {
+        method: 'PUT',
+        headers: { ...ctx.headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ relatedItemIds }),
+      });
+      console.log(`  🔗 Attached ${relatedItemIds.length} relatedItemIds to Car Rental Company ${compId}`);
+    }
+  }
+
   return createdServices;
 }

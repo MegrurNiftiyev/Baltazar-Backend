@@ -2,12 +2,14 @@ import { Router } from 'express';
 import { requireAuth } from '../../middlewares/requireAuth.js';
 import { requireRole } from '../../middlewares/requireRole.js';
 import { validate } from '../../middlewares/validate.js';
-import { createOrderSchema, advanceStepSchema, updateOrderStatusSchema, orderQuerySchema } from './order.schema.js';
+import { createOrderSchema, updateOrderStatusSchema, orderQuerySchema, patchPaymentMethodSchema, patchDeliveryAddressSchema } from './order.schema.js';
 import {
   createOrderController,
   getOrdersController,
   getOrderByIdController,
-  advanceStepController,
+  getNextScreenController,
+  patchPaymentMethodController,
+  patchDeliveryAddressController,
   cancelOrderController,
   getPaymentSummaryController,
   updateOrderStatusController,
@@ -85,10 +87,29 @@ router.get('/:id', requireAuth, getOrderByIdController);
 
 /**
  * @swagger
- * /api/orders/{id}/step:
- *   put:
+ * /api/orders/{id}/next-screen:
+ *   get:
  *     tags: [Order]
- *     summary: Advance order to next step
+ *     summary: Get the next screen and auto-fill user data
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Next screen resolved }
+ *       404: { description: Order not found }
+ */
+router.get('/:id/next-screen', requireAuth, getNextScreenController);
+
+/**
+ * @swagger
+ * /api/orders/{id}/payment-method:
+ *   patch:
+ *     tags: [Order]
+ *     summary: Set the payment method for an order
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -101,11 +122,35 @@ router.get('/:id', requireAuth, getOrderByIdController);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/AdvanceOrderStepInput'
+ *             $ref: '#/components/schemas/PatchPaymentMethodInput'
  *     responses:
- *       200: { description: Step advanced, returns next step info }
+ *       200: { description: Payment method updated }
  */
-router.put('/:id/step', requireAuth, validate({ body: advanceStepSchema }), advanceStepController);
+router.patch('/:id/payment-method', requireAuth, validate({ body: patchPaymentMethodSchema }), patchPaymentMethodController);
+
+/**
+ * @swagger
+ * /api/orders/{id}/delivery-address:
+ *   patch:
+ *     tags: [Order]
+ *     summary: Set the delivery address for a food order
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PatchDeliveryAddressInput'
+ *     responses:
+ *       200: { description: Delivery address updated }
+ */
+router.patch('/:id/delivery-address', requireAuth, validate({ body: patchDeliveryAddressSchema }), patchDeliveryAddressController);
 
 /**
  * @swagger

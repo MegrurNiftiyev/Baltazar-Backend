@@ -27,9 +27,19 @@ export const getOrderByIdController = catchAsync(async (req: Request, res: Respo
   res.status(200).json({ success: true, data: localize(order, req.lang!) });
 });
 
-export const advanceStepController = catchAsync(async (req: Request, res: Response) => {
-  const result = await orderService.advanceStep(req.params.id as string, req.user!.userId, req.body);
-  res.status(200).json({ success: true, data: localize(result, req.lang!) });
+export const getNextScreenController = catchAsync(async (req: Request, res: Response) => {
+  const result = await orderService.getNextScreen(req.params.id as string, req.user!.userId);
+  res.status(200).json({ success: true, data: result });
+});
+
+export const patchPaymentMethodController = catchAsync(async (req: Request, res: Response) => {
+  const result = await orderService.patchPaymentMethod(req.params.id as string, req.user!.userId, req.body.paymentMethodId);
+  res.status(200).json({ success: true, data: result });
+});
+
+export const patchDeliveryAddressController = catchAsync(async (req: Request, res: Response) => {
+  const result = await orderService.patchDeliveryAddress(req.params.id as string, req.user!.userId, req.body);
+  res.status(200).json({ success: true, data: result });
 });
 
 export const cancelOrderController = catchAsync(async (req: Request, res: Response) => {

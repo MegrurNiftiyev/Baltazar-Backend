@@ -6,6 +6,7 @@ import { requireRole } from '../../middlewares/requireRole.js';
 import {
   getCompaniesController,
   getCompanyByIdController,
+  getCompanyRelatedItemsController,
   createCompanyController,
   updateCompanyController,
   deleteCompanyController,
@@ -39,6 +40,24 @@ const router = Router();
  *       200: { description: List of companies }
  */
 router.get('/', optionalAuth, validate({ query: companiesQuerySchema }), getCompaniesController);
+
+/**
+ * @swagger
+ * /api/companies/{id}/related-items:
+ *   get:
+ *     tags: [Companies]
+ *     summary: Get resolved related items for a company as cross-service DTO cards
+ *     security: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: List of related item cards }
+ *       404: { description: Company not found }
+ */
+router.get('/:id/related-items', optionalAuth, getCompanyRelatedItemsController);
 
 /**
  * @swagger
