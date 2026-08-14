@@ -5,7 +5,49 @@ import { languageEnum } from '../../shared/language.js';
 extendZodWithOpenApi(z);
 
 /**
- * Update profile — all fields optional (partial update).
+ * Update basic user info DTO.
+ */
+export const updateUserDtoSchema = z.object({
+  name: z.string().min(2).max(100).optional(),
+  phone: z.string().min(7).max(20).optional(),
+  region: z.string().min(1).max(10).optional(),
+  language: languageEnum.optional(),
+}).openapi('UpdateUserDto');
+
+/**
+ * Update personal info DTO.
+ */
+export const updatePersonalInfoDtoSchema = z.object({
+  dateOfBirth: z.string().min(1),
+  address: z.string().min(1),
+  idNumber: z.string().min(1),
+}).openapi('UpdatePersonalInfoDto');
+
+/**
+ * Update passport DTO.
+ */
+export const updatePassportInfoDtoSchema = z.object({
+  passportNumber: z.string().min(1),
+  expiryDate: z.string().min(1),
+}).openapi('UpdatePassportInfoDto');
+
+/**
+ * Update driver license DTO.
+ */
+export const updateDriverLicenseDtoSchema = z.object({
+  licenseNumber: z.string().min(1),
+  expiryDate: z.string().min(1),
+}).openapi('UpdateDriverLicenseDto');
+
+/**
+ * Update profile photo DTO.
+ */
+export const updateProfilePhotoDtoSchema = z.object({
+  avatarUrl: z.string().url(),
+}).openapi('UpdateProfilePhotoDto');
+
+/**
+ * Composite Update profile — all fields optional (partial update).
  */
 export const updateProfileSchema = z.object({
   name: z.string().min(2).max(100).optional(),
@@ -56,9 +98,14 @@ export const userProfileSchema = z.object({
 }).openapi('UserProfile');
 
 export const updateAvatarSchema = z.object({
-  avatar: z.string().url(),
+  avatarUrl: z.string().url(),
 }).openapi('UpdateAvatarInput');
 
+export type UpdateUserDto = z.infer<typeof updateUserDtoSchema>;
+export type UpdatePersonalInfoDto = z.infer<typeof updatePersonalInfoDtoSchema>;
+export type UpdatePassportInfoDto = z.infer<typeof updatePassportInfoDtoSchema>;
+export type UpdateDriverLicenseDto = z.infer<typeof updateDriverLicenseDtoSchema>;
+export type UpdateProfilePhotoDto = z.infer<typeof updateProfilePhotoDtoSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type UserProfile = z.infer<typeof userProfileSchema>;
 export type UpdateAvatarInput = z.infer<typeof updateAvatarSchema>;

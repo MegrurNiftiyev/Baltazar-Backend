@@ -10,7 +10,15 @@ import { addCardSchema, paySchema } from '../modules/payment/payment.schema.js';
 import { carsQuerySchema, createCarSchema, updateCarSchema } from '../modules/rentacar/rentacar.schema.js';
 import { createReviewSchema, reviewQuerySchema, updateReviewSchema } from '../modules/reviews/reviews.schema.js';
 import { toursQuerySchema, includedServicesParamsSchema, createTourSchema, updateTourSchema, createIncludedServiceSchema, updateIncludedServiceSchema, includedServiceIdParamsSchema } from '../modules/travel/travel.schema.js';
-import { updateProfileSchema, userProfileSchema } from '../modules/users/users.schema.js';
+import { 
+  updateProfileSchema, 
+  userProfileSchema, 
+  updateUserDtoSchema, 
+  updatePersonalInfoDtoSchema, 
+  updatePassportInfoDtoSchema, 
+  updateDriverLicenseDtoSchema, 
+  updateProfilePhotoDtoSchema 
+} from '../modules/users/users.schema.js';
 import { addToWishlistSchema } from '../modules/wishlist/wishlist.schema.js';
 import { categoriesQuerySchema, createCategorySchema, updateCategorySchema } from '../modules/categories/categories.schema.js';
 import { createCompanySchema, updateCompanySchema, companiesQuerySchema } from '../modules/companies/companies.schema.js';
@@ -54,6 +62,11 @@ registry.register('UpdateTourInput', updateTourSchema);
 registry.register('CreateIncludedServiceInput', createIncludedServiceSchema);
 registry.register('UpdateIncludedServiceInput', updateIncludedServiceSchema);
 registry.register('IncludedServiceIdParams', includedServiceIdParamsSchema);
+registry.register('UpdateUserDto', updateUserDtoSchema);
+registry.register('UpdatePersonalInfoDto', updatePersonalInfoDtoSchema);
+registry.register('UpdatePassportInfoDto', updatePassportInfoDtoSchema);
+registry.register('UpdateDriverLicenseDto', updateDriverLicenseDtoSchema);
+registry.register('UpdateProfilePhotoDto', updateProfilePhotoDtoSchema);
 registry.register('UpdateProfileInput', updateProfileSchema);
 registry.register('UserProfile', userProfileSchema);
 registry.register('AddToWishlistInput', addToWishlistSchema);

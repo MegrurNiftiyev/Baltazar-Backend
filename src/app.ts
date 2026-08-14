@@ -75,6 +75,7 @@ app.use(globalLimiter);
 // ── API routes (order matches Swagger tag order — see config/swagger.ts) ──
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/user', usersRouter);
 app.use('/api/user', wishlistRouter);
 app.use('/api/services/hotel', hotelRouter);
 app.use('/api/services/rentacar', rentacarRouter);

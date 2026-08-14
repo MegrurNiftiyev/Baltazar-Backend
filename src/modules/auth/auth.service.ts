@@ -61,6 +61,9 @@ async function issueTokens(userId: string, role: 'USER' | 'ADMIN', language: 'az
  * somehow bypasses schema validation and sends role: "ADMIN",
  * the service layer ignores it.
  */
+const DEFAULT_AVATAR_URL =
+  'https://firebasestorage.googleapis.com/v0/b/baltazar-a28a4.firebasestorage.app/o/avatars%2Fdefault_user_photo.jpg?alt=media&token=d4fc10ca-018f-4f0e-bbaa-210fe5c9f6e4';
+
 export async function register(input: RegisterInput) {
   const existing = await findUserByEmail(input.email);
   if (existing) {
@@ -77,6 +80,7 @@ export async function register(input: RegisterInput) {
     phone: input.phone || null,
     region: input.region || 'AZ',
     language: input.language || 'az',
+    avatarUrl: DEFAULT_AVATAR_URL,
     personalInfo: false,
     driverLicense: false,
     passport: false,
@@ -207,6 +211,8 @@ export async function googleLogin(input: GoogleLoginInput) {
 
   if (!user) {
     // Auto-register from Google
+    const googleAvatarUrl = googlePayload.picture || DEFAULT_AVATAR_URL;
+
     const docRef = await usersCollection.add({
       name: googlePayload.name || googlePayload.email,
       email: googlePayload.email,
@@ -215,6 +221,7 @@ export async function googleLogin(input: GoogleLoginInput) {
       phone: null,
       region: 'AZ',
       language: 'az',
+      avatarUrl: googleAvatarUrl,
       personalInfo: false,
       driverLicense: false,
       passport: false,
