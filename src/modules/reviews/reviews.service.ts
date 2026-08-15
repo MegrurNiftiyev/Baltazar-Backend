@@ -1,8 +1,8 @@
 import { db } from '../../config/firebase.js';
 import { AppError } from '../../errors/AppError.js';
 import type { CreateReviewInput, ReviewQuery, UpdateReviewInput } from './reviews.schema.js';
-import { paginateQuery } from '../../shared/pagination.js';
 import { COLLECTIONS } from '../../config/collections.js';
+
 
 const reviewsCollection = db.collection(COLLECTIONS.REVIEWS);
 const ordersCollection = db.collection(COLLECTIONS.ORDERS);
@@ -95,12 +95,44 @@ export async function getReviews(filters: ReviewQuery, role?: string) {
     throw new AppError(400, 'VALIDATION_ERROR', 'targetType and targetId are required');
   }
 
-  return paginateQuery(
-    reviewsCollection,
-    query.orderBy('createdAt', 'desc'),
-    filters,
-    (doc) => ({ id: doc.id, ...doc.data() })
-  );
+  const snapshot = await query.get();
+  let docs = snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      userId: data.userId || null,
+      userName: data.userName || (data.user && typeof data.user === 'object' ? data.user.name : undefined) || 'Anonymous',
+      avatarUrl: data.avatarUrl || (data.user && typeof data.user === 'object' ? data.user.avatarUrl : undefined) || null,
+      targetType: data.targetType,
+      targetId: data.targetId,
+      rating: data.rating,
+      comment: data.comment || '',
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
+  });
+
+  // Sort by createdAt descending
+  docs.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+  const limit = filters.limit ? Number(filters.limit) : 20;
+  let startIndex = 0;
+  if (filters.cursor) {
+    const foundIdx = docs.findIndex((d) => d.id === filters.cursor);
+    if (foundIdx !== -1) {
+      startIndex = foundIdx + 1;
+    }
+  }
+
+  const pageDocs = docs.slice(startIndex, startIndex + limit);
+  const hasMore = startIndex + limit < docs.length;
+  const nextCursor = hasMore && pageDocs.length > 0 ? pageDocs[pageDocs.length - 1]!.id : null;
+
+  return {
+    items: pageDocs,
+    nextCursor,
+    hasMore,
+  };
 }
 
 async function canReview(userId: string, targetType: string, targetId: string): Promise<boolean> {
@@ -135,32 +167,51 @@ export async function createReview(userId: string, input: CreateReviewInput) {
 
   if (!existingReview.empty) throw new AppError(409, 'ALREADY_REVIEWED');
 
-  const docRef = await reviewsCollection.add({
+  const userDoc = await db.collection(COLLECTIONS.USERS).doc(userId).get();
+  const userData = userDoc.exists ? userDoc.data() : undefined;
+  const userName = userData?.name || 'Anonymous';
+  const avatarUrl = userData?.avatarUrl || null;
+  const createdAt = new Date().toISOString();
+
+  const reviewPayload = {
     userId,
+    userName,
+    avatarUrl,
     targetType: input.targetType,
     targetId: input.targetId,
     rating: input.rating,
-    comment: input.comment,
-    createdAt: new Date().toISOString(),
-  });
+    comment: input.comment || '',
+    createdAt,
+  };
+
+  const docRef = await reviewsCollection.add(reviewPayload);
 
   // Update rating aggregation
   await applyRatingDelta(input.targetType, input.targetId, input.rating, 1);
 
   return {
     id: docRef.id,
-    userId,
-    targetType: input.targetType,
-    targetId: input.targetId,
-    rating: input.rating,
-    comment: input.comment,
+    ...reviewPayload,
   };
 }
 
 export async function getReviewById(id: string) {
   const doc = await reviewsCollection.doc(id).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
-  return { id: doc.id, ...doc.data() };
+  const data = doc.data()!;
+  return {
+    id: doc.id,
+    userId: data.userId || null,
+    userName: data.userName || (data.user && typeof data.user === 'object' ? data.user.name : undefined) || 'Anonymous',
+    avatarUrl: data.avatarUrl || (data.user && typeof data.user === 'object' ? data.user.avatarUrl : undefined) || null,
+    targetType: data.targetType,
+    targetId: data.targetId,
+    rating: data.rating,
+    comment: data.comment || '',
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+    ...data,
+  };
 }
 
 async function assertOwner(id: string, userId: string, role?: string) {
@@ -171,7 +222,11 @@ async function assertOwner(id: string, userId: string, role?: string) {
 
 export async function updateReview(id: string, userId: string, input: UpdateReviewInput) {
   const existing = (await assertOwner(id, userId)) as unknown as { rating?: number; targetType: string; targetId: string };
-  await reviewsCollection.doc(id).update(input);
+  const updatePayload: Record<string, unknown> = {
+    ...input,
+    updatedAt: new Date().toISOString(),
+  };
+  await reviewsCollection.doc(id).update(updatePayload);
 
   if (input.rating !== undefined && input.rating !== existing.rating) {
     const delta = input.rating - (existing.rating ?? 0);
@@ -189,4 +244,5 @@ export async function deleteReview(id: string, userId: string, role?: string) {
 
   return { id, deleted: true };
 }
+
 

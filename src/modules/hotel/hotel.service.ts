@@ -37,7 +37,10 @@ export async function calculateHotelPriceRange(hotelId: string): Promise<{ min: 
   };
 }
 
-export function toHotelExploreCard(doc: any, lang: SupportedLang = 'en'): ExploreCardDTO {
+import { getCurrencyForRegion } from '../../utils/currency.js';
+import type { Region } from '../../shared/enums.js';
+
+export function toHotelExploreCard(doc: any, lang: SupportedLang = 'en', region?: Region): ExploreCardDTO {
   const ratingVal =
     typeof doc.rating === 'number'
       ? doc.rating
@@ -63,12 +66,13 @@ export function toHotelExploreCard(doc: any, lang: SupportedLang = 'en'): Explor
     image: doc.images?.[0] || doc.image || '',
     price: minPrice,
     priceSuffix: getLocalizedPriceSuffix('HOTEL', lang),
-    currency: doc.currency || 'AZN',
+    currency: doc.currency || getCurrencyForRegion(region),
     rating: ratingVal,
     ratingCount: countVal,
     category: doc.city || undefined,
   };
 }
+
 
 async function assertNoActiveOrdersForServiceIds(serviceIds: string[]) {
   for (let i = 0; i < serviceIds.length; i += 30) {
@@ -93,7 +97,7 @@ async function deleteSnapshotInBatches(snapshot: FirebaseFirestore.QuerySnapshot
 
 // ── Hotels ─────────────────────────────────────────────────────────────
 
-export async function getHotels(filters: HotelQuery, lang: SupportedLang = 'en') {
+export async function getHotels(filters: HotelQuery, lang: SupportedLang = 'en', region?: Region) {
   let query: FirebaseFirestore.Query = hotelsCollection.where('status', '==', 'ACTIVE');
 
   if (filters.starRating !== undefined) {
@@ -126,7 +130,7 @@ export async function getHotels(filters: HotelQuery, lang: SupportedLang = 'en')
         reviewCount: data.reviewCount ?? 0,
         priceRange: data.priceRange || { min: data.price || 0, max: data.price || 0 },
         priceSuffix: getLocalizedPriceSuffix('HOTEL', lang),
-        currency: data.currency || 'AZN',
+        currency: data.currency || getCurrencyForRegion(region),
         images,
         createdAt: data.createdAt,
       };
@@ -156,7 +160,7 @@ export async function getHotels(filters: HotelQuery, lang: SupportedLang = 'en')
   return { ...result, items: filteredItems };
 }
 
-export async function getHotelById(id: string, userId?: string) {
+export async function getHotelById(id: string, userId?: string, region?: Region) {
   const doc = await hotelsCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
@@ -169,8 +173,9 @@ export async function getHotelById(id: string, userId?: string) {
   }
 
   const reviewEligibility = await getReviewEligibility(userId, 'HOTEL', id);
-  return { id: doc.id, ...data, priceRange, reviewEligibility };
+  return { id: doc.id, ...data, currency: data.currency || getCurrencyForRegion(region), priceRange, reviewEligibility };
 }
+
 
 export async function createHotel(input: CreateHotelInput) {
   const title = input.title || input.name;

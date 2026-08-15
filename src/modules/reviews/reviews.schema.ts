@@ -23,6 +23,20 @@ export const updateReviewSchema = z.object({
   comment: z.string().min(1).max(2000).optional(),
 }).refine((value) => Object.keys(value).length > 0).openapi('UpdateReviewInput');
 
+export const reviewResponseSchema = z.object({
+  id: z.string(),
+  userId: z.string().nullable().optional(),
+  userName: z.string().optional(),
+  avatarUrl: z.string().nullable().optional(),
+  targetType: reviewTargetTypeEnum,
+  targetId: z.string(),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().default(''),
+  createdAt: z.string(),
+  updatedAt: z.string().optional(),
+}).openapi('ReviewResponse');
+
 export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type ReviewQuery = z.infer<typeof reviewQuerySchema>;
 export type UpdateReviewInput = z.infer<typeof updateReviewSchema>;
+export type ReviewResponse = z.infer<typeof reviewResponseSchema>;

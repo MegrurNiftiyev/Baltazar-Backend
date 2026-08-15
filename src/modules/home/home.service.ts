@@ -61,14 +61,16 @@ export async function deleteBanner(id: string) {
 
 const getOrderValue = (item: any) => (typeof item.order === 'number' ? item.order : 0);
 
-async function getItemsForServiceType(serviceType: string, lang: SupportedLang = 'en') {
+import type { Region } from '../../shared/enums.js';
+
+async function getItemsForServiceType(serviceType: string, lang: SupportedLang = 'en', region?: Region) {
   const collectionMap: Record<string, string> = {
     RENT_A_CAR: COLLECTIONS.CARS,
     HOTEL: COLLECTIONS.HOTELS,
     TRAVEL: COLLECTIONS.TRAVELS,
     FOOD: COLLECTIONS.FOOD_ITEMS,
   };
-  const mapperMap: Record<string, (doc: any, lang?: SupportedLang) => any> = {
+  const mapperMap: Record<string, (doc: any, lang?: SupportedLang, region?: Region) => any> = {
     RENT_A_CAR: toCarExploreCard,
     HOTEL: toHotelExploreCard,
     TRAVEL: toTourExploreCard,
@@ -98,7 +100,7 @@ async function getItemsForServiceType(serviceType: string, lang: SupportedLang =
     return dateB.localeCompare(dateA);
   });
 
-  const mapped = docs.map((doc) => mapper(doc, lang));
+  const mapped = docs.map((doc) => mapper(doc, lang, region));
   return mapped.slice(0, 6);
 }
 
@@ -121,19 +123,20 @@ export async function getHomeSections() {
 async function buildExploreRows(
   orderedSections: Array<{ serviceType: string; order: number }>,
   lang: SupportedLang = 'en',
+  region?: Region,
 ): Promise<ExploreSectionDTO[]> {
   const rows = await Promise.all(
     orderedSections.map(async (sec) => ({
       serviceType: sec.serviceType as any,
       title: titleMap[sec.serviceType as keyof typeof titleMap],
       order: sec.order,
-      items: await getItemsForServiceType(sec.serviceType, lang),
+      items: await getItemsForServiceType(sec.serviceType, lang, region),
     })),
   );
   return rows;
 }
 
-export async function getExplore(userId?: string, lang: SupportedLang = 'en'): Promise<ExploreSectionDTO[]> {
+export async function getExplore(userId?: string, lang: SupportedLang = 'en', region?: Region): Promise<ExploreSectionDTO[]> {
   if (userId) {
     const interestsDoc = await db.collection(COLLECTIONS.USER_INTERESTS).doc(userId).get();
     if (interestsDoc.exists) {
@@ -148,7 +151,7 @@ export async function getExplore(userId?: string, lang: SupportedLang = 'en'): P
         serviceType: st,
         order: (index + 1) * 10,
       }));
-      return buildExploreRows(orderedSections, lang);
+      return buildExploreRows(orderedSections, lang, region);
     }
   }
 
@@ -165,11 +168,12 @@ export async function getExplore(userId?: string, lang: SupportedLang = 'en'): P
       { serviceType: 'TRAVEL', order: 30 },
       { serviceType: 'FOOD', order: 40 },
     ];
-    return buildExploreRows(defaultSections, lang);
+    return buildExploreRows(defaultSections, lang, region);
   }
 
-  return buildExploreRows(orderedSections, lang);
+  return buildExploreRows(orderedSections, lang, region);
 }
+
 
 export async function incrementUserInterest(
   userId: string,

@@ -4,7 +4,7 @@ import { localize } from '../../utils/localize.js';
 import * as wishlistService from './wishlist.service.js';
 
 export const getWishlistController = catchAsync(async (req: Request, res: Response) => {
-  const result = await wishlistService.getWishlist(req.user!.userId, req.query as any);
+  const result = await wishlistService.getWishlist(req.user!.userId, req.query as any, req.region);
   res.status(200).json({
     success: true,
     data: localize(result.items, req.lang!),
@@ -15,6 +15,7 @@ export const getWishlistController = catchAsync(async (req: Request, res: Respon
     },
   });
 });
+
 
 export const addToWishlistController = catchAsync(async (req: Request, res: Response) => {
   const result = await wishlistService.addToWishlist(req.user!.userId, req.body);

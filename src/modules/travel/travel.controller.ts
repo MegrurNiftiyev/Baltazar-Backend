@@ -9,7 +9,7 @@ import { incrementUserInterest } from '../home/home.service.js';
 // ── Tours ──────────────────────────────────────────────────────────────
 
 export const getToursController = catchAsync(async (req: Request, res: Response) => {
-  const result = await travelService.getTours(req.validatedQuery as any, req.lang);
+  const result = await travelService.getTours(req.validatedQuery as any, req.lang, req.region);
   res.status(200).json({
     success: true,
     data: localize(result.items, req.lang!),
@@ -22,12 +22,13 @@ export const getToursController = catchAsync(async (req: Request, res: Response)
 });
 
 export const getTourByIdController = catchAsync(async (req: Request, res: Response) => {
-  const tour = await travelService.getTourById(req.params.id as string, req.user?.userId);
+  const tour = await travelService.getTourById(req.params.id as string, req.user?.userId, req.region);
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'TRAVEL').catch(() => {});
   }
   res.status(200).json({ success: true, data: localize(tour, req.lang!) });
 });
+
 
 export const createTourController = catchAsync(async (req: Request, res: Response) => {
   const tour = await travelService.createTour(req.body);

@@ -1,8 +1,15 @@
 import { db } from '../config/firebase.js';
 import { COLLECTIONS } from '../config/collections.js';
+import { REGION_CURRENCY_MAP, type Region, type Currency } from '../shared/enums.js';
 
 const rateCache = new Map<string, { rate: number; cachedAt: number }>();
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+
+export function getCurrencyForRegion(region?: string): Currency {
+  if (!region) return 'AZN';
+  const upper = region.toUpperCase().trim() as Region;
+  return REGION_CURRENCY_MAP[upper] || 'AZN';
+}
 
 async function getCachedRate(region: string): Promise<number> {
   const currency = getCurrencyForRegion(region);
@@ -15,12 +22,8 @@ async function getCachedRate(region: string): Promise<number> {
   return rate;
 }
 
-function getCurrencyForRegion(region: string): string {
-  const map: Record<string, string> = { AZ: 'AZN' };
-  return map[region] || 'USD';
-}
-
 export async function toDisplayPrice(basePriceUsd: number, region: string) {
   const rate = await getCachedRate(region);
   return { amount: Math.round(basePriceUsd * rate * 100) / 100, currency: getCurrencyForRegion(region) };
 }
+

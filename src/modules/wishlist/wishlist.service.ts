@@ -16,10 +16,13 @@ const collectionMap: Record<string, string> = {
   FOOD: 'foodItems',
 };
 
+import { getCurrencyForRegion } from '../../utils/currency.js';
+import type { Region } from '../../shared/enums.js';
+
 /**
  * Get the user's wishlist — queries dedicated `wishlist` collection by `userId`.
  */
-export async function getWishlist(userId: string, query: { limit?: number; cursor?: string } = {}) {
+export async function getWishlist(userId: string, query: { limit?: number; cursor?: string } = {}, region?: Region) {
   const userDoc = await usersCollection.doc(userId).get();
   if (!userDoc.exists) {
     throw new AppError(404, 'NOT_FOUND');
@@ -79,11 +82,13 @@ export async function getWishlist(userId: string, query: { limit?: number; curso
   const items = docs
     .map((doc, index) => {
       if (!doc.exists) return null;
+      const data = doc.data()!;
       return {
         wishlistItemId: refMeta[index]!.wishlistItemId,
         serviceType: refMeta[index]!.serviceType,
         serviceId: refMeta[index]!.serviceId,
-        ...doc.data(),
+        currency: data.currency || getCurrencyForRegion(region),
+        ...data,
       };
     })
     .filter(Boolean);
@@ -94,6 +99,7 @@ export async function getWishlist(userId: string, query: { limit?: number; curso
     nextCursor: hasMore ? String(cursor + limit) : undefined,
   };
 }
+
 
 /**
  * Add a service to the user's wishlist (dedicated `wishlist` collection).

@@ -12,7 +12,10 @@ import type { ExploreCardDTO } from '../../shared/dto/explore-card.dto.js';
 import { getLocalizedPriceSuffix } from '../../shared/priceSuffix.js';
 import type { SupportedLang } from '../../config/locales.js';
 
-export function toCarExploreCard(doc: any, lang: SupportedLang = 'en'): ExploreCardDTO {
+import { getCurrencyForRegion } from '../../utils/currency.js';
+import type { Region } from '../../shared/enums.js';
+
+export function toCarExploreCard(doc: any, lang: SupportedLang = 'en', region?: Region): ExploreCardDTO {
   const ratingAvg =
     typeof doc.rating === 'number'
       ? doc.rating
@@ -36,12 +39,13 @@ export function toCarExploreCard(doc: any, lang: SupportedLang = 'en'): ExploreC
     image: doc.images?.[0] || doc.image || '',
     price: typeof doc.price === 'number' ? doc.price : typeof doc.dailyPrice === 'number' ? doc.dailyPrice : 0,
     priceSuffix: getLocalizedPriceSuffix('RENT_A_CAR', lang),
-    currency: doc.currency || 'AZN',
+    currency: doc.currency || getCurrencyForRegion(region),
     rating: ratingAvg,
     ratingCount: countVal,
     category: doc.category || undefined,
   };
 }
+
 
 
 
@@ -84,7 +88,7 @@ export async function deleteCarsForCompany(companyId: string): Promise<{ deleted
  * Returns a list DTO: { id, brand, model, price, image, rating }
  * Full document is only returned by getCarById.
  */
-export async function getCars(filters: CarsQuery, lang: SupportedLang = 'en') {
+export async function getCars(filters: CarsQuery, lang: SupportedLang = 'en', region?: Region) {
   let query: FirebaseFirestore.Query = carsCollection.where('status', '==', 'AVAILABLE');
 
   // Equality filters (can be combined freely in Firestore)
@@ -120,6 +124,7 @@ export async function getCars(filters: CarsQuery, lang: SupportedLang = 'en') {
         model: data.model,
         price: data.price,
         priceSuffix: getLocalizedPriceSuffix('RENT_A_CAR', lang),
+        currency: data.currency || getCurrencyForRegion(region),
         image: data.images?.[0] || null,
         rating: data.rating || 0,
         category: data.category,
@@ -143,15 +148,16 @@ export async function getCars(filters: CarsQuery, lang: SupportedLang = 'en') {
 /**
  * Get full car details by ID.
  */
-export async function getCarById(id: string, userId?: string) {
+export async function getCarById(id: string, userId?: string, region?: Region) {
   const doc = await carsCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
   const { ratingSum, ...data } = doc.data()!;
   const reviewEligibility = await getReviewEligibility(userId, 'RENT_A_CAR', id);
-  return { id: doc.id, ...data, reviewEligibility };
+  return { id: doc.id, ...data, currency: data.currency || getCurrencyForRegion(region), reviewEligibility };
 }
+
 
 export async function createCar(input: CreateCarInput) {
   const docRef = await carsCollection.add({

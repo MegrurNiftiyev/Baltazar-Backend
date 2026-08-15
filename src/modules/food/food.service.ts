@@ -12,7 +12,10 @@ import type { ExploreCardDTO } from '../../shared/dto/explore-card.dto.js';
 import { getLocalizedPriceSuffix } from '../../shared/priceSuffix.js';
 import type { SupportedLang } from '../../config/locales.js';
 
-export function toFoodExploreCard(doc: any, lang: SupportedLang = 'en'): ExploreCardDTO {
+import { getCurrencyForRegion } from '../../utils/currency.js';
+import type { Region } from '../../shared/enums.js';
+
+export function toFoodExploreCard(doc: any, lang: SupportedLang = 'en', region?: Region): ExploreCardDTO {
   const ratingAvg =
     typeof doc.rating === 'number'
       ? doc.rating
@@ -30,12 +33,13 @@ export function toFoodExploreCard(doc: any, lang: SupportedLang = 'en'): Explore
     image: doc.images?.[0] || doc.image || '',
     price: typeof doc.price === 'number' ? doc.price : 0,
     priceSuffix: getLocalizedPriceSuffix('FOOD', lang),
-    currency: doc.currency || 'AZN',
+    currency: doc.currency || getCurrencyForRegion(region),
     rating: ratingAvg,
     ratingCount: countVal,
     category: doc.category || undefined,
   };
 }
+
 
 
 const companiesCollection = db.collection(COLLECTIONS.COMPANIES);
@@ -73,7 +77,7 @@ export async function deleteFoodItemsForCompany(companyId: string): Promise<{ de
 
 // ── Food Items ─────────────────────────────────────────────────────────
 
-export async function getFoodItems(filters: FoodItemsQuery, lang: SupportedLang = 'en') {
+export async function getFoodItems(filters: FoodItemsQuery, lang: SupportedLang = 'en', region?: Region) {
   let query: FirebaseFirestore.Query = foodItemsCollection.where('status', '==', 'AVAILABLE');
 
   if (filters.companyId) {
@@ -97,6 +101,7 @@ export async function getFoodItems(filters: FoodItemsQuery, lang: SupportedLang 
         category: data.category,
         price: data.price,
         priceSuffix: getLocalizedPriceSuffix('FOOD', lang),
+        currency: data.currency || getCurrencyForRegion(region),
         image: data.images?.[0] || null,
       };
     }
@@ -125,15 +130,16 @@ export async function getFoodItems(filters: FoodItemsQuery, lang: SupportedLang 
   return { ...result, items: filteredItems };
 }
 
-export async function getFoodItemById(id: string, userId?: string) {
+export async function getFoodItemById(id: string, userId?: string, region?: Region) {
   const doc = await foodItemsCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
   const { ratingSum, ...data } = doc.data()!;
   const reviewEligibility = await getReviewEligibility(userId, 'FOOD', id);
-  return { id: doc.id, ...data, reviewEligibility };
+  return { id: doc.id, ...data, currency: data.currency || getCurrencyForRegion(region), reviewEligibility };
 }
+
 
 export async function createFoodItem(input: CreateFoodItemInput) {
   // Verify company exists

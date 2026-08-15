@@ -113,31 +113,43 @@ export async function seedOrdersPaymentsReviews(
     }
   }
 
-  const byType = {
-    FOOD: createdServices.filter((s) => s.serviceType === 'FOOD'),
-    HOTEL: createdServices.filter((s) => s.serviceType === 'HOTEL'),
-    RENT_A_CAR: createdServices.filter((s) => s.serviceType === 'RENT_A_CAR'),
-    TRAVEL: createdServices.filter((s) => s.serviceType === 'TRAVEL'),
-  };
+  const uniqueCompanyIds = Array.from(
+    new Set(createdServices.map((s) => s.companyId).filter((id): id is string => Boolean(id)))
+  );
 
-  for (const [i, user] of usersWithCards.entries()) {
-    console.log(`\n👤 ${user.userId}`);
-    // one order per service type per user (round-robin), skip if that type has no services
-    for (const type of ['FOOD', 'RENT_A_CAR', 'HOTEL', 'TRAVEL'] as const) {
-      const pool = byType[type];
-      if (pool.length === 0) continue;
-      const service = pool[i % pool.length]!;
+  console.log(`\n📦 Total services to seed reviews for: ${createdServices.length} (+ ${uniqueCompanyIds.length} companies)`);
+  console.log(`👥 Available test users with cards: ${usersWithCards.length}`);
 
+  if (usersWithCards.length === 0) {
+    console.warn('⚠️ No test users with cards available for seeding reviews.');
+    return;
+  }
+
+  // Seed 2 to 3 reviews for EVERY service item
+  for (let sIdx = 0; sIdx < createdServices.length; sIdx++) {
+    const service = createdServices[sIdx]!;
+    const reviewsPerItem = 2 + (sIdx % 2); // 2 or 3 reviews per item
+
+    for (let rIdx = 0; rIdx < reviewsPerItem; rIdx++) {
+      const user = usersWithCards[(sIdx + rIdx) % usersWithCards.length]!;
       const orderId = await createAndCompleteOrder(ctx, user, service);
-      if (!orderId) continue;
-
-      await createReviewForOrder(ctx, user, service);
-
-      if ((type === 'RENT_A_CAR' || type === 'TRAVEL') && service.companyId) {
-        await createReviewForOrder(ctx, user, { serviceType: 'COMPANY', id: service.companyId });
+      if (orderId) {
+        await createReviewForOrder(ctx, user, service);
       }
     }
   }
 
-  console.log('\n🎉 Orders/Payments/Reviews seed complete.');
+  // Seed 2 to 3 reviews for each company
+  for (let cIdx = 0; cIdx < uniqueCompanyIds.length; cIdx++) {
+    const companyId = uniqueCompanyIds[cIdx]!;
+    const reviewsPerCompany = 2 + (cIdx % 2);
+
+    for (let rIdx = 0; rIdx < reviewsPerCompany; rIdx++) {
+      const user = usersWithCards[(cIdx + rIdx) % usersWithCards.length]!;
+      await createReviewForOrder(ctx, user, { serviceType: 'COMPANY', id: companyId });
+    }
+  }
+
+  console.log('\n🎉 Orders/Payments/Reviews seed complete. All items have 2-3 reviews.');
 }
+

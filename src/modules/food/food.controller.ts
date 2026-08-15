@@ -9,7 +9,7 @@ import { incrementUserInterest } from '../home/home.service.js';
 // ── Food Items ─────────────────────────────────────────────────────────
 
 export const getFoodItemsController = catchAsync(async (req: Request, res: Response) => {
-  const result = await foodService.getFoodItems(req.validatedQuery as any, req.lang);
+  const result = await foodService.getFoodItems(req.validatedQuery as any, req.lang, req.region);
   res.status(200).json({
     success: true,
     data: localize(result.items, req.lang!),
@@ -22,12 +22,13 @@ export const getFoodItemsController = catchAsync(async (req: Request, res: Respo
 });
 
 export const getFoodItemByIdController = catchAsync(async (req: Request, res: Response) => {
-  const item = await foodService.getFoodItemById(req.params.id as string, req.user?.userId);
+  const item = await foodService.getFoodItemById(req.params.id as string, req.user?.userId, req.region);
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'FOOD').catch(() => {});
   }
   res.status(200).json({ success: true, data: localize(item, req.lang!) });
 });
+
 
 export const createFoodItemController = catchAsync(async (req: Request, res: Response) => {
   const item = await foodService.createFoodItem(req.body);

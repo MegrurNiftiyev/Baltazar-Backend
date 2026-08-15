@@ -7,7 +7,7 @@ import { incrementUserInterest } from '../home/home.service.js';
 // ── Hotels ─────────────────────────────────────────────────────────────
 
 export const getHotelsController = catchAsync(async (req: Request, res: Response) => {
-  const result = await hotelService.getHotels(req.validatedQuery as any, req.lang);
+  const result = await hotelService.getHotels(req.validatedQuery as any, req.lang, req.region);
   res.status(200).json({
     success: true,
     data: localize(result.items, req.lang!),
@@ -20,12 +20,13 @@ export const getHotelsController = catchAsync(async (req: Request, res: Response
 });
 
 export const getHotelByIdController = catchAsync(async (req: Request, res: Response) => {
-  const hotel = await hotelService.getHotelById(req.params.id as string, req.user?.userId);
+  const hotel = await hotelService.getHotelById(req.params.id as string, req.user?.userId, req.region);
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'HOTEL').catch(() => {});
   }
   res.status(200).json({ success: true, data: localize(hotel, req.lang!) });
 });
+
 
 export const createHotelController = catchAsync(async (req: Request, res: Response) => {
   const hotel = await hotelService.createHotel(req.body);
