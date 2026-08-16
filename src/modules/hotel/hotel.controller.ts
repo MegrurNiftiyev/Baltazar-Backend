@@ -20,7 +20,7 @@ export const getHotelsController = catchAsync(async (req: Request, res: Response
 });
 
 export const getHotelByIdController = catchAsync(async (req: Request, res: Response) => {
-  const hotel = await hotelService.getHotelById(req.params.id as string, req.user?.userId, req.region);
+  const hotel = await hotelService.getHotelById(req.params.id as string, req.user?.userId, req.region, req.lang);
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'HOTEL').catch(() => {});
   }
@@ -46,7 +46,7 @@ export const deleteHotelController = catchAsync(async (req: Request, res: Respon
 // ── Rooms ──────────────────────────────────────────────────────────────
 
 export const getRoomsController = catchAsync(async (req: Request, res: Response) => {
-  const rooms = await hotelService.getRooms(req.params.id as string, req.validatedQuery as any);
+  const rooms = await hotelService.getRooms(req.params.id as string, req.validatedQuery as any, req.region);
   res.status(200).json({
     success: true,
     data: localize(rooms, req.lang!),

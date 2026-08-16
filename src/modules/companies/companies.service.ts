@@ -21,7 +21,9 @@ const SERVICE_COLLECTION_MAP: Record<string, string> = {
   HOTEL: COLLECTIONS.HOTELS,
 };
 
-const CARD_MAPPER_MAP: Record<string, (doc: any, lang: SupportedLang) => ExploreCardDTO> = {
+import type { Region } from '../../shared/enums.js';
+
+const CARD_MAPPER_MAP: Record<string, (doc: any, lang: SupportedLang, region?: Region) => ExploreCardDTO> = {
   FOOD: toFoodExploreCard,
   RENT_A_CAR: toCarExploreCard,
   TRAVEL: toTourExploreCard,
@@ -110,7 +112,7 @@ async function resolveChildDeleter(serviceType: string) {
   }
 }
 
-export async function getCompanyRelatedItems(companyId: string, lang: SupportedLang = 'en'): Promise<ExploreCardDTO[]> {
+export async function getCompanyRelatedItems(companyId: string, lang: SupportedLang = 'en', region?: Region): Promise<ExploreCardDTO[]> {
   const doc = await companiesCollection.doc(companyId).get();
   if (!doc.exists) throw new AppError(404, 'NOT_FOUND');
 
@@ -131,7 +133,7 @@ export async function getCompanyRelatedItems(companyId: string, lang: SupportedL
   const cards: ExploreCardDTO[] = [];
   for (const itemDoc of docs) {
     if (itemDoc.exists) {
-      cards.push(cardMapper({ id: itemDoc.id, ...itemDoc.data() }, lang));
+      cards.push(cardMapper({ id: itemDoc.id, ...itemDoc.data() }, lang, region));
     }
   }
 

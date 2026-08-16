@@ -1,7 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import type { SeedContext } from './utils.js';
-import { ORDER_SCREENS } from '../../src/config/orderScreens.js';
+const ORDER_SCREENS: Record<string, string[]> = {
+  RENT_A_CAR: ['PERSONAL_INFO_SCREEN', 'DRIVER_LICENSE_SCREEN', 'PAYMENT_SCREEN', 'CONFIRM_SCREEN'],
+  TRAVEL: ['PERSONAL_INFO_SCREEN', 'PASSPORT_INFO_SCREEN', 'PAYMENT_SCREEN', 'CONFIRM_SCREEN'],
+  FOOD: ['PERSONAL_INFO_SCREEN', 'DELIVERY_ADDRESS_SCREEN', 'PAYMENT_SCREEN', 'CONFIRM_SCREEN'],
+  HOTEL: ['PERSONAL_INFO_SCREEN', 'PAYMENT_SCREEN', 'CONFIRM_SCREEN'],
+};
+import { db } from '../../src/config/firebase.js';
+import { COLLECTIONS } from '../../src/config/collections.js';
+import { applyRatingDelta } from '../../src/modules/reviews/reviews.service.js';
 
 function randomFrom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]!;
@@ -139,17 +147,37 @@ export async function seedOrdersPaymentsReviews(
     }
   }
 
-  // Seed 2 to 3 reviews for each company
+  // Seed 2 to 3 reviews for each company directly
   for (let cIdx = 0; cIdx < uniqueCompanyIds.length; cIdx++) {
     const companyId = uniqueCompanyIds[cIdx]!;
-    const reviewsPerCompany = 2 + (cIdx % 2);
+    const count = 2 + (cIdx % 2);
 
-    for (let rIdx = 0; rIdx < reviewsPerCompany; rIdx++) {
+    for (let rIdx = 0; rIdx < count; rIdx++) {
       const user = usersWithCards[(cIdx + rIdx) % usersWithCards.length]!;
-      await createReviewForOrder(ctx, user, { serviceType: 'COMPANY', id: companyId });
+      const rating = 3 + Math.floor(Math.random() * 3);
+      const comment = randomFrom(reviewCommentsSeed);
+
+      const userSnap = await db.collection(COLLECTIONS.USERS).doc(user.userId).get();
+      const userData = userSnap.exists ? userSnap.data() : {};
+      const userName = userData?.name || 'Anonymous';
+      const avatarUrl = userData?.avatarUrl || null;
+
+      await db.collection(COLLECTIONS.REVIEWS).add({
+        userId: user.userId,
+        userName,
+        avatarUrl,
+        targetType: 'COMPANY',
+        targetId: companyId,
+        rating,
+        comment,
+        createdAt: new Date().toISOString(),
+      });
+
+      await applyRatingDelta('COMPANY', companyId, rating, 1);
+      console.log(`  ⭐ Company Review (${rating}/5) — COMPANY/${companyId}`);
     }
   }
 
-  console.log('\n🎉 Orders/Payments/Reviews seed complete. All items have 2-3 reviews.');
+  console.log('\n🎉 Orders/Payments/Reviews seed complete. All items and companies have 2-3 reviews.');
 }
 

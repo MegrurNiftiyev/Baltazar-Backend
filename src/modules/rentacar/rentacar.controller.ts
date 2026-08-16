@@ -22,7 +22,7 @@ export const getCarsController = catchAsync(async (req: Request, res: Response) 
 });
 
 export const getCarByIdController = catchAsync(async (req: Request, res: Response) => {
-  const car = await rentacarService.getCarById(req.params.id as string, req.user?.userId, req.region);
+  const car = await rentacarService.getCarById(req.params.id as string, req.user?.userId, req.region, req.lang);
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'RENT_A_CAR').catch(() => {});
   }

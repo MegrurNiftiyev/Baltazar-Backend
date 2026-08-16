@@ -34,40 +34,30 @@ export const roomQuerySchema = z
 
 // ── Admin CRUD Schemas ─────────────────────────────────────────────────
 
-export const createHotelSchema = z
-  .object({
-    title: localizedMapSchema.optional(),
-    name: localizedMapSchema.optional(),
-    description: localizedMapSchema.optional(),
-    city: z.string().min(1),
-    address: z.string().optional(),
-    starRating: z.number().int().min(1).max(5),
-    amenities: z.array(z.string()).optional(),
-    images: z.array(z.string().url()).max(10).optional(),
-    sectionsOrder: z.array(z.string()).optional(),
-    serviceType: z.literal('HOTEL').default('HOTEL'),
-    status: companyStatusEnum.default('ACTIVE'),
-  })
+export const hotelBaseSchema = z.object({
+  companyId: z.string().optional(),
+  title: localizedMapSchema.optional(),
+  name: localizedMapSchema.optional(),
+  about: localizedMapSchema.optional(),
+  description: localizedMapSchema.optional(),
+  city: z.string().min(1),
+  address: z.string().optional(),
+  starRating: z.number().int().min(1).max(5),
+  amenities: z.array(z.string()).optional(),
+  images: z.array(z.string().url()).max(10).optional(),
+  logo: z.string().url().optional(),
+  sectionsOrder: z.array(z.string()).optional(),
+  serviceType: z.literal('HOTEL').default('HOTEL'),
+  status: companyStatusEnum.default('ACTIVE'),
+});
+
+export const createHotelSchema = hotelBaseSchema
   .refine((data) => data.title !== undefined || data.name !== undefined, {
     message: 'Either title or name must be provided',
   })
   .openapi('CreateHotelInput');
 
-export const updateHotelSchema = z
-  .object({
-    title: localizedMapSchema.optional(),
-    name: localizedMapSchema.optional(),
-    description: localizedMapSchema.optional(),
-    city: z.string().min(1).optional(),
-    address: z.string().optional(),
-    starRating: z.number().int().min(1).max(5).optional(),
-    amenities: z.array(z.string()).optional(),
-    images: z.array(z.string().url()).max(10).optional(),
-    sectionsOrder: z.array(z.string()).optional(),
-    serviceType: z.literal('HOTEL').optional(),
-    status: companyStatusEnum.optional(),
-  })
-  .openapi('UpdateHotelInput');
+export const updateHotelSchema = hotelBaseSchema.partial().openapi('UpdateHotelInput');
 
 export const createRoomSchema = z
   .object({

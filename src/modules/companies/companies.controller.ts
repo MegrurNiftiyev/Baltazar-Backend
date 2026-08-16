@@ -38,6 +38,6 @@ export const deleteCompanyController = catchAsync(async (req: Request, res: Resp
 });
 
 export const getCompanyRelatedItemsController = catchAsync(async (req: Request, res: Response) => {
-  const data = await companiesService.getCompanyRelatedItems(req.params.id as string, req.lang || 'en');
+  const data = await companiesService.getCompanyRelatedItems(req.params.id as string, req.lang || 'en', req.region);
   res.status(200).json({ success: true, data });
 });

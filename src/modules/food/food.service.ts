@@ -12,7 +12,7 @@ import type { ExploreCardDTO } from '../../shared/dto/explore-card.dto.js';
 import { getLocalizedPriceSuffix } from '../../shared/priceSuffix.js';
 import type { SupportedLang } from '../../config/locales.js';
 
-import { getCurrencyForRegion } from '../../utils/currency.js';
+import { convertPriceFromUsd, getCurrencyForRegion } from '../../utils/currency.js';
 import type { Region } from '../../shared/enums.js';
 
 export function toFoodExploreCard(doc: any, lang: SupportedLang = 'en', region?: Region): ExploreCardDTO {
@@ -25,15 +25,18 @@ export function toFoodExploreCard(doc: any, lang: SupportedLang = 'en', region?:
 
   const countVal = doc.reviewCount ?? doc.rating?.count ?? 0;
 
+  const rawPrice = typeof doc.price === 'number' ? doc.price : 0;
+  const { price, currency } = convertPriceFromUsd(rawPrice, region);
+
   return {
     id: doc.id,
     serviceType: 'FOOD',
     serviceId: doc.id,
     title: doc.name || '',
     image: doc.images?.[0] || doc.image || '',
-    price: typeof doc.price === 'number' ? doc.price : 0,
+    price,
     priceSuffix: getLocalizedPriceSuffix('FOOD', lang),
-    currency: doc.currency || getCurrencyForRegion(region),
+    currency,
     rating: ratingAvg,
     ratingCount: countVal,
     category: doc.category || undefined,
@@ -130,14 +133,17 @@ export async function getFoodItems(filters: FoodItemsQuery, lang: SupportedLang 
   return { ...result, items: filteredItems };
 }
 
-export async function getFoodItemById(id: string, userId?: string, region?: Region) {
+export async function getFoodItemById(id: string, userId?: string, region?: Region, lang: SupportedLang = 'en') {
   const doc = await foodItemsCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
   const { ratingSum, ...data } = doc.data()!;
   const reviewEligibility = await getReviewEligibility(userId, 'FOOD', id);
-  return { id: doc.id, ...data, currency: data.currency || getCurrencyForRegion(region), reviewEligibility };
+  const rawPrice = typeof data.price === 'number' ? data.price : 0;
+  const { price, currency } = convertPriceFromUsd(rawPrice, region);
+  const priceSuffix = getLocalizedPriceSuffix('FOOD', lang);
+  return { id: doc.id, ...data, price, priceSuffix, currency, reviewEligibility };
 }
 
 

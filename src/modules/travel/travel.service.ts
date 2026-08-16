@@ -12,7 +12,7 @@ import type {
 import { paginateQuery } from '../../shared/pagination.js';
 import type { ExploreCardDTO } from '../../shared/dto/explore-card.dto.js';
 import { getLocalizedPriceSuffix } from '../../shared/priceSuffix.js';
-import { getCurrencyForRegion } from '../../utils/currency.js';
+import { convertPriceFromUsd, getCurrencyForRegion } from '../../utils/currency.js';
 import type { Region } from '../../shared/enums.js';
 import type { SupportedLang } from '../../config/locales.js';
 
@@ -28,15 +28,18 @@ export function toTourExploreCard(doc: any, lang: SupportedLang = 'en', region?:
   const countVal = doc.reviewCount ?? doc.rating?.count ?? 0;
   const firstCategory = doc.categories?.[0] || doc.category;
 
+  const rawPrice = typeof doc.price === 'number' ? doc.price : typeof doc.packagePrice === 'number' ? doc.packagePrice : 0;
+  const { price, currency } = convertPriceFromUsd(rawPrice, region);
+
   return {
     id: doc.id,
     serviceType: 'TRAVEL',
     serviceId: doc.id,
     title: doc.title || doc.name || '',
     image: doc.images?.[0] || doc.image || '',
-    price: typeof doc.price === 'number' ? doc.price : typeof doc.packagePrice === 'number' ? doc.packagePrice : 0,
+    price,
     priceSuffix: getLocalizedPriceSuffix('TRAVEL', lang),
-    currency: doc.currency || getCurrencyForRegion(region),
+    currency,
     rating: ratingAvg,
     ratingCount: countVal,
     category: firstCategory || undefined,
@@ -145,14 +148,17 @@ export async function getTours(filters: ToursQuery, lang: SupportedLang = 'en', 
   return { ...result, items: filteredItems };
 }
 
-export async function getTourById(id: string, userId?: string, region?: Region) {
+export async function getTourById(id: string, userId?: string, region?: Region, lang: SupportedLang = 'en') {
   const doc = await toursCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
   const { ratingSum, ...data } = doc.data()!;
   const reviewEligibility = await getReviewEligibility(userId, 'TRAVEL', id);
-  return { id: doc.id, ...data, currency: data.currency || getCurrencyForRegion(region), reviewEligibility };
+  const rawPrice = typeof data.price === 'number' ? data.price : typeof data.packagePrice === 'number' ? data.packagePrice : 0;
+  const { price, currency } = convertPriceFromUsd(rawPrice, region);
+  const priceSuffix = getLocalizedPriceSuffix('TRAVEL', lang);
+  return { id: doc.id, ...data, price, priceSuffix, currency, reviewEligibility };
 }
 
 

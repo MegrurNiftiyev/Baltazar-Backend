@@ -12,7 +12,7 @@ import type { ExploreCardDTO } from '../../shared/dto/explore-card.dto.js';
 import { getLocalizedPriceSuffix } from '../../shared/priceSuffix.js';
 import type { SupportedLang } from '../../config/locales.js';
 
-import { getCurrencyForRegion } from '../../utils/currency.js';
+import { convertPriceFromUsd, getCurrencyForRegion } from '../../utils/currency.js';
 import type { Region } from '../../shared/enums.js';
 
 export function toCarExploreCard(doc: any, lang: SupportedLang = 'en', region?: Region): ExploreCardDTO {
@@ -31,15 +31,18 @@ export function toCarExploreCard(doc: any, lang: SupportedLang = 'en', region?: 
       ? `${doc.brand} ${doc.model}`.trim()
       : doc.name || doc.brand || doc.model || '');
 
+  const rawPrice = typeof doc.price === 'number' ? doc.price : typeof doc.dailyPrice === 'number' ? doc.dailyPrice : 0;
+  const { price, currency } = convertPriceFromUsd(rawPrice, region);
+
   return {
     id: doc.id,
     serviceType: 'RENT_A_CAR',
     serviceId: doc.id,
     title: carTitle,
     image: doc.images?.[0] || doc.image || '',
-    price: typeof doc.price === 'number' ? doc.price : typeof doc.dailyPrice === 'number' ? doc.dailyPrice : 0,
+    price,
     priceSuffix: getLocalizedPriceSuffix('RENT_A_CAR', lang),
-    currency: doc.currency || getCurrencyForRegion(region),
+    currency,
     rating: ratingAvg,
     ratingCount: countVal,
     category: doc.category || undefined,
@@ -148,14 +151,17 @@ export async function getCars(filters: CarsQuery, lang: SupportedLang = 'en', re
 /**
  * Get full car details by ID.
  */
-export async function getCarById(id: string, userId?: string, region?: Region) {
+export async function getCarById(id: string, userId?: string, region?: Region, lang: SupportedLang = 'en') {
   const doc = await carsCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
   }
   const { ratingSum, ...data } = doc.data()!;
   const reviewEligibility = await getReviewEligibility(userId, 'RENT_A_CAR', id);
-  return { id: doc.id, ...data, currency: data.currency || getCurrencyForRegion(region), reviewEligibility };
+  const rawPrice = typeof data.price === 'number' ? data.price : typeof data.dailyPrice === 'number' ? data.dailyPrice : 0;
+  const { price, currency } = convertPriceFromUsd(rawPrice, region);
+  const priceSuffix = getLocalizedPriceSuffix('RENT_A_CAR', lang);
+  return { id: doc.id, ...data, price, priceSuffix, currency, reviewEligibility };
 }
 
 

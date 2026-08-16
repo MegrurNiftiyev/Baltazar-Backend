@@ -22,7 +22,7 @@ export const getFoodItemsController = catchAsync(async (req: Request, res: Respo
 });
 
 export const getFoodItemByIdController = catchAsync(async (req: Request, res: Response) => {
-  const item = await foodService.getFoodItemById(req.params.id as string, req.user?.userId, req.region);
+  const item = await foodService.getFoodItemById(req.params.id as string, req.user?.userId, req.region, req.lang);
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'FOOD').catch(() => {});
   }

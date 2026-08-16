@@ -16,7 +16,7 @@ const collectionMap: Record<string, string> = {
   FOOD: 'foodItems',
 };
 
-import { getCurrencyForRegion } from '../../utils/currency.js';
+import { convertPriceFromUsd } from '../../utils/currency.js';
 import type { Region } from '../../shared/enums.js';
 
 /**
@@ -83,12 +83,15 @@ export async function getWishlist(userId: string, query: { limit?: number; curso
     .map((doc, index) => {
       if (!doc.exists) return null;
       const data = doc.data()!;
+      const rawPrice = typeof data.price === 'number' ? data.price : typeof data.dailyPrice === 'number' ? data.dailyPrice : typeof data.packagePrice === 'number' ? data.packagePrice : 0;
+      const { price, currency } = convertPriceFromUsd(rawPrice, region);
       return {
         wishlistItemId: refMeta[index]!.wishlistItemId,
         serviceType: refMeta[index]!.serviceType,
         serviceId: refMeta[index]!.serviceId,
-        currency: data.currency || getCurrencyForRegion(region),
         ...data,
+        price,
+        currency,
       };
     })
     .filter(Boolean);

@@ -37,7 +37,7 @@ export async function calculateHotelPriceRange(hotelId: string): Promise<{ min: 
   };
 }
 
-import { getCurrencyForRegion } from '../../utils/currency.js';
+import { convertPriceFromUsd, getCurrencyForRegion } from '../../utils/currency.js';
 import type { Region } from '../../shared/enums.js';
 
 export function toHotelExploreCard(doc: any, lang: SupportedLang = 'en', region?: Region): ExploreCardDTO {
@@ -51,12 +51,14 @@ export function toHotelExploreCard(doc: any, lang: SupportedLang = 'en', region?
       : 0;
 
   const countVal = doc.reviewCount ?? doc.rating?.count ?? 0;
-  const minPrice =
+  const minBasePrice =
     typeof doc.priceRange?.min === 'number'
       ? doc.priceRange.min
       : typeof doc.price === 'number'
       ? doc.price
       : 0;
+
+  const { price, currency } = convertPriceFromUsd(minBasePrice, region);
 
   return {
     id: doc.id,
@@ -64,9 +66,9 @@ export function toHotelExploreCard(doc: any, lang: SupportedLang = 'en', region?
     serviceId: doc.id,
     title: doc.title || doc.name || '',
     image: doc.images?.[0] || doc.image || '',
-    price: minPrice,
+    price,
     priceSuffix: getLocalizedPriceSuffix('HOTEL', lang),
-    currency: doc.currency || getCurrencyForRegion(region),
+    currency,
     rating: ratingVal,
     ratingCount: countVal,
     category: doc.city || undefined,
@@ -160,7 +162,7 @@ export async function getHotels(filters: HotelQuery, lang: SupportedLang = 'en',
   return { ...result, items: filteredItems };
 }
 
-export async function getHotelById(id: string, userId?: string, region?: Region) {
+export async function getHotelById(id: string, userId?: string, region?: Region, lang: SupportedLang = 'en') {
   const doc = await hotelsCollection.doc(id).get();
   if (!doc.exists) {
     throw new AppError(404, 'NOT_FOUND');
@@ -172,18 +174,44 @@ export async function getHotelById(id: string, userId?: string, region?: Region)
     priceRange = await calculateHotelPriceRange(id);
   }
 
+  const minConv = convertPriceFromUsd(priceRange?.min ?? 0, region);
+  const maxConv = convertPriceFromUsd(priceRange?.max ?? 0, region);
+  const convertedPriceRange = { min: minConv.price, max: maxConv.price };
+  const currency = minConv.currency;
+
   const reviewEligibility = await getReviewEligibility(userId, 'HOTEL', id);
-  return { id: doc.id, ...data, currency: data.currency || getCurrencyForRegion(region), priceRange, reviewEligibility };
+  const priceSuffix = getLocalizedPriceSuffix('HOTEL', lang);
+
+  return {
+    id: doc.id,
+    ...data,
+    name: data.name || data.title,
+    title: data.title || data.name,
+    about: data.about || data.description,
+    description: data.description || data.about,
+    amenities: data.amenities || [],
+    currency,
+    priceRange: convertedPriceRange,
+    minPrice: convertedPriceRange.min,
+    maxPrice: convertedPriceRange.max,
+    priceSuffix,
+    reviewEligibility,
+  };
 }
 
 
 export async function createHotel(input: CreateHotelInput) {
   const title = input.title || input.name;
   const name = input.name || input.title;
+  const about = input.about || input.description;
+  const description = input.description || input.about;
   const hotelData = {
     ...input,
     title,
     name,
+    about,
+    description,
+    amenities: input.amenities || [],
     serviceType: 'HOTEL',
     rating: 5,
     reviewCount: 0,
@@ -215,7 +243,7 @@ export async function deleteHotel(id: string) {
 
 // ── Rooms ──────────────────────────────────────────────────────────────
 
-export async function getRooms(hotelId: string, filters: RoomQuery) {
+export async function getRooms(hotelId: string, filters: RoomQuery, region?: Region) {
   let query: FirebaseFirestore.Query = roomsCollection.where('hotelId', '==', hotelId);
 
   if (filters.roomType) {
@@ -223,7 +251,12 @@ export async function getRooms(hotelId: string, filters: RoomQuery) {
   }
 
   const snapshot = await query.get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map((doc) => {
+    const data = doc.data();
+    const rawPrice = typeof data.price === 'number' ? data.price : 0;
+    const { price, currency } = convertPriceFromUsd(rawPrice, region);
+    return { id: doc.id, ...data, price, currency };
+  });
 }
 
 export async function createRoom(input: CreateRoomInput) {

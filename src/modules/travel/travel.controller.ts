@@ -22,7 +22,7 @@ export const getToursController = catchAsync(async (req: Request, res: Response)
 });
 
 export const getTourByIdController = catchAsync(async (req: Request, res: Response) => {
-  const tour = await travelService.getTourById(req.params.id as string, req.user?.userId, req.region);
+  const tour = await travelService.getTourById(req.params.id as string, req.user?.userId, req.region, req.lang);
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'TRAVEL').catch(() => {});
   }
