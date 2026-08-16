@@ -161,7 +161,28 @@ export async function getCarById(id: string, userId?: string, region?: Region, l
   const rawPrice = typeof data.price === 'number' ? data.price : typeof data.dailyPrice === 'number' ? data.dailyPrice : 0;
   const { price, currency } = convertPriceFromUsd(rawPrice, region);
   const priceSuffix = getLocalizedPriceSuffix('RENT_A_CAR', lang);
-  return { id: doc.id, ...data, price, priceSuffix, currency, reviewEligibility };
+
+  let companyName = data.companyName || '';
+  let companyProfilePhoto = data.companyProfilePhoto || data.companyLogo || '';
+  if (data.companyId && (!companyName || !companyProfilePhoto)) {
+    const compDoc = await db.collection(COLLECTIONS.COMPANIES).doc(data.companyId).get();
+    if (compDoc.exists) {
+      const compData = compDoc.data()!;
+      if (!companyName) companyName = compData.name || '';
+      if (!companyProfilePhoto) companyProfilePhoto = compData.profileImage || compData.logo || '';
+    }
+  }
+
+  return {
+    id: doc.id,
+    ...data,
+    companyName,
+    companyProfilePhoto,
+    price,
+    priceSuffix,
+    currency,
+    reviewEligibility,
+  };
 }
 
 

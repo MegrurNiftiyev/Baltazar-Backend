@@ -136,14 +136,14 @@ const messages: Record<string, LocalizedMap> = {
     ru: 'Слишком много запросов. Попробуйте позже',
   },
   HAS_ACTIVE_BOOKINGS: {
-    az: 'Bu xidmete aktiv sifarisler baglidir, siline bilmez',
+    az: 'Bu xidmətə aktiv sifarişlər bağlıdır, silinə bilməz',
     en: 'This item has active bookings and cannot be deleted',
-    ru: 'U etogo obekta est aktivnye bronirovaniya, udalenie nevozmozhno',
+    ru: 'У этого объекта есть активные бронирования, удаление невозможно',
   },
   PAYMENT_IN_PROGRESS: {
-    az: 'Bu sifaris ucun odenis artiq icra olunur',
+    az: 'Bu sifariş üçün ödəniş artıq icra olunur',
     en: 'Payment is already in progress for this order',
-    ru: 'Platezh po etomu zakazu uzhe obrabatyvaetsya',
+    ru: 'Платёж по этому заказу уже обрабатывается',
   },
   IMAGE_NOT_FOUND: {
     az: 'İstinad edilən şəkil tapılmadı, vaxtı bitib və ya sizə aid deyil',

@@ -35,7 +35,6 @@ export const roomQuerySchema = z
 // ── Admin CRUD Schemas ─────────────────────────────────────────────────
 
 export const hotelBaseSchema = z.object({
-  companyId: z.string().optional(),
   title: localizedMapSchema.optional(),
   name: localizedMapSchema.optional(),
   about: localizedMapSchema.optional(),

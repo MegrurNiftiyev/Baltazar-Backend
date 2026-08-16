@@ -143,7 +143,28 @@ export async function getFoodItemById(id: string, userId?: string, region?: Regi
   const rawPrice = typeof data.price === 'number' ? data.price : 0;
   const { price, currency } = convertPriceFromUsd(rawPrice, region);
   const priceSuffix = getLocalizedPriceSuffix('FOOD', lang);
-  return { id: doc.id, ...data, price, priceSuffix, currency, reviewEligibility };
+
+  let companyName = data.companyName || '';
+  let companyProfilePhoto = data.companyProfilePhoto || data.companyLogo || '';
+  if (data.companyId && (!companyName || !companyProfilePhoto)) {
+    const compDoc = await db.collection(COLLECTIONS.COMPANIES).doc(data.companyId).get();
+    if (compDoc.exists) {
+      const compData = compDoc.data()!;
+      if (!companyName) companyName = compData.name || '';
+      if (!companyProfilePhoto) companyProfilePhoto = compData.profileImage || compData.logo || '';
+    }
+  }
+
+  return {
+    id: doc.id,
+    ...data,
+    companyName,
+    companyProfilePhoto,
+    price,
+    priceSuffix,
+    currency,
+    reviewEligibility,
+  };
 }
 
 

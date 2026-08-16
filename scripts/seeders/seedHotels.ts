@@ -23,38 +23,11 @@ export async function seedHotels(ctx: SeedContext) {
     const img1 = await ctx.uploadImageFile(hotelImages[(i + 1) % hotelImages.length]!, 'hotels');
     const img2 = await ctx.uploadImageFile(hotelImages[(i + 2) % hotelImages.length]!, 'hotels');
 
-    // 1. Create Hotel Company in COMPANIES collection
-    const compRes = await fetch(`${ctx.baseUrl}/api/companies`, {
-      method: 'POST',
-      headers: { ...ctx.headers, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: hotel.name,
-        about: hotel.about,
-        serviceType: 'HOTEL',
-        logo: logoUrl,
-        profileImage: logoUrl,
-        bannerImage: img1,
-        images: [img1, img2],
-        address: hotel.address,
-        status: 'ACTIVE',
-        sectionOrder: ['ABOUT', 'GALLERY', 'ITEMS'],
-      }),
-    });
-    const compResult = await compRes.json();
-    let companyId: string | undefined = undefined;
-    if (compRes.ok) {
-      companyId = compResult.data.id;
-      console.log(`✨ Created Hotel Company: ${hotel.name.en} (${companyId})`);
-    } else {
-      console.error('❌ Hotel company error:', compResult);
-    }
-
-    // 2. Create Hotel Item in HOTELS collection
+    // Create Hotel Item in HOTELS collection
     const hotelRes = await fetch(`${ctx.baseUrl}/api/services/hotel`, {
       method: 'POST',
       headers: { ...ctx.headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        companyId,
         name: hotel.name,
         about: hotel.about,
         description: hotel.about,
@@ -75,17 +48,7 @@ export async function seedHotels(ctx: SeedContext) {
     const hotelId = hotelResult.data.id;
     console.log(`  🏨 Created Hotel: ${hotel.name.en} (${hotelId})`);
 
-    // 3. Attach hotelId as relatedItemIds to the Hotel Company
-    if (companyId) {
-      await fetch(`${ctx.baseUrl}/api/companies/${companyId}`, {
-        method: 'PUT',
-        headers: { ...ctx.headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ relatedItemIds: [hotelId] }),
-      });
-      console.log(`  🔗 Attached relatedItemId ${hotelId} to Hotel Company ${companyId}`);
-    }
-
-    createdServices.push({ serviceType: 'HOTEL', id: hotelId, companyId });
+    createdServices.push({ serviceType: 'HOTEL', id: hotelId });
 
     // Add Rooms with single room image uploaded from testimages/hotlerooms/
     for (let r = 0; r < hotel.rooms.length; r++) {
