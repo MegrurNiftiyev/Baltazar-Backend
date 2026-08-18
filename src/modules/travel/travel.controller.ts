@@ -1,18 +1,18 @@
 import type { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsync.js';
 import { localize } from '../../utils/localize.js';
+import { attachIsLiked, attachIsLikedToItem } from '../../utils/wishlist.js';
 import * as travelService from './travel.service.js';
 import { incrementUserInterest } from '../home/home.service.js';
-
-
 
 // ── Tours ──────────────────────────────────────────────────────────────
 
 export const getToursController = catchAsync(async (req: Request, res: Response) => {
   const result = await travelService.getTours(req.validatedQuery as any, req.lang, req.region);
+  const itemsWithLiked = attachIsLiked(result.items, req.user?.wishlist, 'TRAVEL');
   res.status(200).json({
     success: true,
-    data: localize(result.items, req.lang!),
+    data: localize(itemsWithLiked, req.lang!),
     pagination: {
       nextCursor: result.nextCursor,
       hasMore: result.hasMore,
@@ -26,7 +26,8 @@ export const getTourByIdController = catchAsync(async (req: Request, res: Respon
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'TRAVEL').catch(() => {});
   }
-  res.status(200).json({ success: true, data: localize(tour, req.lang!) });
+  const tourWithLiked = attachIsLikedToItem(tour, req.user?.wishlist, 'TRAVEL');
+  res.status(200).json({ success: true, data: localize(tourWithLiked, req.lang!) });
 });
 
 

@@ -1,3 +1,4 @@
+import { FieldValue } from 'firebase-admin/firestore';
 import { db } from '../../config/firebase.js';
 import { AppError } from '../../errors/AppError.js';
 import type { AddToWishlistInput } from './wishlist.schema.js';
@@ -92,6 +93,7 @@ export async function getWishlist(userId: string, query: { limit?: number; curso
         ...data,
         price,
         currency,
+        isLiked: true,
       };
     })
     .filter(Boolean);
@@ -132,6 +134,16 @@ export async function addToWishlist(userId: string, input: AddToWishlistInput) {
     createdAt: new Date().toISOString(),
   });
 
+  await usersCollection.doc(userId).set(
+    {
+      wishlist: FieldValue.arrayUnion({
+        serviceId: input.serviceId,
+        serviceType: input.serviceType,
+      }),
+    },
+    { merge: true }
+  );
+
   return {
     wishlistItemId: `${input.serviceType}_${input.serviceId}`,
     serviceId: input.serviceId,
@@ -148,28 +160,48 @@ export async function removeFromWishlist(userId: string, itemId: string) {
   const fullDocId = `${userId}_${itemId}`;
   const directDoc = await wishlistCollection.doc(fullDocId).get();
 
+  let targetServiceType: string | undefined;
+  let targetServiceId: string | undefined;
+
   if (directDoc.exists) {
+    targetServiceType = directDoc.data()?.serviceType;
+    targetServiceId = directDoc.data()?.serviceId;
     await wishlistCollection.doc(fullDocId).delete();
-    return { itemId, removed: true };
-  }
-
-  const exactDoc = await wishlistCollection.doc(itemId).get();
-  if (exactDoc.exists && exactDoc.data()?.userId === userId) {
-    await wishlistCollection.doc(itemId).delete();
-    return { itemId, removed: true };
-  }
-
-  // Parse itemId if format is serviceType_serviceId
-  const parts = itemId.split('_');
-  if (parts.length >= 2) {
-    const serviceType = parts[0];
-    const serviceId = parts.slice(1).join('_');
-    const constructedId = `${userId}_${serviceType}_${serviceId}`;
-    const snap = await wishlistCollection.doc(constructedId).get();
-    if (snap.exists) {
-      await wishlistCollection.doc(constructedId).delete();
-      return { itemId, removed: true };
+  } else {
+    const exactDoc = await wishlistCollection.doc(itemId).get();
+    if (exactDoc.exists && exactDoc.data()?.userId === userId) {
+      targetServiceType = exactDoc.data()?.serviceType;
+      targetServiceId = exactDoc.data()?.serviceId;
+      await wishlistCollection.doc(itemId).delete();
+    } else {
+      const parts = itemId.split('_');
+      if (parts.length >= 2) {
+        const serviceType = parts[0]!;
+        const serviceId = parts.slice(1).join('_');
+        const constructedId = `${userId}_${serviceType}_${serviceId}`;
+        const snap = await wishlistCollection.doc(constructedId).get();
+        if (snap.exists) {
+          targetServiceType = snap.data()?.serviceType || serviceType;
+          targetServiceId = snap.data()?.serviceId || serviceId;
+          await wishlistCollection.doc(constructedId).delete();
+        } else {
+          targetServiceType = serviceType;
+          targetServiceId = serviceId;
+        }
+      }
     }
+  }
+
+  if (targetServiceType && targetServiceId) {
+    await usersCollection.doc(userId).set(
+      {
+        wishlist: FieldValue.arrayRemove({
+          serviceId: targetServiceId,
+          serviceType: targetServiceType,
+        }),
+      },
+      { merge: true }
+    );
   }
 
   return { itemId, removed: true };

@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsync.js';
 import { localize } from '../../utils/localize.js';
+import { attachIsLikedToCards } from '../../utils/wishlist.js';
 import * as companiesService from './companies.service.js';
 
 export const getCompaniesController = catchAsync(async (req: Request, res: Response) => {
@@ -39,5 +40,6 @@ export const deleteCompanyController = catchAsync(async (req: Request, res: Resp
 
 export const getCompanyRelatedItemsController = catchAsync(async (req: Request, res: Response) => {
   const data = await companiesService.getCompanyRelatedItems(req.params.id as string, req.lang || 'en', req.region);
-  res.status(200).json({ success: true, data });
+  const withLiked = attachIsLikedToCards(data, req.user?.wishlist);
+  res.status(200).json({ success: true, data: withLiked });
 });

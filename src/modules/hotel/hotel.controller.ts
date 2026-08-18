@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsync.js';
 import { localize } from '../../utils/localize.js';
+import { attachIsLiked, attachIsLikedToItem } from '../../utils/wishlist.js';
 import * as hotelService from './hotel.service.js';
 import { incrementUserInterest } from '../home/home.service.js';
 
@@ -8,9 +9,10 @@ import { incrementUserInterest } from '../home/home.service.js';
 
 export const getHotelsController = catchAsync(async (req: Request, res: Response) => {
   const result = await hotelService.getHotels(req.validatedQuery as any, req.lang, req.region);
+  const itemsWithLiked = attachIsLiked(result.items, req.user?.wishlist, 'HOTEL');
   res.status(200).json({
     success: true,
-    data: localize(result.items, req.lang!),
+    data: localize(itemsWithLiked, req.lang!),
     pagination: {
       nextCursor: result.nextCursor,
       hasMore: result.hasMore,
@@ -24,7 +26,8 @@ export const getHotelByIdController = catchAsync(async (req: Request, res: Respo
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'HOTEL').catch(() => {});
   }
-  res.status(200).json({ success: true, data: localize(hotel, req.lang!) });
+  const hotelWithLiked = attachIsLikedToItem(hotel, req.user?.wishlist, 'HOTEL');
+  res.status(200).json({ success: true, data: localize(hotelWithLiked, req.lang!) });
 });
 
 

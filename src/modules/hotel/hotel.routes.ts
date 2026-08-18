@@ -63,7 +63,7 @@ const router = Router();
  *     responses:
  *       200: { description: List of hotels }
  */
-router.get('/', validate({ query: hotelQuerySchema }), getHotelsController);
+router.get('/', optionalAuth, validate({ query: hotelQuerySchema }), getHotelsController);
 
 /**
  * @swagger

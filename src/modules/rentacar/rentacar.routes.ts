@@ -64,7 +64,7 @@ const router = Router();
  *     responses:
  *       200: { description: List of cars (DTO — id, brand, model, price, image, rating) }
  */
-router.get('/cars', validate({ query: carsQuerySchema }), getCarsController);
+router.get('/cars', optionalAuth, validate({ query: carsQuerySchema }), getCarsController);
 
 /**
  * @swagger

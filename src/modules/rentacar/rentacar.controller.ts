@@ -1,18 +1,18 @@
 import type { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsync.js';
 import { localize } from '../../utils/localize.js';
+import { attachIsLiked, attachIsLikedToItem } from '../../utils/wishlist.js';
 import * as rentacarService from './rentacar.service.js';
 import { incrementUserInterest } from '../home/home.service.js';
-
-
 
 // ── Cars ───────────────────────────────────────────────────────────────
 
 export const getCarsController = catchAsync(async (req: Request, res: Response) => {
   const result = await rentacarService.getCars(req.validatedQuery as any, req.lang, req.region);
+  const itemsWithLiked = attachIsLiked(result.items, req.user?.wishlist, 'RENT_A_CAR');
   res.status(200).json({
     success: true,
-    data: localize(result.items, req.lang!),
+    data: localize(itemsWithLiked, req.lang!),
     pagination: {
       nextCursor: result.nextCursor,
       hasMore: result.hasMore,
@@ -26,7 +26,8 @@ export const getCarByIdController = catchAsync(async (req: Request, res: Respons
   if (req.user) {
     void incrementUserInterest(req.user.userId, 'RENT_A_CAR').catch(() => {});
   }
-  res.status(200).json({ success: true, data: localize(car, req.lang!) });
+  const carWithLiked = attachIsLikedToItem(car, req.user?.wishlist, 'RENT_A_CAR');
+  res.status(200).json({ success: true, data: localize(carWithLiked, req.lang!) });
 });
 
 

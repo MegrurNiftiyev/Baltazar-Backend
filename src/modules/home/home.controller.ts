@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { catchAsync } from '../../utils/catchAsync.js';
 import { localize } from '../../utils/localize.js';
+import { attachIsLikedToExploreSections } from '../../utils/wishlist.js';
 import * as homeService from './home.service.js';
 
 export const getBannerController = catchAsync(async (req: Request, res: Response) => {
@@ -25,5 +26,6 @@ export const deleteBannerController = catchAsync(async (req: Request, res: Respo
 
 export const getExploreController = catchAsync(async (req: Request, res: Response) => {
   const explore = await homeService.getExplore(req.user?.userId, req.lang, req.region);
-  res.status(200).json({ success: true, data: localize(explore, req.lang!) });
+  const withLiked = attachIsLikedToExploreSections(explore, req.user?.wishlist);
+  res.status(200).json({ success: true, data: localize(withLiked, req.lang!) });
 });

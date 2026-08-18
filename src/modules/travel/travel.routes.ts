@@ -67,7 +67,7 @@ const includedServicesRouter = Router();
  *     responses:
  *       200: { description: List of tours }
  */
-router.get('/tours', validate({ query: toursQuerySchema }), getToursController);
+router.get('/tours', optionalAuth, validate({ query: toursQuerySchema }), getToursController);
 
 /**
  * @swagger

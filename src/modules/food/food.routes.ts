@@ -55,7 +55,7 @@ const router = Router();
  *     responses:
  *       200: { description: List of food items }
  */
-router.get('/items', validate({ query: foodItemsQuerySchema }), getFoodItemsController);
+router.get('/items', optionalAuth, validate({ query: foodItemsQuerySchema }), getFoodItemsController);
 
 /**
  * @swagger

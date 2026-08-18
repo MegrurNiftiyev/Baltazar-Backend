@@ -9,6 +9,7 @@ declare global {
         userId: string;
         role: 'USER' | 'ADMIN';
         language: SupportedLang;
+        wishlist?: Array<{ serviceId: string; serviceType: string }>;
       };
       /** Populated by resolveLocale middleware. */
       lang?: SupportedLang;
