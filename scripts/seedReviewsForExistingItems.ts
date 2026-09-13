@@ -219,8 +219,10 @@ async function main() {
           const comment = randomFrom(commentsPool);
           const createdAt = new Date(Date.now() - Math.floor(Math.random() * 10 * 86400000)).toISOString();
 
+          const authorUserId = (author as any).id || `user-mock-${authorIdx}`;
+
           await db.collection(COLLECTIONS.REVIEWS).add({
-            userId: (author as any).id || `user-mock-${authorIdx}`,
+            userId: authorUserId,
             userName: author.name,
             avatarUrl: author.avatarUrl,
             targetType: domain.targetType,
@@ -228,6 +230,47 @@ async function main() {
             rating,
             comment,
             createdAt,
+          });
+
+          // Also seed a CONFIRMED order for this user so getOrders and canReview eligibility succeed
+          const itemData = itemDoc.data();
+          const itemTitle = typeof itemData.name === 'object' ? (itemData.name.en || itemData.name.az || 'Seeded Item') : (itemData.name || itemData.title?.en || itemData.title || 'Seeded Item');
+          const itemImage = itemData.image || itemData.logo || itemData.profileImage || itemData.bannerImage || '';
+          const itemPrice = typeof itemData.price === 'number' ? itemData.price : typeof itemData.dailyPrice === 'number' ? itemData.dailyPrice : 50;
+
+          await db.collection(COLLECTIONS.ORDERS).add({
+            userId: authorUserId,
+            serviceType: domain.targetType === 'COMPANY' ? 'FOOD' : domain.targetType,
+            serviceId: itemId,
+            subItemId: null,
+            status: 'CONFIRMED',
+            isPersonalInfoRequired: true,
+            isDriverLicenseRequired: domain.targetType === 'RENT_A_CAR',
+            isPassportRequired: domain.targetType === 'TRAVEL',
+            isDeliveryAddressRequired: domain.targetType === 'FOOD',
+            personalInfo: {
+              name: author.name,
+              phone: '+994501234567',
+              dateOfBirth: '1995-01-01',
+              address: 'Baku, Azerbaijan',
+              idNumber: 'AZE12345678',
+            },
+            driverLicense: domain.targetType === 'RENT_A_CAR' ? { licenseNumber: 'DL123456', expiryDate: '2030-01-01' } : null,
+            passport: domain.targetType === 'TRAVEL' ? { passportNumber: 'P1234567', expiryDate: '2030-01-01' } : null,
+            deliveryAddress: domain.targetType === 'FOOD' ? { lat: 40.4092, lng: 49.8671, addressName: 'Nizami str. 42' } : null,
+            paymentMethodId: 'pm_seeded_card',
+            serviceItemSnapshot: {
+              title: itemTitle,
+              image: itemImage,
+              price: itemPrice,
+              priceSuffix: 'AZN',
+              currency: 'AZN',
+            },
+            totalPrice: itemPrice,
+            createdAt,
+            expiresAt: new Date(Date.now() + 86400000).toISOString(),
+            paidAt: createdAt,
+            updatedAt: createdAt,
           });
 
           ratings.push(rating);

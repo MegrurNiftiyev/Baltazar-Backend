@@ -1,7 +1,6 @@
 import { db } from '../../config/firebase.js';
 import { AppError } from '../../errors/AppError.js';
 import { COLLECTIONS } from '../../config/collections.js';
-import { paginateQuery } from '../../shared/pagination.js';
 import type { SupportedLang } from '../../config/locales.js';
 import type { 
   CreateOrderInput, 
@@ -310,14 +309,56 @@ export async function getOrders(userId: string, role?: string, filters?: OrderQu
     if (filters?.serviceType) query = query.where('serviceType', '==', filters.serviceType);
   } else {
     query = query.where('userId', '==', userId);
+    if (filters?.status) query = query.where('status', '==', filters.status);
+    if (filters?.serviceType) query = query.where('serviceType', '==', filters.serviceType);
   }
 
-  return paginateQuery(
-    ordersCollection,
-    query.orderBy('createdAt', 'desc'),
-    filters || { limit: 20 },
-    (doc) => ({ id: doc.id, ...doc.data() })
-  );
+  let snapshot: FirebaseFirestore.QuerySnapshot;
+  try {
+    snapshot = await query.orderBy('createdAt', 'desc').get();
+  } catch (err: any) {
+    if (err.code === 9 || (err.message && err.message.toLowerCase().includes('index'))) {
+      snapshot = await query.get();
+    } else {
+      throw err;
+    }
+  }
+
+  let docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  docs.sort((a: any, b: any) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+  const limit = filters?.limit ? Number(filters.limit) : 20;
+  let startIndex = 0;
+  if (filters?.cursor) {
+    const foundIdx = docs.findIndex((d: any) => d.id === filters.cursor);
+    if (foundIdx !== -1) {
+      startIndex = foundIdx + 1;
+    }
+  }
+
+  const pageDocs = docs.slice(startIndex, startIndex + limit);
+  const items = pageDocs.map((doc: any) => ({
+    id: doc.id,
+    userId: doc.userId,
+    serviceType: doc.serviceType,
+    serviceId: doc.serviceId,
+    subItemId: doc.subItemId || null,
+    status: doc.status,
+    serviceItemSnapshot: doc.serviceItemSnapshot,
+    totalPrice: doc.totalPrice,
+    createdAt: doc.createdAt,
+    expiresAt: doc.expiresAt,
+    paidAt: doc.paidAt || null,
+  }));
+
+  const hasMore = startIndex + limit < docs.length;
+  const nextCursor = hasMore && items.length > 0 ? items[items.length - 1]!.id : null;
+
+  return {
+    items,
+    nextCursor,
+    hasMore,
+  };
 }
 
 export async function getPaymentSummary(orderId: string, userId: string) {

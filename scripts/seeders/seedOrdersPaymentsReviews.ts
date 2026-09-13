@@ -64,19 +64,19 @@ export async function seedOrdersPaymentsReviews(
     }
     const orderId = orderJson.data.id;
 
-    // 2. Submit every screen in order, stop when 'DONE' comes back
-    const screens = ORDER_SCREENS[service.serviceType as keyof typeof ORDER_SCREENS];
-    for (const screen of screens) {
-      const stepRes = await fetch(`${ctx.baseUrl}/api/orders/${orderId}/step`, {
-        method: 'PUT', headers,
-        body: JSON.stringify({ screen, data: mockDataForScreen(screen) }),
+    // 2. Set payment method
+    await fetch(`${ctx.baseUrl}/api/orders/${orderId}/payment-method`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({ paymentMethodId: user.paymentMethodId }),
+    });
+
+    if (service.serviceType === 'FOOD') {
+      await fetch(`${ctx.baseUrl}/api/orders/${orderId}/delivery-address`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ lat: 40.4092617, lng: 49.8670924, addressName: 'Nizami str. 42, Baku' }),
       });
-      const stepJson = await stepRes.json();
-      if (!stepRes.ok) {
-        console.error(`  ❌ Step ${screen} failed (order ${orderId}):`, stepJson);
-        return null;
-      }
-      if (stepJson.data?.nextStep === 'DONE' || stepJson.data === 'DONE') break;
     }
 
     // 3. Pay
