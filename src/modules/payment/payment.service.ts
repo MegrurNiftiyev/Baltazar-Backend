@@ -29,32 +29,63 @@ async function gatewayRequest(path: string, body: Record<string, unknown>) {
 }
 
 export async function getAllCards(userId: string) {
-  const snapshot = await paymentMethodsCollection
-    .where('userId', '==', userId)
-    .orderBy('createdAt', 'desc')
-    .get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  let snapshot: FirebaseFirestore.QuerySnapshot;
+  try {
+    snapshot = await paymentMethodsCollection
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .get();
+  } catch (err: any) {
+    if (err.code === 9 || (err.message && err.message.toLowerCase().includes('index'))) {
+      snapshot = await paymentMethodsCollection
+        .where('userId', '==', userId)
+        .get();
+    } else {
+      throw err;
+    }
+  }
+
+  const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  docs.sort((a: any, b: any) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  return docs;
 }
 
 export async function addCard(userId: string, input: AddCardInput) {
-  const docRef = await paymentMethodsCollection.add({
+  // Check if card already exists for this user to avoid duplicate entries in Firestore
+  let existingDoc: FirebaseFirestore.QueryDocumentSnapshot | undefined;
+  try {
+    const existingSnapshot = await paymentMethodsCollection
+      .where('userId', '==', userId)
+      .get();
+    existingDoc = existingSnapshot.docs.find(
+      (doc) => doc.data().paymentMethodId === input.paymentMethodId
+    );
+  } catch (_err) {
+    // Proceed if query fails
+  }
+
+  if (existingDoc) {
+    return { id: existingDoc.id, ...existingDoc.data() };
+  }
+
+  const createdAt = new Date().toISOString();
+  const cardData = {
     userId,
     paymentMethodId: input.paymentMethodId,
     brand: input.brand,
     last4: input.last4,
     expiryMonth: input.expiryMonth,
     expiryYear: input.expiryYear,
-    createdAt: new Date().toISOString(),
-  });
+    createdAt,
+  };
+
+  const docRef = await paymentMethodsCollection.add(cardData);
 
   return {
     id: docRef.id,
-    paymentMethodId: input.paymentMethodId,
-    brand: input.brand,
-    last4: input.last4,
+    ...cardData,
   };
 }
-
 
 export async function processPayment(userId: string, orderId: string, input: PayInput) {
   await db.runTransaction(async (tx) => {
@@ -81,11 +112,29 @@ export async function processPayment(userId: string, orderId: string, input: Pay
   let chargeResponse: { chargeId?: string; transactionId?: string; status: string };
   let amount: number;
   try {
-    const methodSnapshot = await paymentMethodsCollection
-      .where('userId', '==', userId)
-      .where('paymentMethodId', '==', input.paymentMethodId)
-      .limit(1)
-      .get();
+    let methodSnapshot: FirebaseFirestore.QuerySnapshot;
+    try {
+      methodSnapshot = await paymentMethodsCollection
+        .where('userId', '==', userId)
+        .where('paymentMethodId', '==', input.paymentMethodId)
+        .limit(1)
+        .get();
+    } catch (err: any) {
+      if (err.code === 9 || (err.message && err.message.toLowerCase().includes('index'))) {
+        const userMethodsSnapshot = await paymentMethodsCollection
+          .where('userId', '==', userId)
+          .get();
+        const matchingDocs = userMethodsSnapshot.docs.filter(
+          (doc) => doc.data().paymentMethodId === input.paymentMethodId
+        );
+        methodSnapshot = {
+          empty: matchingDocs.length === 0,
+          docs: matchingDocs,
+        } as any;
+      } else {
+        throw err;
+      }
+    }
 
     if (methodSnapshot.empty) throw new AppError(404, 'NOT_FOUND', 'Payment method not found or not owned by user');
 
