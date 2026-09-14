@@ -29,7 +29,7 @@ export const globalLimiter = rateLimit({
 
 export const paymentLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 5,
+  max: 30,
   skip: skipInDev,
   standardHeaders: true,
   legacyHeaders: false,
